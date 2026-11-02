@@ -1,6 +1,6 @@
 import AppKit
 
-final class NoteBlockLayoutFragment: NSTextLayoutFragment {
+final class NoteBlockLayoutFragment: NoteTextLayoutFragment {
     let decoration: NoteBlockDecoration
 
     private static let orderedLabelPadding: CGFloat = 4
@@ -28,6 +28,9 @@ final class NoteBlockLayoutFragment: NSTextLayoutFragment {
     }
 
     override func draw(at point: CGPoint, in context: CGContext) {
+        context.saveGState()
+        defer { context.restoreGState() }
+        context.setShouldSmoothFonts(false)
         let left = point.x - layoutFragmentFrame.minX
         if case .code(let row, let language) = decoration.shape {
             drawBand(row: row, language: language, left: left, top: point.y, in: context)

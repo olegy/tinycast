@@ -14,22 +14,23 @@ enum NoteMarkdownStyler {
     }
 
     /// The literal editor's attributes, and the base every rendered line starts from.
-    static let literal: Attributes = [
-        .font: NoteMarkdownTypography.body,
-        .foregroundColor: NSColor(Theme.Colors.noteText)
-    ]
+    static var literal: Attributes {
+        [.font: NoteMarkdownTypography.body, .foregroundColor: noteText]
+    }
+
+    private static let noteText = NSColor(Theme.Colors.noteText)
 
     private static let hidden: Attributes = [
         .font: NoteMarkdownTypography.hidden,
         .foregroundColor: NSColor.clear
     ]
-    private static let hiddenEmptyListMarker: Attributes = [
-        .font: NoteMarkdownTypography.body,
-        .foregroundColor: NSColor.clear
-    ]
+    private static var hiddenEmptyListMarker: Attributes {
+        [.font: NoteMarkdownTypography.body, .foregroundColor: NSColor.clear]
+    }
 
-    private static let listSlot = NoteCheckboxGeometry.slot(
-        bodyPointSize: NoteMarkdownTypography.body.pointSize)
+    private static var listSlot: CGFloat {
+        NoteCheckboxGeometry.slot(bodyPointSize: NoteMarkdownTypography.body.pointSize)
+    }
     private static let quoteStep = Theme.Size.markdownQuoteBar + Theme.Spacing.lg
     private static let codeInset = Theme.Spacing.lg
     /// Space after each list item, kept when revealed so moving the caret never shifts the rows.

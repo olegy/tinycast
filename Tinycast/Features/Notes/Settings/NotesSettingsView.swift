@@ -26,6 +26,18 @@ struct NotesSettingsView: View {
                     SettingsRowTitle(.notesOptions, "Show Formatting Bar")
                 }
                 .settingsEnabled(settings.notesEnabled && settings.notesRendersMarkdown)
+                Toggle(isOn: $settings.notesShowsCharacterCount) {
+                    SettingsRowTitle(.notesOptions, "Show Character Count")
+                }
+                .settingsEnabled(settings.notesEnabled)
+                LabeledContent {
+                    Slider(value: textSizeStep, in: 0...Double(NoteTextSize.allCases.count - 1), step: 1)
+                        .frame(width: Self.textSizeSliderWidth)
+                        .accessibilityValue(Text(verbatim: "\(Int(settings.notesTextSize.pointSize)) pt"))
+                } label: {
+                    SettingsRowTitle(.notesOptions, "Text Size")
+                }
+                .settingsEnabled(settings.notesEnabled)
                 LabeledContent {
                     if settings.notesFolder != nil {
                         Button(
@@ -46,5 +58,15 @@ struct NotesSettingsView: View {
         }
         .formStyle(.grouped)
         .settingsScrollTarget(.notes)
+    }
+
+    private static let textSizeSliderWidth: CGFloat = 200
+
+    /// The slider moves by whole steps, one per `NoteTextSize` case.
+    private var textSizeStep: Binding<Double> {
+        let sizes = NoteTextSize.allCases
+        return Binding(
+            get: { Double(sizes.firstIndex(of: settings.notesTextSize) ?? 0) },
+            set: { settings.notesTextSize = sizes[min(max(Int($0.rounded()), 0), sizes.count - 1)] })
     }
 }

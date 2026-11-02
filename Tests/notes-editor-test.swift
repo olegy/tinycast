@@ -20,6 +20,7 @@ struct NotesEditorTests {
         testCharacterCountReports()
         testRenderingKeepsSourceAndUndo()
         testHiddenMarkersAndReveal()
+        testTextSize()
         testRestyleFollowsEdits()
         testRenderingOffIsLiteral()
         testTaskSpacing()
@@ -384,6 +385,24 @@ struct NotesEditorTests {
         check(
             "each edit publishes once, equal to the displayed source",
             changes.count == 2 && changes.last == editor.textView.string)
+    }
+
+    private static func testTextSize() {
+        let source = "# Big\n\nbody"
+        let input = NoteEditorInput(id: NoteID(rawValue: "Size.md"), source: source, epoch: 1)
+        let editor = makeEditor(input: input, rendersMarkdown: true)
+        let standardHeading = font(in: editor.textView, at: 2)?.pointSize ?? 0
+        editor.coordinator.setBodyPointSize(NoteTextSize.largest.pointSize)
+        check(
+            "a larger text size restyles the body and scales headings with it",
+            font(in: editor.textView, at: 8)?.pointSize == CGFloat(NoteTextSize.largest.pointSize)
+                && (font(in: editor.textView, at: 2)?.pointSize ?? 0) > standardHeading
+                && editor.textView.typingAttributes[.font] as? NSFont == NoteMarkdownTypography.body)
+        editor.coordinator.setBodyPointSize(NoteTextSize.standard.pointSize)
+        check(
+            "the standard size restores the original fonts",
+            font(in: editor.textView, at: 8)?.pointSize == CGFloat(NoteTextSize.standard.pointSize)
+                && font(in: editor.textView, at: 2)?.pointSize == standardHeading)
     }
 
     private static func testHiddenMarkersAndReveal() {
@@ -1095,6 +1114,7 @@ struct NotesEditorTests {
         NoteEditorView(
             input: input,
             rendersMarkdown: rendersMarkdown,
+            bodyPointSize: NoteTextSize.standard.pointSize,
             onSourceChange: onSourceChange,
             onCharacterCountChange: onCountChange,
             onFormattingChange: onFormattingChange,

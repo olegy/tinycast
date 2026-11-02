@@ -535,11 +535,13 @@ run notes-editor-test      Tinycast/Platform/Signposts.swift \
                            Tinycast/Features/Notes/Model/NoteFormatting.swift \
                            Tinycast/Features/Notes/Model/NoteMarkdownEditing.swift \
                            Tinycast/Features/Notes/Model/NoteRevealPolicy.swift \
+                           Tinycast/Features/Notes/Model/NoteTextSize.swift \
                            Tinycast/Features/Notes/UI/NoteMarkdownTypography.swift \
                            Tinycast/Features/Notes/UI/NoteBlockDecoration.swift \
                            Tinycast/Features/Notes/UI/NoteMarkdownStyler.swift \
                            Tinycast/Features/Notes/UI/NoteMarkdownRenderer.swift \
                            Tinycast/Features/Notes/UI/NoteCheckboxGeometry.swift \
+                           Tinycast/Features/Notes/UI/NoteTextLayoutFragment.swift \
                            Tinycast/Features/Notes/UI/NoteBlockLayoutFragment.swift \
                            Tinycast/Features/Notes/UI/NoteLayoutFragmentProvider.swift \
                            Tinycast/Features/Notes/UI/NoteTextViewEditing.swift \
@@ -562,11 +564,13 @@ run -O index notes-editor-performance \
                            Tinycast/Features/Notes/Model/NoteFormatting.swift \
                            Tinycast/Features/Notes/Model/NoteMarkdownEditing.swift \
                            Tinycast/Features/Notes/Model/NoteRevealPolicy.swift \
+                           Tinycast/Features/Notes/Model/NoteTextSize.swift \
                            Tinycast/Features/Notes/UI/NoteMarkdownTypography.swift \
                            Tinycast/Features/Notes/UI/NoteBlockDecoration.swift \
                            Tinycast/Features/Notes/UI/NoteMarkdownStyler.swift \
                            Tinycast/Features/Notes/UI/NoteMarkdownRenderer.swift \
                            Tinycast/Features/Notes/UI/NoteCheckboxGeometry.swift \
+                           Tinycast/Features/Notes/UI/NoteTextLayoutFragment.swift \
                            Tinycast/Features/Notes/UI/NoteBlockLayoutFragment.swift \
                            Tinycast/Features/Notes/UI/NoteLayoutFragmentProvider.swift \
                            Tinycast/Features/Notes/UI/NoteTextViewEditing.swift \

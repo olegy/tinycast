@@ -71,6 +71,7 @@ final class NoteTextView: NSTextView, InjectableTextView {
     override func draw(_ dirtyRect: NSRect) {
         super.draw(dirtyRect)
         guard textStorage?.length == 0 else { return }
+        NSGraphicsContext.current?.cgContext.setShouldSmoothFonts(false)
         NSAttributedString(
             string: String(localized: "Start writing…"),
             attributes: [

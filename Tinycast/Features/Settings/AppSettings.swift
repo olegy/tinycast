@@ -395,6 +395,14 @@ final class AppSettings {
         didSet { defaults.set(notesShowsFormattingBar, forKey: Key.notesShowsFormattingBar.rawValue) }
     }
 
+    var notesShowsCharacterCount: Bool {
+        didSet { defaults.set(notesShowsCharacterCount, forKey: Key.notesShowsCharacterCount.rawValue) }
+    }
+
+    var notesTextSize: NoteTextSize {
+        didSet { defaults.set(notesTextSize.rawValue, forKey: Key.notesTextSize.rawValue) }
+    }
+
     /// The notes folder as the user wrote it, `~` allowed; nil keeps it in Application Support.
     var notesFolder: String? {
         didSet { defaults.set(notesFolder, forKey: Key.notesFolder.rawValue) }
@@ -787,6 +795,11 @@ final class AppSettings {
         notesShowsFormattingBar =
             defaults.object(forKey: Key.notesShowsFormattingBar.rawValue) == nil
             || defaults.bool(forKey: Key.notesShowsFormattingBar.rawValue)
+        notesShowsCharacterCount =
+            defaults.object(forKey: Key.notesShowsCharacterCount.rawValue) == nil
+            || defaults.bool(forKey: Key.notesShowsCharacterCount.rawValue)
+        notesTextSize =
+            defaults.string(forKey: Key.notesTextSize.rawValue).flatMap(NoteTextSize.init) ?? .standard
         notesFolder = defaults.string(forKey: Key.notesFolder.rawValue)
         aiEnabled = defaults.bool(forKey: Key.aiEnabled.rawValue)
         mcpEnabled = defaults.bool(forKey: Key.mcpEnabled.rawValue)

@@ -54,6 +54,7 @@ struct NotesView: View {
             NoteEditorView(
                 input: notes.editorInput,
                 rendersMarkdown: notes.rendersMarkdown,
+                bodyPointSize: notes.textSize.pointSize,
                 onSourceChange: notes.updateSource,
                 onCharacterCountChange: notes.updateCharacterCount,
                 onFormattingChange: notes.updateFormatting,
@@ -71,7 +72,7 @@ struct NotesView: View {
     private var formattingBand: some View {
         HStack(spacing: Theme.Spacing.md) {
             ViewThatFits(in: .horizontal) {
-                characterCount
+                if notes.showsCharacterCount { characterCount }
                 Color.clear.frame(width: 0, height: 0)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
@@ -102,7 +103,7 @@ struct NotesView: View {
     }
 
     private var footer: some View {
-        characterCount
+        Group { if notes.showsCharacterCount { characterCount } }
             .frame(maxWidth: .infinity)
             .frame(height: Theme.Size.noteFooterHeight)
     }

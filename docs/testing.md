@@ -356,8 +356,10 @@ swiftc -O -swift-version 6 Tinycast/Platform/{Signposts,Appearance,NotificationT
     Tinycast/Features/TextInjection/Service/InjectableTextView.swift \
     $N/Model/{NoteDocument,NoteMarkdown,NoteMarkdownParser,NoteInlineScanner}.swift \
     $N/Model/{NoteEditPlan,NoteEditAction,NoteFormatting,NoteMarkdownEditing,NoteRevealPolicy}.swift \
+    $N/Model/NoteTextSize.swift \
     $N/UI/{NoteMarkdownTypography,NoteBlockDecoration,NoteMarkdownStyler,NoteMarkdownRenderer}.swift \
-    $N/UI/{NoteCheckboxGeometry,NoteBlockLayoutFragment,NoteLayoutFragmentProvider}.swift \
+    $N/UI/{NoteCheckboxGeometry,NoteTextLayoutFragment,NoteBlockLayoutFragment}.swift \
+    $N/UI/NoteLayoutFragmentProvider.swift \
     $N/UI/{NoteTextViewEditing,NoteTextView,NoteEditorView}.swift \
     Tests/notes-editor-performance.swift -o /tmp/notes-editor-performance
 /tmp/notes-editor-performance

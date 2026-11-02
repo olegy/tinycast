@@ -36,6 +36,8 @@ enum SettingsBackupCoverage {
         "notesEnabled": .notesEnabled,
         "notesRendersMarkdown": .notesRendersMarkdown,
         "notesShowsFormattingBar": .notesShowsFormattingBar,
+        "notesShowsCharacterCount": .notesShowsCharacterCount,
+        "notesTextSize": .notesTextSize,
         "customCommandsEnabled": .customCommandsEnabled,
         "customCommandsShowInLauncher": .customCommandsShowInLauncher,
         "snippetsShowInLauncher": .snippetsShowInLauncher,

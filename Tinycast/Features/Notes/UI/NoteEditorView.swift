@@ -4,6 +4,7 @@ import SwiftUI
 struct NoteEditorView: NSViewRepresentable {
     let input: NoteEditorInput
     let rendersMarkdown: Bool
+    let bodyPointSize: CGFloat
     let onSourceChange: (String) -> Void
     let onCharacterCountChange: (NoteEditorInput, Int) -> Void
     let onFormattingChange: (NoteEditorInput, NoteFormatting) -> Void
@@ -23,6 +24,7 @@ struct NoteEditorView: NSViewRepresentable {
         // `NotesView` lays out its own title-bar band, so AppKit must not inset this a second time.
         scrollView.automaticallyAdjustsContentInsets = false
 
+        _ = NoteMarkdownTypography.setBodySize(bodyPointSize)
         let textView = NoteTextView(usingTextLayoutManager: true)
         Self.configure(textView)
         textView.delegate = context.coordinator
@@ -38,6 +40,7 @@ struct NoteEditorView: NSViewRepresentable {
         context.coordinator.parent = self
         context.coordinator.update(input)
         context.coordinator.setRendersMarkdown(rendersMarkdown)
+        context.coordinator.setBodyPointSize(bodyPointSize)
     }
 
     @MainActor
@@ -116,6 +119,13 @@ struct NoteEditorView: NSViewRepresentable {
             renderer.isEnabled = rendersMarkdown
             renderer.reset()
             reportFormatting()
+        }
+
+        func setBodyPointSize(_ pointSize: CGFloat) {
+            guard NoteMarkdownTypography.setBodySize(pointSize), let textView else { return }
+            textView.font = NoteMarkdownTypography.body
+            textView.needsDisplay = true
+            renderer.reset()
         }
 
         func textDidChange(_ notification: Notification) {

@@ -3,6 +3,14 @@
 What is new in each Tinycast Lite release. The update window shows the section of the version it
 offers.
 
+## Next
+
+### Notes
+
+- **Text Size.** A slider in Settings > Notes makes a note's text larger, in four steps from today's
+  size up to 23 points. Headings grow with it; the window's title and footer stay as they are.
+- **Show Character Count** can now be turned off in Settings > Notes.
+
 ## 0.12.1-lite.1
 
 First Tinycast Lite release, based on [Tinycast 0.12.1](https://github.com/abue-ammar/tinycast/releases/tag/v0.12.1).

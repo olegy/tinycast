@@ -117,7 +117,8 @@ struct NotesEditorPerformance {
         input: NoteEditorInput
     ) -> (coordinator: NoteEditorView.Coordinator, textView: NoteTextView, window: NSWindow) {
         let view = NoteEditorView(
-            input: input, rendersMarkdown: true, onSourceChange: { _ in },
+            input: input, rendersMarkdown: true, bodyPointSize: NoteTextSize.standard.pointSize,
+            onSourceChange: { _ in },
             onCharacterCountChange: { _, _ in },
             onFormattingChange: { _, _ in }, onReady: { _ in })
         let coordinator = NoteEditorView.Coordinator(parent: view)

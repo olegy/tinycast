@@ -12,7 +12,7 @@ final class NoteLayoutFragmentProvider: NSObject, NSTextLayoutManagerDelegate {
             let decoration = paragraph.attribute(.noteBlockDecoration, at: 0, effectiveRange: nil)
                 as? NoteBlockDecoration
         else {
-            return NSTextLayoutFragment(textElement: textElement, range: textElement.elementRange)
+            return NoteTextLayoutFragment(textElement: textElement, range: textElement.elementRange)
         }
         return NoteBlockLayoutFragment(
             textElement: textElement, range: textElement.elementRange, decoration: decoration)

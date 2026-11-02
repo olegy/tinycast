@@ -181,7 +181,11 @@ block moved and to any list line whose depth changed.
 
 `NoteMarkdownStyler` turns one line into attributes. `NoteMarkdownTypography` sets the body one
 system text style up (title3) and headings at largeTitle, title1 and title2, with or without
-rendering; Interface Size does not scale Notes. A hidden marker gets a 0.01-point system font and
+rendering. The Text Size setting replaces the body size and scales the headings by the same ratio;
+code, checkboxes and list slots already follow the body. The body pins SF's Text optical size, so it
+keeps the Text cut's spacing past 20 points, and every fragment (`NoteTextLayoutFragment` and its
+`NoteBlockLayoutFragment` subclass) draws with font smoothing off, which keeps large text from reading
+as bold. Interface Size does not scale Notes. A hidden marker gets a 0.01-point system font and
 a clear colour, so it stays in the string at almost no width. Fence and rule lines are cleared at their
 normal font instead, so they keep their row height. Every list item (bullet, numbered or task) gets 8
 points of space after it, rendered or revealed, so items read as separate rows and moving the caret
@@ -298,6 +302,16 @@ Flipping it restyles the open note without touching its undo history or marking 
 Settings > Notes > **Show Formatting Bar** is `AppSettings.notesShowsFormattingBar`, on when absent and
 carried by settings backups. It only takes effect while Render Markdown is on, and its row is disabled
 otherwise.
+
+Settings > Notes > **Show Character Count** is `AppSettings.notesShowsCharacterCount`, on when absent
+and carried by settings backups. Off hides the count; the footer keeps its height so the editor does
+not move.
+
+Settings > Notes > **Text Size** is `AppSettings.notesTextSize`, a four-step slider over
+`NoteTextSize` (15, 18, 20 and 23 points), Standard when absent and carried by settings backups. Only
+the editor's text changes: the title bar, the footer and the formatting bar keep their sizes. A change
+goes through `NoteEditorView`, which swaps `NoteMarkdownTypography`'s fonts and fully restyles the open
+note without touching its undo history.
 
 An empty note shows a `Start writing…` placeholder aligned to the 16-point text container inset. The
 character count comes straight off `NSTextStorage.length` and sits in a footer under the editor, or at
