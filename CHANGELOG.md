@@ -5,6 +5,11 @@ offers.
 
 ## Next
 
+### Removed
+
+- **Dictation** is gone, along with its settings, the microphone button in AI Chat and the
+  microphone permission.
+
 ### Notes
 
 - **Text Size.** A slider in Settings > Notes makes a note's text larger, in four steps from today's

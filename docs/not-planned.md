@@ -145,7 +145,7 @@ Tinycast is an all-in-one launcher, not a full window manager. Its window tools 
 - **Turn off "always on top".** Most people want Notes to float. ([#670](https://github.com/abue-ammar/tinycast/issues/670))
 - **Collect everything you copy into a note (AutoPaste).** ([#307](https://github.com/abue-ammar/tinycast/issues/307))
 
-## AI and dictation
+## AI
 
 - **Send your selected text or file to AI on its own.** macOS often won't share the selection.
   ([#1420](https://github.com/abue-ammar/tinycast/issues/1420), [#415](https://github.com/abue-ammar/tinycast/issues/415))
@@ -163,8 +163,6 @@ Tinycast is an all-in-one launcher, not a full window manager. Its window tools 
 - **Quick Action results inside the palette, or a preview that stays open.** **Instead:** copy the
   result with its copy button. ([#1360](https://github.com/abue-ammar/tinycast/issues/1360), [#1023](https://github.com/abue-ammar/tinycast/issues/1023))
 - **A proxy setting.** ([#430](https://github.com/abue-ammar/tinycast/issues/430))
-- **Your own dictation models or a personal word list.** Tinycast is not a dictation app.
-  ([#1529](https://github.com/abue-ammar/tinycast/issues/1529), [#1332](https://github.com/abue-ammar/tinycast/issues/1332))
 
 ## Raycast extensions
 

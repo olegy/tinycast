@@ -17,7 +17,7 @@ remove what Lite does not need instead of hiding it behind flags. Upstream's rul
 to the code.
 
 - **Identity.** Release is `Tinycast.app` / `com.olegy.tinycast`, Debug `Tinycast Dev.app` /
-  `com.olegy.tinycast.dev`; the Dictation helper appends `.dictation`.
+  `com.olegy.tinycast.dev`.
 - **Version** is `MARKETING_VERSION` = `$(TINYCAST_UPSTREAM_VERSION)-lite.$(TINYCAST_LITE_REVISION)`
   (e.g. `0.12.1-lite.1`) in `project.yml`. Bump the revision for each build installed with new changes
   and for every release. The revision never resets: a new upstream base sets the upstream version and

@@ -290,14 +290,6 @@ struct DoubleTapDetectorTests {
             !HotKeyBinding.modifier(.leftCommand).conflicts(with: .doubleModifier(.leftCommand)),
             "a single and double tap can coexist")
         expect(
-            HotKeyBinding.modifier(.leftCommand).conflicts(
-                with: .doubleModifier(.leftCommand), holdsModifier: true),
-            "a hold reserves its key across single and double taps")
-        expect(
-            HotKeyBinding.modifier(.leftCommand).conflicts(
-                with: .doubleTap(.command), holdsModifier: true),
-            "a hold cannot shadow a generic double tap")
-        expect(
             spelling.binding(from: "left cmd+k") == nil,
             "ordinary combinations remain side-agnostic")
     }
@@ -547,7 +539,7 @@ struct DoubleTapDetectorTests {
                     for time in [0.0, 1.0] {
                         expect(
                             sided.handle(keys, at: time) == .cancelled,
-                            "\(context): Hyper cannot start dictation's lone-key hold")
+                            "\(context): Hyper cannot start a lone-key tap")
                         expect(
                             sided.handle(keys, at: time + 0.01) == nil,
                             "\(context): repeated Hyper flags cannot start a hold")

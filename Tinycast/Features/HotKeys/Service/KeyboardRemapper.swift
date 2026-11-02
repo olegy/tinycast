@@ -28,14 +28,13 @@ final class KeyboardRemapper {
     private(set) var sawKarabinerConflict = false
 
     private let defaults: UserDefaults
-    private let recoveryKey: String
+    private let recoveryKey = "hyperKeyKeyboardMappings"
     private let bootSessionID: String?
     private var savedMappings: [String: SavedMapping]
     private lazy var system: HIDEventSystem? = makeSystem()
 
-    init(defaults: UserDefaults = .standard, recoveryKey: String = "hyperKeyKeyboardMappings") {
+    init(defaults: UserDefaults = .standard) {
         self.defaults = defaults
-        self.recoveryKey = recoveryKey
         bootSessionID = Self.currentBootSessionID()
         let recovery = defaults.data(forKey: recoveryKey).flatMap {
             try? JSONDecoder().decode(Recovery.self, from: $0)

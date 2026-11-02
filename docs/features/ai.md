@@ -535,7 +535,7 @@ and the Actions menu's own chords, and dies with the window.
   the cap. The row: a `+` menu (Attach Files…, an `NSOpenPanel`; Web Search when the route offers it;
   the Tools submenu), an accent Search pill while web search is on, whose click turns it off, then
   the model menu, the reasoning menu (a word with no glyph, always shown, disabled for a model with no
-  efforts, so the row never changes shape), the context ring, the mic while Dictation is on, and
+  efforts, so the row never changes shape), the context ring and
   Send/Stop. Every control is `aiChatComposerControl` tall with one `aiChatComposerGlyph` slot and
   bare until hovered; Search gives up its word before the model's name truncates. One Attach Files…
   takes every kind; its help names what this chat's model can read. The gauge is the
@@ -550,14 +550,8 @@ and the Actions menu's own chords, and dies with the window.
   the refusals a paste does. The text field takes a file drop itself and hands it to the same
   attach, since an `NSTextView` would otherwise type the file's path. The unsent text lives on `AIChatState.draft`, so it survives closing
   the window.
-- **The composer's mic is Dictation's, and only shown while Dictation is on.** A click runs
-  `DictationCoordinator.toggle(into:)` for this field whatever the shortcut's hold-or-toggle mode or
-  the window's focus; a second click or Return finishes, Escape cancels, and the transcript goes in
-  at the caret, never to the clipboard. With no model installed the click opens Settings → Dictation.
-  The field is a `ComposerTextView`, an `InjectableTextView`, so the Dictation shortcut, snippets and
-  Quick Actions write into it in process, as they do into a note.
-  Switching chats or closing the window cancels dictation targeting its composer before the editor
-  is rebound or torn down; a queued transcript cannot land in another chat or a closed editor.
+- **The field is a `ComposerTextView`, an `InjectableTextView`,** so snippets and Quick Actions
+  write into it in process, as they do into a note.
 
 `AIChatState` turns provider-neutral stream events into one live assistant message. Thinking state is
 shown without entering the transcript, partial text is preserved on failure, cancellation invalidates

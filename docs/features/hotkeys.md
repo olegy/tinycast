@@ -6,17 +6,16 @@
 - `HotKeyBinding` — what an action is bound to: `.combo(KeyShortcut)`,
   `.doubleTap(DoubleTapModifier)`, sided `.modifier` / `.doubleModifier`, `.globe`, or `.doubleGlobe`.
 - `HotKeyCenter` — the Carbon `RegisterEventHotKey` layer, pausable.
-- Dictation alone also observes Carbon's key-release event for hold-to-talk.
 - `DoubleTapModifier` / `DoubleTapDetector` — the double-tap recognizer.
 - `ModifierKey` / `ModifierKeyDetector` — reported sides, lone presses, taps and holds.
-- `ModifierTapMonitor` — the shared modifier-only tap, including Dictation's hold/release callbacks.
+- `ModifierTapMonitor` — the shared modifier-only tap.
 
 `HotKeyManager` owns them all: persistence, conflict lookup, and dispatch. Every action reads and
 writes one `HotKeyBinding`, so all cases share persistence, conflict detection, the recorder and
 the keycap rendering — only the _engine_ differs.
 
 Carbon's dispatcher enters through an explicit `@MainActor` callback. Press and release handlers
-return `OSStatus` synchronously, preserving event order and hold-to-talk release handling.
+return `OSStatus` synchronously, preserving event order.
 
 ## Invariants
 
@@ -136,12 +135,6 @@ track Globe from the physical `kVK_Function` keycode, not just the fn flag, beca
 It shares the double-tap's listen-only monitor, permission warning, lifecycle and pause while
 recording. macOS may perform its own Globe action too; set “Press fn/Globe key to” to “Do Nothing” in
 Keyboard settings if it conflicts. Globe+key chords use Carbon registration, like other combos.
-
-Dictation's hold-to-talk mode reserves its single physical modifier across both tap gestures. It
-starts after 250 ms held alone, so ordinary modifier+key chords do not briefly start recording. Another
-key, modifier or mouse click cancels a pending or active hold; Return and Escape belong to the dictation
-panel while listening. Release finishes the recording. Pausing, rebinding, disabling Dictation,
-session changes and tap teardown cancel any hold. Double-tap bindings require toggle mode.
 
 ## Double-tap modifiers
 
@@ -307,8 +300,7 @@ Carbon hotkeys still fire inside Secure Input, and both remedies are built on th
   (`KeyShortcut.secureInputEquivalent(of:)`), rebuilt with the bindings and dropped when Secure Input
   ends. The Carbon event's device flags select Right Control without querying mutable keyboard state.
   Left Control never triggers Hyper. An existing Tinycast Control binding shares the registration and
-  still runs from Left Control; Dictation receives the release for whichever action began the press.
-  Rebuilding or pausing registrations cancels an outstanding hold. Carbon reserves these Control
+  still runs from Left Control; Right Control runs the Hyper one. Carbon reserves these Control
   combinations during Secure Input even when Left Control has no Tinycast binding.
 
 The tap still sees a modifier's `flagsChanged` inside Secure Input, but never the key pressed between
@@ -350,13 +342,6 @@ place that prompts for it. A one-second watchdog runs while a key is live: it re
 until the grant lands, notices revocation, revives a tap the system disabled on timeout or user input,
 and polls Secure Input. The HID remap outlives the process, so `applicationWillTerminate` takes it off
 every keyboard before exiting.
-
-## The Dictation key
-
-Apple's 🎤 key (Consumer `0xC000000CF`) can't be recorded. While a recorder is open or a binding uses
-F20, `DictationKeyManager` remaps it to **F20**, a bare F-key Carbon fires on press and release, even
-in Secure Input, with no tap or permission. Otherwise, and in other users' sessions, macOS Dictation
-keeps it. F20 keycaps draw as `mic`.
 
 ## Recorder
 
