@@ -79,6 +79,14 @@ struct QuickActionsSettingsView: View {
             core.applyInstalledAILifecycle()
         }
         .onChange(of: appSettings.aiEnabled) { repairInstalledModel() }
+        // mod: quick-action-screen — Edit Quick Action in the launcher opens the same editor.
+        .onChange(of: core.quickActionScreen.pendingEdit, initial: true) {
+            switch core.quickActionScreen.takePendingEdit() {
+            case .builtIn(let action)?: editingAction = action
+            case .custom(let action)?: customEditing = CustomQuickActionEditRequest(action: action)
+            case nil: break
+            }
+        }
         .onChange(of: aiSettings.enabledInstalledProviders) {
             core.applyInstalledAILifecycle()
             repairInstalledModel()
@@ -101,7 +109,6 @@ struct QuickActionsSettingsView: View {
                     }
                     AliasField(key: action.entryID, name: action.name)
                     ShortcutRecorder(action: .quickAction(id: action.id), isQuiet: true)
-                    resultPicker(title: action.name, selection: previewBinding(action))
                     launcherToggle(title: action.name, entry: AppEntry(action))
                 }
             }
@@ -112,10 +119,6 @@ struct QuickActionsSettingsView: View {
             }
         } header: {
             SettingsSectionHeader(.quickActionsActions)
-        } footer: {
-            Text("Replace writes into your document, and undo restores it. Preview shows a panel first.")
-                .font(.caption)
-                .foregroundStyle(.secondary)
         }
     }
 
@@ -130,8 +133,6 @@ struct QuickActionsSettingsView: View {
             }
             if let entry { AliasField(entry: entry) }
             ShortcutRecorder(action: .command(CommandID(action)), isQuiet: true)
-            resultPicker(title: action.title, selection: previewBinding(action))
-                .disabled(action.alwaysPreviews)
             if let entry { launcherToggle(title: action.title, entry: entry) }
         }
     }
@@ -206,7 +207,6 @@ struct QuickActionsSettingsView: View {
 
     private func subtitle(for action: QuickAction) -> String? {
         let details = [
-            action.alwaysPreviews ? String(localized: "Always shown in a panel") : nil,
             store.modelOverride(for: action).map(routeTitle)
         ].compactMap(\.self)
         return details.isEmpty ? nil : details.joined(separator: " · ")

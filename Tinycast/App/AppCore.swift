@@ -226,6 +226,8 @@ final class AppCore {
         injector: textInjector, appIndex: appIndex, hotKeys: hotKeys, favorites: favorites,
         visibility: visibility, ranking: launcherRanking, aliases: aliases,
         paletteCoordinator: paletteCoordinator, core: self)
+    // mod: quick-action-screen
+    @ObservationIgnored private(set) lazy var quickActionScreen = QuickActionScreenCoordinator(core: self)
     @ObservationIgnored private(set) lazy var mcpCoordinator = MCPCoordinator(
         settings: settings, store: mcpSettings, manager: mcp, core: self)
     /// Its own window and lifecycle, like Settings; Quick AI is the palette's half of the feature.
@@ -280,6 +282,7 @@ final class AppCore {
 
     func start() {
         Signposts.interval("AppCore.start") {
+            SpaceTheme.start()  // tinycast-space: before the extension scan, which must see the Theme command
             // Shorten AppKit's ~2–3s tooltip delay; registration domain, so a user default wins.
             UserDefaults.standard.register(defaults: ["NSInitialToolTipDelay": 250])
             NSApp.setActivationPolicy(.accessory)
@@ -420,7 +423,10 @@ final class AppCore {
                 return appIndex.isCommandEnabled(id)
             }
             KeyShortcut.displayedHyperChord = { [settings] in
-                guard settings.hyperKey != .none else { return nil }
+                // tinycast-space: another app can own the Hyper key and still want the ✦ glyph.
+                guard settings.hyperKey != .none
+                    || UserDefaults.standard.bool(forKey: "spaceHyperGlyphWithoutRemap")
+                else { return nil }
                 return KeyShortcut.hyperChord(includesShift: settings.hyperKeyIncludesShift)
             }
             SystemActionRunner.onAsyncFailure = { [weak self] id, failure in
@@ -474,6 +480,12 @@ final class AppCore {
     }
 
     func handleOpenURL(_ url: URL) {
+        // tinycast-space: the link extensions fire when a timer or task finishes.
+        if ConfettiOverlay.claims(url) { return ConfettiOverlay.fire() }
+        // tinycast-space: a theme link — ray.so, Raycast's Theme Studio, or the Theme command.
+        if SpaceTheme.handle(url, in: self) { return }
+        // tinycast-space: `tinycast://open?id=…`, any launcher entry by its id.
+        if EntryDeepLinkActions.handle(url, in: self) { return }
         guard ExtensionDeepLink.claims(url) else { return }
         guard let route = ExtensionDeepLink.route(url: url) else {
             paletteCoordinator.showPalette(mode: .launcher, restoreAnyMode: true)

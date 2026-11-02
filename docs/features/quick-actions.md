@@ -12,6 +12,19 @@ shortcut and a launcher row like any other.
 Quick Actions is the provider layer's second consumer. It shares the provider connections and
 selectable Markdown renderer with AI Chat.
 
+**Mod (`quick-action-screen`): every action opens on the palette's own screen** (`PaletteMode.quickAction`,
+code in `Tinycast/Mod/QuickActionScreen/`). The text is read before the palette shows — the selection
+(Accessibility, then a borrowed ⌘C), else the clipboard, else empty — and is edited on top, the reply
+streams beneath it. ↵ runs, then pastes to whatever the palette covers at that moment (⌘↵ copies, ⌘E
+edits again); Escape stops a running reply, otherwise leaves the screen. The model, effort or language
+picked in the header lives only in that window. Hiding the palette minimises the screen, a running reply
+keeps going, and Pop to Root Search restores it; leaving the screen by any path discards the session
+(`PaletteState.onQuickActionScreenLeft`). Paste and Copy end it. The floating panel, the Replace /
+Preview choice and unseen replacement are no longer used, so the `changeCount` guard no longer protects
+anything: a clipboard fallback is visible and editable before it is sent. Without Accessibility, or with
+Tinycast in front, the screen still opens on the clipboard and only Copy is offered. ⌘E on a Quick Action
+row in the launcher opens its editor in Settings → Quick Actions (Translate has none).
+
 ## Invariants
 
 - **Off out of the box, and off means the shortcuts do nothing.** `AppSettings.quickActionsEnabled`

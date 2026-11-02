@@ -12,7 +12,7 @@ struct AvailableRelease: Codable, Hashable, Sendable {
 /// Nothing throws: an unusable body means nothing to install, and the pump retries.
 enum ReleaseFeed {
     /// Where releases come from, and what every `@handle` and `#304` in their notes points at.
-    static let repository = "abue-ammar/tinycast"
+    static let repository = "olegy/tinycast"
 
     /// The only artifact with an x86_64 slice, so the only one an Intel Mac can install.
     private static let universalMarker = "-Universal-"
@@ -42,8 +42,6 @@ enum ReleaseFeed {
     ) -> AvailableRelease? {
         guard !entry.draft, channel.accepts(prerelease: entry.prerelease),
             let version = AppVersion(entry.tagName),
-            // A tag disagreeing with the prerelease flag is a mis-published release, not an update.
-            version.isPrerelease == entry.prerelease,
             let asset = asset(from: entry.assets, for: architecture)
         else { return nil }
         return AvailableRelease(

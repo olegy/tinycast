@@ -253,7 +253,7 @@ struct ExtensionMarkdownView: View {
         case bullet(String)
         case numbered(index: Int, text: String)
         case quote(String)
-        case code(String)
+        case code(language: String?, text: String)
         case rule
         case image(URL)
         case table([[String]])
@@ -274,12 +274,13 @@ struct ExtensionMarkdownView: View {
                         .textSelection(.enabled)
                 case .bullet(let text):
                     HStack(alignment: .top, spacing: metrics.spacing.sm) {
-                        Text(verbatim: "•").foregroundStyle(.secondary)
+                        Text(verbatim: "•").font(metrics.typography.rowTitle).foregroundStyle(.secondary)
                         Text(inline(text)).font(metrics.typography.rowTitle)
                     }
                 case .numbered(let index, let text):
                     HStack(alignment: .top, spacing: metrics.spacing.sm) {
-                        Text(verbatim: "\(index).").foregroundStyle(.secondary).monospacedDigit()
+                        Text(verbatim: "\(index).").font(metrics.typography.rowTitle)
+                            .foregroundStyle(.secondary).monospacedDigit()
                         Text(inline(text)).font(metrics.typography.rowTitle)
                     }
                 case .quote(let text):
@@ -289,19 +290,8 @@ struct ExtensionMarkdownView: View {
                             .font(metrics.typography.rowTitle)
                             .foregroundStyle(.secondary)
                     }
-                case .code(let text):
-                    ScrollView(.horizontal) {
-                        Text(text)
-                            .font(.system(.callout, design: .monospaced))
-                            .textSelection(.enabled)
-                            .padding(metrics.spacing.sm)
-                    }
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .background(
-                        RoundedRectangle(cornerRadius: metrics.radius.menu, style: .continuous)
-                            .fill(ExtensionColors.detailCardFill)
-                    )
-                    .hideNativeScrollers()
+                case .code(let language, let text):
+                    ExtensionCodeBlock(language: language, text: text)
                 case .rule:
                     Rectangle().fill(Theme.Colors.separator).frame(height: 1)
                 case .image(let url):
@@ -324,6 +314,8 @@ struct ExtensionMarkdownView: View {
                 }
             }
         }
+        // mod: markdown-selection — every block selects, not only paragraphs and code.
+        .textSelection(.enabled)
         .frame(maxWidth: .infinity, alignment: .leading)
     }
 
@@ -337,15 +329,22 @@ struct ExtensionMarkdownView: View {
     }
 
     private func inline(_ text: String) -> AttributedString {
-        (try? AttributedString(
-            markdown: text,
-            options: .init(interpretedSyntax: .inlineOnlyPreservingWhitespace))) ?? AttributedString(text)
+        var parsed =
+            (try? AttributedString(
+                markdown: text,
+                options: .init(interpretedSyntax: .inlineOnlyPreservingWhitespace))) ?? AttributedString(text)
+        let code = parsed.runs.filter { $0.inlinePresentationIntent?.contains(.code) == true }.map(\.range)
+        for range in code {
+            parsed[range].font = metrics.typography.code
+            parsed[range].backgroundColor = ExtensionColors.detailCardFill
+        }
+        return parsed
     }
 
     private static func parse(_ source: String) -> [Block] {
         var blocks: [Block] = []
         var paragraph: [String] = []
-        var fence: [String]?
+        var fence: (language: String?, lines: [String])?
         var numberedIndex = 0
         var table: [[String]] = []
 
@@ -363,17 +362,18 @@ struct ExtensionMarkdownView: View {
             let trimmed = line.trimmingCharacters(in: .whitespaces)
 
             if trimmed.hasPrefix("```") {
-                if let body = fence {
-                    blocks.append(.code(body.joined(separator: "\n")))
+                if let open = fence {
+                    blocks.append(.code(language: open.language, text: open.lines.joined(separator: "\n")))
                     fence = nil
                 } else {
                     flushParagraph()
-                    fence = []
+                    let info = trimmed.drop(while: { $0 == "`" }).split(separator: " ").first
+                    fence = (info.map(String.init), [])
                 }
                 continue
             }
             if fence != nil {
-                fence?.append(line)
+                fence?.lines.append(line)
                 continue
             }
             if trimmed.isEmpty {
@@ -430,7 +430,9 @@ struct ExtensionMarkdownView: View {
             }
             paragraph.append(trimmed)
         }
-        if let body = fence { blocks.append(.code(body.joined(separator: "\n"))) }
+        if let open = fence {
+            blocks.append(.code(language: open.language, text: open.lines.joined(separator: "\n")))
+        }
         flushParagraph()
         return blocks
     }
@@ -452,6 +454,61 @@ struct ExtensionMarkdownView: View {
             scheme.hasPrefix("http") || scheme == "data"
         else { return nil }
         return url
+    }
+}
+
+/// A fence's language and a Copy button over its code, which scrolls rather than wraps.
+private struct ExtensionCodeBlock: View {
+    @Environment(\.metrics) private var metrics
+    let language: String?
+    let text: String
+    /// A fresh stamp re-arms the reset, so a second copy holds "Copied".
+    @State private var copiedAt: Date?
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            HStack {
+                Text(verbatim: language ?? "").foregroundStyle(.secondary)
+                Spacer(minLength: metrics.spacing.sm)
+                Button {
+                    Paster.copyPlainText(text)
+                    copiedAt = Date()
+                } label: {
+                    // The wider word holds the width, so the header never twitches on copy.
+                    ZStack {
+                        Text("Copied").hidden()
+                        Text(copiedAt == nil ? "Copy" : "Copied")
+                    }
+                }
+                .buttonStyle(.plain)
+                .foregroundStyle(.secondary)
+            }
+            .font(metrics.typography.rowTrailing)
+            .padding(.horizontal, metrics.spacing.md)
+            .padding(.vertical, metrics.spacing.sm)
+            Rectangle().fill(Theme.Colors.separator).frame(height: 1)
+            ScrollView(.horizontal) {
+                Text(text)
+                    .font(metrics.typography.code)
+                    .padding(.horizontal, metrics.spacing.md)
+                    .padding(.vertical, metrics.spacing.sm)
+            }
+            .hideNativeScrollers()
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(
+            RoundedRectangle(cornerRadius: metrics.radius.menu, style: .continuous)
+                .fill(ExtensionColors.detailCardFill)
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: metrics.radius.menu, style: .continuous)
+                .strokeBorder(Theme.Colors.separator)
+        )
+        .task(id: copiedAt) {
+            guard copiedAt != nil else { return }
+            try? await Task.sleep(for: .seconds(Theme.Duration.copyFeedback))
+            copiedAt = nil
+        }
     }
 }
 

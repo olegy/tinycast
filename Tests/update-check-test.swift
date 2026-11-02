@@ -50,19 +50,19 @@ struct UpdateCheckTests {
         await waitUntil { fixture.requests == 1 }
         expect(store.isChecking, "the automatic check is in flight")
         store.stop()
-        fixture.respond(feed(version: "1.2.0"))
+        fixture.respond(feed(version: "1.2.0-lite.1"))
         await waitUntil { !store.isChecking }
         expect(fixture.wasCancelled, "stopping cancels the in-flight automatic check")
-        expect(store.latest?.version == AppVersion("1.1.0"), "a cancelled response is discarded")
+        expect(store.latest?.version == AppVersion("1.1.0-lite.1"), "a cancelled response is discarded")
         expect(offers == 0, "cancellation cannot announce the cached pending update")
         expect(try Data(contentsOf: file) == originalCache, "a cancelled check leaves the cache intact")
 
         store.start(after: .zero)
         await waitUntil { fixture.requests == 2 }
-        fixture.respond(feed(version: "1.2.0"))
+        fixture.respond(feed(version: "1.2.0-lite.1"))
         await waitUntil { offers == 1 }
         expect(!fixture.wasCancelled, "re-enabling starts a fresh check")
-        expect(store.update?.version == AppVersion("1.2.0"), "the restarted check adopts the release")
+        expect(store.update?.version == AppVersion("1.2.0-lite.1"), "the restarted check adopts the release")
         store.start(after: .zero)
         try await Task.sleep(for: .milliseconds(10))
         expect(fixture.requests == 2, "restarting respects the cached check time")
@@ -72,11 +72,11 @@ struct UpdateCheckTests {
         let manual = Task { await store.check() }
         await waitUntil { fixture.requests == 3 }
         store.stop()
-        fixture.respond(feed(version: "1.3.0"))
+        fixture.respond(feed(version: "1.3.0-lite.1"))
         let answered = await manual.value
         expect(answered, "manual checking still works with automatic checking stopped")
         expect(!fixture.wasCancelled, "stopping the pump does not cancel a manual check")
-        expect(store.update?.version == AppVersion("1.3.0"), "manual checking receives a newer release")
+        expect(store.update?.version == AppVersion("1.3.0-lite.1"), "manual checking receives a newer release")
         expect(offers == 1, "manual checking does not restart automatic announcements")
 
         let reopened = makeStore(file: file, fixture: fixture)
@@ -86,7 +86,7 @@ struct UpdateCheckTests {
     static func seedCache(at file: URL) throws {
         guard
             let release = ReleaseFeed.newest(
-                from: feed(version: "1.1.0"), channel: .stable, architecture: .current)
+                from: feed(version: "1.1.0-lite.1"), channel: .stable, architecture: .current)
         else { fatalError("the fixture release must be installable") }
         let cache: [String: Any] = [
             "lastCheckedAt": Date.distantPast.timeIntervalSinceReferenceDate,
@@ -97,7 +97,7 @@ struct UpdateCheckTests {
 
     static func makeStore(file: URL, fixture: FetchFixture) -> UpdateCheckStore {
         UpdateCheckStore(
-            channel: .stable, runningVersion: AppVersion("1.0.0"), fileURL: file,
+            channel: .stable, runningVersion: AppVersion("1.0.0-lite.1"), fileURL: file,
             fetch: { await fixture.fetch() })
     }
 

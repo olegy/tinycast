@@ -1,12 +1,11 @@
 import Foundation
 
-/// A released version: `MAJOR.MINOR.PATCH`, optionally `-beta.N`, ordered by semver precedence.
+/// A Lite version: the upstream `MAJOR.MINOR.PATCH` it is based on plus `-lite.N`.
 struct AppVersion: Comparable, Hashable, Sendable, CustomStringConvertible {
     let major: Int
     let minor: Int
     let patch: Int
-    /// Nil on a stable release, which outranks every prerelease of the same triple.
-    let beta: Int?
+    let lite: Int
 
     init?(_ text: String) {
         var body = Substring(text.trimmingCharacters(in: .whitespacesAndNewlines))
@@ -15,44 +14,25 @@ struct AppVersion: Comparable, Hashable, Sendable, CustomStringConvertible {
 
         let halves = body.split(separator: "-", maxSplits: 1, omittingEmptySubsequences: false)
         let numbers = halves[0].split(separator: ".", omittingEmptySubsequences: false)
-        guard numbers.count == 3,
+        // An upstream tag has no `-lite.N`, so it can never be offered as an update.
+        guard halves.count == 2, numbers.count == 3,
             let major = Self.number(numbers[0]),
             let minor = Self.number(numbers[1]),
             let patch = Self.number(numbers[2])
         else { return nil }
-
-        if halves.count == 2 {
-            // `beta` is the only prerelease channel that ships, so anything else is unreadable.
-            let suffix = halves[1].split(separator: ".", omittingEmptySubsequences: false)
-            guard suffix.count == 2, suffix[0] == "beta", let count = Self.number(suffix[1])
-            else { return nil }
-            beta = count
-        } else {
-            beta = nil
-        }
+        let suffix = halves[1].split(separator: ".", omittingEmptySubsequences: false)
+        guard suffix.count == 2, suffix[0] == "lite", let lite = Self.number(suffix[1])
+        else { return nil }
         self.major = major
         self.minor = minor
         self.patch = patch
+        self.lite = lite
     }
 
-    var isPrerelease: Bool { beta != nil }
-
-    var description: String {
-        let triple = "\(major).\(minor).\(patch)"
-        return beta.map { "\(triple)-beta.\($0)" } ?? triple
-    }
+    var description: String { "\(major).\(minor).\(patch)-lite.\(lite)" }
 
     static func < (lhs: Self, rhs: Self) -> Bool {
-        if lhs.major != rhs.major { return lhs.major < rhs.major }
-        if lhs.minor != rhs.minor { return lhs.minor < rhs.minor }
-        if lhs.patch != rhs.patch { return lhs.patch < rhs.patch }
-        switch (lhs.beta, rhs.beta) {
-        case (nil, nil): return false
-        // A prerelease leads to its release, so it sorts below one and never above it.
-        case (.some, nil): return true
-        case (nil, .some): return false
-        case (.some(let left), .some(let right)): return left < right
-        }
+        (lhs.major, lhs.minor, lhs.patch, lhs.lite) < (rhs.major, rhs.minor, rhs.patch, rhs.lite)
     }
 
     /// Rejects a signed or padded field, which `Int` would silently reinterpret.

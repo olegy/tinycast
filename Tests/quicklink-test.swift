@@ -109,6 +109,9 @@ struct QuicklinkTests {
         expect(
             !QuicklinkDestination.usesURLEncoding("/tmp/{argument}", homeDirectory: home),
             "an absolute path is not encoded either")
+        expect(
+            !QuicklinkDestination.usesURLEncoding("{clipboard}", homeDirectory: home),
+            "a link that starts with a value takes that value as its destination, unencoded")
     }
 
     static func placeholderDetection() {

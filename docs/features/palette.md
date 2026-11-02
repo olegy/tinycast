@@ -149,7 +149,8 @@ Scrolling a native form dismisses its menu before the control's anchor moves.
 
 **Escape clears a non-empty query before it leaves the screen**, so one press clears and the next
 leaves: an extension screen exits itself first (it keeps a stack the palette cannot see), then a
-pushed screen pops, and a root hides the palette. A focused inline argument field is a rung above the
+pushed screen pops, and a root closes the palette and pops to root at once, whatever Pop to Root
+Search says — a close by Escape is done with the screen, so the next summon is never stuck on it. A focused inline argument field is a rung above the
 query, so Escape hands focus back to the search field first — the query that found the command is
 still there to be cleared by the next press. A bare backspace in an empty field takes the same step
 **but never closes**: on a root screen summoned by its own hotkey it falls to the root search, which
@@ -157,8 +158,7 @@ is the step Escape would have taken had that screen been reached by typing its n
 whole stack for that same root search from any depth.
 
 `EscapeKeyBehavior` (General settings) can trade the walk back for the old behavior: under
-`closeAndPopToRoot` an empty field closes the window and resets it immediately, whatever Pop to Root
-Search says. Clearing the query is still the first press either way.
+`closeAndPopToRoot` an empty field closes the window and resets it immediately from any depth. Clearing the query is still the first press either way.
 
 The header draws a back chevron on **every** screen but the launcher: leaving is what the icon
 slot means once you are off the root, and a slot that changed shape with provenance would read

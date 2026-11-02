@@ -10,7 +10,14 @@ struct PaletteFrame: Equatable {
 @MainActor
 @Observable
 final class PaletteState {
-    var mode: PaletteMode = .launcher { didSet { restoredSelection = nil } }
+    var mode: PaletteMode = .launcher {
+        didSet {
+            restoredSelection = nil
+            // mod: quick-action-screen — leaving the screen, by any path, ends its session.
+            if oldValue == .quickAction, mode != .quickAction { onQuickActionScreenLeft?() }
+        }
+    }
+    @ObservationIgnored var onQuickActionScreenLeft: (() -> Void)?  // mod: quick-action-screen
     /// The screens below `mode`, innermost last: a summon starts a new one, navigating pushes on.
     private(set) var backStack: [PaletteFrame] = []
     var query: String = "" { didSet { restoredSelection = nil } }

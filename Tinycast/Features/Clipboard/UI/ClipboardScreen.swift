@@ -45,6 +45,11 @@ struct ClipboardScreen: PaletteScreen {
             return true
         case .pin: return pin(at: selection)
         case .favoriteSlot(let index): return activatePinned(at: index)
+        case .saveAsSnippet:
+            guard core.settings.snippetsEnabled, let item = item(at: selection), item.kind == .text
+            else { return false }
+            ClipboardActionsMenu.saveAsSnippet(item, core: core)
+            return true
         case .copyText:
             guard let item = item(at: selection), item.offersTextExtraction else { return false }
             core.clipboardCoordinator.copyImageText(item)
@@ -169,6 +174,13 @@ private struct ClipFollowKey: Equatable {
 
 @MainActor
 enum ClipboardActionsMenu {
+    /// tinycast-space: the editor opens on the entry's text; the name is left for the user to give.
+    /// Here rather than on ClipboardCoordinator, whose harness builds it against a stub AppCore.
+    static func saveAsSnippet(_ item: ClipboardItem, core: AppCore) {
+        guard item.kind == .text, let text = item.text else { return }
+        core.snippetCoordinator.editSnippet(nil, prefilledText: text)
+    }
+
     static func content(
         item: ClipboardItem, core: AppCore, store: ClipboardStore, target: PasteTarget?
     ) -> PopoverMenuContent {
@@ -209,6 +221,14 @@ enum ClipboardActionsMenu {
             ) {
                 core.clipboardCoordinator.togglePinnedClip(item)
             })
+        if item.kind == .text, core.settings.snippetsEnabled {
+            items.append(
+                PopoverMenuItem(
+                    title: "Save as Snippet", systemImage: "text.quote", shortcut: "⌘S"
+                ) {
+                    ClipboardActionsMenu.saveAsSnippet(item, core: core)
+                })
+        }
         if item.offersTextExtraction {
             items.append(
                 PopoverMenuItem(

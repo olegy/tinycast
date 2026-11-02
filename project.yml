@@ -1,6 +1,6 @@
 name: Tinycast
 options:
-  bundleIdPrefix: com.tinycast
+  bundleIdPrefix: com.olegy
   deploymentTarget:
     macOS: "26.0"
   createIntermediateGroups: true
@@ -9,18 +9,22 @@ options:
 
 settings:
   base:
-    MARKETING_VERSION: "0.1.0"
-    CURRENT_PROJECT_VERSION: "1"
+    # Tinycast Lite: the upstream version it is based on plus a Lite revision, e.g. 0.12.1-lite.1.
+    # Bump the revision for every build installed with new changes and for every release.
+    TINYCAST_UPSTREAM_VERSION: "0.12.1"
+    TINYCAST_LITE_REVISION: "1"
+    MARKETING_VERSION: "$(TINYCAST_UPSTREAM_VERSION)-lite.$(TINYCAST_LITE_REVISION)"
+    CURRENT_PROJECT_VERSION: "$(TINYCAST_UPSTREAM_VERSION).$(TINYCAST_LITE_REVISION)"
     SWIFT_VERSION: "6.0"
     DEVELOPMENT_TEAM: ""
     CODE_SIGN_STYLE: Manual
     # A stable self-signed identity keeps the Accessibility grant across rebuilds. docs/signing.md
     CODE_SIGN_IDENTITY: "Tinycast Self-Signed"
     SWIFT_STRICT_CONCURRENCY: complete
-    TINYCAST_BUNDLE_IDENTIFIER: com.tinycast.app
+    TINYCAST_BUNDLE_IDENTIFIER: com.olegy.tinycast
   configs:
     Debug:
-      TINYCAST_BUNDLE_IDENTIFIER: com.tinycast.app.dev
+      TINYCAST_BUNDLE_IDENTIFIER: com.olegy.tinycast.dev
       DICTATION_EXECUTABLE_NAME: Tinycast Dev Dictation
     Release:
       DICTATION_EXECUTABLE_NAME: Tinycast Dictation
@@ -103,7 +107,7 @@ targets:
       - Tinycast/Features/Clipboard/Service/ClipboardTextHelper.swift
     settings:
       base:
-        # Pinned, or release.yml's PRODUCT_NAME renames the binary `ClipboardTextWorker` looks for.
+        # Pinned, or a PRODUCT_NAME override renames the binary `ClipboardTextWorker` looks for.
         EXECUTABLE_NAME: ClipboardTextHelper
         PRODUCT_MODULE_NAME: ClipboardTextHelper
         SKIP_INSTALL: YES
@@ -121,7 +125,7 @@ targets:
       - Tinycast/Features/FileSearch/Service/FileIndexSnapshot.swift
     settings:
       base:
-        # Pinned like ClipboardTextHelper's: release.yml's PRODUCT_NAME would otherwise rename it.
+        # Pinned like ClipboardTextHelper's: a PRODUCT_NAME override would otherwise rename it.
         EXECUTABLE_NAME: FileIndexHelper
         PRODUCT_MODULE_NAME: FileIndexHelper
         SKIP_INSTALL: YES

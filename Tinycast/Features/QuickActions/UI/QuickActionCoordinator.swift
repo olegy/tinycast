@@ -177,6 +177,8 @@ final class QuickActionCoordinator {
 
     func run(_ action: QuickAction) {
         guard settings.quickActionsEnabled, running == nil else { return }
+        // mod: quick-action-screen — every action opens on the palette's own screen instead.
+        guard !core.quickActionScreen.open(action) else { return }
         let source =
             paletteCoordinator.isVisible
             ? InjectionTarget.behindPalette(
@@ -203,6 +205,7 @@ final class QuickActionCoordinator {
         running = nil
         hideProgress(ownedBy: progressOwner)
         panels.dismiss()
+        core.quickActionScreen.discard()  // mod: quick-action-screen
     }
 
     /// The generation stops a superseded task from clearing the newer handle as it finishes.

@@ -1,10 +1,36 @@
-# Tinycast
+# Tinycast Lite
 
 A native macOS menu-bar launcher: fuzzy app launcher, global and per-app hotkeys, a text/image
 clipboard history, an inline calculator, a floating note, snippets, quicklinks, window management
 and an emoji picker. It also **runs Raycast extensions** natively, in JavaScriptCore.
 SwiftUI + AppKit, running as an accessory with no Dock icon (`LSUIElement`). Zero third-party
 dependencies.
+
+## Tinycast Lite
+
+This repository is **Tinycast Lite**: a standalone version of
+[abue-ammar/tinycast](https://github.com/abue-ammar/tinycast) for personal use (`origin` =
+`olegy/tinycast`, `upstream` = the original). There is **no upstream sync**: the `upstream` remote is
+kept to watch changes, which are ported by hand, one commit each, and only when they are worth
+having. Change upstream code directly — there is no patch layer and no merge-friendliness to preserve;
+remove what Lite does not need instead of hiding it behind flags. Upstream's rules below still apply
+to the code.
+
+- **Identity.** Release is `Tinycast.app` / `com.olegy.tinycast`, Debug `Tinycast Dev.app` /
+  `com.olegy.tinycast.dev`; the Dictation helper appends `.dictation`.
+- **Version** is `MARKETING_VERSION` = `$(TINYCAST_UPSTREAM_VERSION)-lite.$(TINYCAST_LITE_REVISION)`
+  (e.g. `0.12.1-lite.1`) in `project.yml`. Bump the revision for each build installed with new changes
+  and for every release. The revision never resets: a new upstream base sets the upstream version and
+  bumps the revision as usual (`0.12.1-lite.3` → `0.13.0-lite.4`).
+- **Updates come from this repository.** `ReleaseFeed.repository` is `olegy/tinycast`, only
+  `com.olegy.tinycast` updates (`ReleaseChannel`), only `-lite.N` tags parse (`AppVersion`), and a
+  bundle installs only if it satisfies `BundleSignature.requirement` — the Apple Development team
+  `SL2WXVL9K2`. Never point the feed back at upstream or loosen the requirement.
+- **Signing.** `Scripts/install.sh` and `Scripts/release.sh` sign with the Apple Development
+  certificate named in the gitignored `keys/signing.env`, and check the build against the updater's
+  requirement. Debug keeps signing with `Tinycast Self-Signed`. See [signing.md](docs/signing.md).
+- **Releases** are published from the release Mac by `Scripts/release.sh`, never by CI, with the
+  version's `CHANGELOG.md` section as notes. Every change that ships goes into the next section.
 
 ## Posture: modern-first, always
 
@@ -44,7 +70,7 @@ system-wide chord, and HIToolbox's TIS APIs remain the public input-source mecha
 | `Tinycast/Windows/`      | the non-palette AppKit surfaces: `Dialog/`, `HUD/`, `About/`, `AppWindowController`     |
 | `Tinycast/Features/`     | one folder per feature; larger ones split `Model/` `Service/` `UI/` `Settings/`         |
 | `Tests/`                 | the standalone harnesses — one Swift file each, no XCTest target                        |
-| `Scripts/`               | every executable script: test runner, data generators, packaging, linting, editor setup |
+| `Scripts/`               | every executable script: test runner, data generators, install/release, linting, editor |
 
 | Read it before you                                          | Doc                                                          |
 | ----------------------------------------------------------- | ------------------------------------------------------------ |
@@ -54,7 +80,7 @@ system-wide chord, and HIToolbox's TIS APIs remain the public input-source mecha
 | build, run or regenerate data                               | [development.md](docs/development.md)                        |
 | add or restyle any view                                     | [ui.md](docs/ui.md)                                          |
 | touch one feature's internals                               | [features/](docs/features/) — each opens with its invariants |
-| package or ship a build                                     | [release.md](docs/release.md)                                |
+| install or ship a build                                     | [release.md](docs/release.md)                                |
 
 ## Non-negotiables
 
@@ -129,7 +155,7 @@ feature's doc, under its own `## Invariants`.
   constant or type instead. Cap 100 characters, delete rather than update, and never comment a change
   you just made. Nothing lints this; get it right the first time.
   Full rules: [standards.md#comments](docs/standards.md#comments).
-- **Debug builds are their own channel** — `Tinycast Dev.app` / `com.tinycast.app.dev` — so a local run
+- **Debug builds are their own channel** — `Tinycast Dev.app` / `com.olegy.tinycast.dev` — so a local run
   never shares prefs, caches, TCC grants or the login item with an installed copy. Anything newly
   persisted must stay keyed by `Bundle.main.bundleIdentifier`.
 - **XcodeGen owns the project.** `Tinycast.xcodeproj` is committed but generated from `project.yml`;

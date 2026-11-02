@@ -78,7 +78,8 @@ https://chat.openai.com/?q={clipboard}
 space or an `&` can't truncate the destination. Encoding is applied _after_ the modifier pipeline, so
 `| uppercase` can't rewrite the `%xx` hex, and it is skipped when the template already spoke for
 itself — `| raw` opts out, `| percent-encode` has done it once already. A local path is never
-encoded: `%20` in a path is a literal, not a space.
+encoded: `%20` in a path is a literal, not a space. Neither is a link that _starts_ with a
+placeholder, such as `{clipboard}`: that value is the destination itself, scheme and slashes included.
 
 `| raw` opts out of more than the escaping. Whether a link is a website, a path or a deeplink is
 decided by `QuicklinkDestination.detect` on the **expanded** text, so an unencoded substituted value

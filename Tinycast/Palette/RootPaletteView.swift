@@ -130,6 +130,10 @@ struct RootPaletteView: View {
         case .extensionCommand:
             return ExtensionCommandScreen(
                 screen: extensionScreen, extensions: extensions, vm: vm, openActions: openActions)
+        case .quickAction:  // mod: quick-action-screen
+            return QuickActionScreen(
+                coordinator: core.quickActionScreen, palette: vm, metrics: metrics,
+                openMenuCorner: menuCorner, openInputMenu: openInputOptions)
         }
     }
 
@@ -212,7 +216,7 @@ struct RootPaletteView: View {
                     title: String(localized: "Changelog"),
                     systemImage: "clock.arrow.trianglehead.2.counterclockwise.rotate.90"
                 ) {
-                    if let url = URL(string: "https://github.com/abue-ammar/tinycast/releases") {
+                    if let url = URL(string: "https://github.com/sermelipharo/tinycast-space/releases") {
                         openURL(url)
                     }
                 },
@@ -339,7 +343,7 @@ struct RootPaletteView: View {
                 )
                 // The window's frame is the size source, so the glass and clip stay matched.
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-                .background(Theme.Colors.panelScrim)
+                .background(SpaceTheme.backdrop)  // tinycast-space: a Raycast theme's gradient
                 .background(GlassEffectView())
                 .overlay {
                     Theme.Colors.dialogDimming
@@ -411,6 +415,8 @@ struct RootPaletteView: View {
                 extensions.dispatch(handler: handler, arguments: [vm.query])
             }
             .modifier(ExtensionSelectionForwarder(screen: extensionScreen, selection: vm.selection))
+            // tinycast-space: a highlighted row offering a raycast://theme link previews it.
+            .modifier(RaycastThemeLinkPreview(screen: extensionScreen, selection: vm.selection))
             // A narrower list means the old index points at a different row, or at none.
             .onChange(of: vm.clipboardFilter) { land(restoringSelection: true) }
             // The filter is part of the query, so narrowing re-runs it rather than thinning rows.
@@ -583,15 +589,39 @@ struct RootPaletteView: View {
                     goBack()
                 case .hidePalette:
                     core.paletteCoordinator.hidePalette()
-                    if settings.escapeKeyBehavior == .closeAndPopToRoot {
-                        core.paletteCoordinator.popToRootNow()
-                    }
+                    // mod: escape-pop-to-root — a close by Escape is done with the screen, so reset.
+                    core.paletteCoordinator.popToRootNow()
                 }
                 return .handled
+            }
+            // tinycast-space: typing a user alias exactly and pressing Space opens its entry, the
+            // way Raycast does. A row with inline arguments gets its first field focused; anything
+            // else runs, so further typing lands in the command's own search field. Apps and
+            // settings panes keep searching, since "tg something" is more often a query.
+            .onKeyPress(.space, phases: .down) { press in
+                guard vm.mode == .launcher, searchFocused, argumentFocused == nil, !menuOpen,
+                    !vm.isComposing, !vm.isControlListOpen, !isCollapsed,
+                    press.modifiers.subtracting(.capsLock).isEmpty,
+                    !vm.query.isEmpty
+                else { return .ignored }
+                // "\ " escapes the Space: the backslash becomes a plain space and the query searches on.
+                if vm.query.hasSuffix("\\") {
+                    vm.query.removeLast()
+                    vm.query += " "
+                    return .handled
+                }
+                return openAliasEntry() ? .handled : .ignored
             }
             .onKeyPress(keys: [.tab], phases: .down) { press in
                 // ⇥ inside an open list belongs to the list, not to the form's field order.
                 if vm.isControlListOpen { return .handled }
+                // tinycast-space: Tab on an exact alias does what Space does.
+                if vm.mode == .launcher, searchFocused, argumentFocused == nil, !menuOpen,
+                    !vm.isComposing, !isCollapsed, press.modifiers.subtracting(.capsLock).isEmpty,
+                    !vm.query.isEmpty, openAliasEntry()
+                {
+                    return .handled
+                }
                 if !menuOpen { advanceTabFocus(backwards: press.modifiers.contains(.shift)) }
                 return .handled
             }
@@ -1103,6 +1133,7 @@ struct RootPaletteView: View {
         vm.menuQuery = ""
         // Stated here rather than mirrored later: the window delegate reads it during this turn.
         vm.menuOpen = false
+        InlineEntryEditor.shared.end(stoppingRecordingIn: core)  // tinycast-space
     }
 
     private func openInputOptions(
@@ -1331,6 +1362,8 @@ struct RootPaletteView: View {
     private func activateMenuItem(_ index: Int) {
         guard let content = menuContent, (0..<content.rowCount).contains(index) else { return }
         guard content.isSelectable(index) else { return }
+        // tinycast-space: a row that edits in place keeps its menu up. See InlineEntryEditor.
+        if content.keepsOpen(index) { return content.activate(index) }
         // Close first: an action opening a window must find the palette key, or nothing hides it.
         closeMenus()
         // A mouse click on a row takes the caret with it; menus close back into the field.
@@ -1357,6 +1390,54 @@ struct RootPaletteView: View {
         case .freshScreen(let mode): vm.push(mode: mode)
         case .ask: core.quickAICoordinator.ask(vm.query)
         }
+    }
+
+    /// tinycast-space: the exact-alias jump shared by Space and Tab. False when the query is not
+    /// exactly a user alias of an entry that opens.
+    private func openAliasEntry() -> Bool {
+        // Case-sensitive on purpose: "cc" opens its command, "CC" (Shift) just searches.
+        guard let key = core.aliases.aliases.first(where: { $0.value == vm.query })?.key,
+            let launcher = screen as? LauncherScreen,
+            let index = launcher.rows.firstIndex(where: {
+                if case .entry(let app) = $0 { return app.preferenceKey == key }
+                return false
+            }),
+            case .entry(let app) = launcher.rows[index],
+            app.kind != .application, app.kind != .systemSettings
+        else { return false }
+        vm.selection = index
+        scroll = ScrollIntent(kind: .follow)
+        // Asked of the row itself, not of the header: its fields are built a pass later, so
+        // reading the accessory here would miss them and open the row instead.
+        let wantsArguments: Bool
+        // A view command whose arguments are all optional opens instead, so what follows lands
+        // in its own search bar — Search Homebrew's query is just its first search.
+        var opensInside = false
+        switch app.kind {
+        case .quicklink:
+            wantsArguments = core.quicklinks.quicklink(entryID: app.id).map {
+                !SnippetTemplateEngine.declaredArguments(in: $0.link).isEmpty
+            } ?? false
+        case .customCommand:
+            wantsArguments = !(core.customCommands.command(entryID: app.id)?.arguments ?? []).isEmpty
+        case .extensionCommand:
+            let command = extensions.resolve(app)?.1
+            let arguments = command?.arguments ?? []
+            opensInside = command?.mode == .view && !arguments.contains(where: \.required)
+            wantsArguments = !arguments.isEmpty && !opensInside
+        default:
+            wantsArguments = false
+        }
+        if wantsArguments {
+            // The palette focuses the first unanswered field as soon as the fields exist.
+            vm.pendingArgumentEntryID = app.id
+        } else if !opensInside, let field = headerAccessory?.fieldNames.first {
+            argumentFocused = field
+            searchFocused = false
+        } else {
+            launcher.activate(at: index)
+        }
+        return true
     }
 
     private func advanceTabFocus(backwards: Bool) {
@@ -1404,7 +1485,8 @@ struct RootPaletteView: View {
     /// The palette was opened to fill one row's fields, so the caret starts in the first empty one.
     private func focusPendingArgument() {
         guard vm.pendingArgumentEntryID != nil,
-            let field = headerAccessory?.firstIncompleteField
+            // tinycast-space: alias + Space lands in an optional field too, as Raycast does.
+            let field = headerAccessory?.firstIncompleteField ?? headerAccessory?.fieldNames.first
         else { return }
         argumentFocused = field
         searchFocused = false
@@ -1453,7 +1535,10 @@ struct RootPaletteView: View {
             core.extensionCoordinator.exitExtensionScreen()
             return
         }
-        if !vm.pop() { core.paletteCoordinator.hidePalette() }
+        if !vm.pop() {
+            core.paletteCoordinator.hidePalette()
+            core.paletteCoordinator.popToRootNow()  // mod: escape-pop-to-root
+        }
     }
 
     private func activateSelection() {

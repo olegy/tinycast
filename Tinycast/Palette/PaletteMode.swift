@@ -26,6 +26,7 @@ enum PaletteMode: String, CaseIterable, Identifiable {
     case snippetEditor
     case dictionary
     case extensionCommand
+    case quickAction  // mod: quick-action-screen
 
     var id: String { rawValue }
 
@@ -56,6 +57,7 @@ enum PaletteMode: String, CaseIterable, Identifiable {
         case .snippets, .snippetEditor: return "curlybraces"
         case .dictionary: return "book.closed"
         case .extensionCommand: return "puzzlepiece.extension"
+        case .quickAction: return "wand.and.sparkles"  // mod: quick-action-screen
         }
     }
     var placeholder: String {
@@ -85,6 +87,7 @@ enum PaletteMode: String, CaseIterable, Identifiable {
         case .dictionary: return String(localized: "Look up a word…")
         // Replaced by the command's own `searchBarPlaceholder` whenever it declares one.
         case .extensionCommand: return String(localized: "Search…")
+        case .quickAction: return String(localized: "Quick Actions")  // mod: quick-action-screen
         }
     }
 }

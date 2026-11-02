@@ -45,6 +45,9 @@ enum SystemActionRunner {
                 "tell application \"System Events\" to shut down with state saving preference")
         case .logOut:
             try await runAppleScript("tell application \"System Events\" to log out")
+        // tinycast-space: Raycast's Confetti; the overlay closes itself.
+        case .confetti:
+            ConfettiOverlay.fire()
         case .showScreenSaver:
             let url = URL(fileURLWithPath: "/System/Library/CoreServices/ScreenSaverEngine.app")
             guard FileManager.default.fileExists(atPath: url.path) else {
@@ -110,10 +113,8 @@ enum SystemActionRunner {
             return SystemActionFeedback(
                 on ? String(localized: "Stage Manager On") : String(localized: "Stage Manager Off"))
         case .openTrash:
-            let trash = FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent(".Trash")
-            guard NSWorkspace.shared.open(trash) else {
-                throw SystemActionFailure(String(localized: "Finder could not open the Trash."))
-            }
+            // mod: fix-open-trash — opening the `~/.Trash` URL lands in the home folder instead.
+            try await runAppleScript("tell application \"Finder\"\nactivate\nopen trash\nend tell")
         case .emptyTrash:
             // Count first: Finder errors on an empty Trash, and `~/.Trash` is TCC-protected.
             let items =

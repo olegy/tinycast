@@ -14,9 +14,10 @@ verifying a change is [testing.md](testing.md).
 
 ## First-time setup
 
-Create the `Tinycast Self-Signed` code-signing identity once — builds sign with it, which is what keeps
-macOS from forgetting the Accessibility grant on every rebuild. Follow **[signing.md](signing.md) §1**,
-a few `openssl`/`security` commands.
+Create the `Tinycast Self-Signed` code-signing identity once — Debug builds sign with it, which is what
+keeps macOS from forgetting the Accessibility grant on every rebuild. Follow
+**[signing.md](signing.md) §1**, a few `openssl`/`security` commands. Release builds
+(`Scripts/install.sh`) sign with the Apple Development certificate named in `keys/signing.env`.
 
 That is the whole required setup. Editor configuration is personal and the repo does not prescribe it;
 the section below is a note for anyone who wants it, not a step.
@@ -51,13 +52,13 @@ download on demand; none are app resources.
 
 ### The dev channel
 
-Debug builds are a separate channel: **`Tinycast Dev.app`**, bundle id `com.tinycast.app.dev`. Every
+Debug builds are a separate channel: **`Tinycast Dev.app`**, bundle id `com.olegy.tinycast.dev`. Every
 persisted thing is keyed by bundle id — `~/Library/Preferences/<id>.plist` (settings and hotkey
 bindings), `~/Library/Application Support/<id>/` (the onboarding marker, Notes, snippets, quicklinks,
 clipboard history, calculator history, launch ranking and frequent emoji; Notes and snippets unless
 a folder is chosen),
 `~/Library/Caches/<id>/` (exchange rates, the update check, staged downloads), the opt-in
-`~/.config/tinycast-dev/settings.json` (`tinycast` on stable), the `SMAppService`
+`~/.config/tinycast-dev/settings.json` (`tinycast` for `com.olegy.tinycast`), the `SMAppService`
 login item, and the Accessibility / Input Monitoring (TCC) grants — so a local build can neither read
 nor clobber an installed app's state, and both run side by side.
 

@@ -410,6 +410,8 @@ final class PaletteWindowController: NSObject, NSWindowDelegate {
                 core.snippetCoordinator.cancelSnippetEditing()
                 return true
             }
+            // mod: quick-action-screen — its text view would read Escape as completion.
+            if core.palette.mode == .quickAction { return core.quickActionScreen.escape() }
             return false
         }
         // Handled at the panel: the field editor or a missing main menu eats these first.

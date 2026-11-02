@@ -331,8 +331,14 @@ struct LauncherScreen: PaletteScreen {
         case .favoriteSlot(let index): return launchFavorite(at: index)
         case .copyCalculation: return copyCalculation(at: selection)
         case .openInApp, .showDetails:
-            guard let meeting = meeting(at: selection) else { return false }
-            return MeetingActionsMenu.perform(shortcut, meeting: meeting, core: core)
+            if let meeting = meeting(at: selection) {
+                return MeetingActionsMenu.perform(shortcut, meeting: meeting, core: core)
+            }
+            // tinycast-space: ⌘I on an app opens Finder's Get Info, as in Raycast.
+            guard shortcut == .showDetails, let app = entry(at: selection), app.kind == .application
+            else { return false }
+            core.launcherCoordinator.showInfoInFinder(app)
+            return true
         default: return false
         }
     }
@@ -379,6 +385,7 @@ struct LauncherScreen: PaletteScreen {
         case .customCommand:
             guard let command = core.customCommands.command(entryID: entry.id) else { return false }
             core.customCommandCoordinator.editCustomCommand(command)
+        case .quickAction: return core.quickActionScreen.editAction(for: entry)  // mod: quick-action-screen
         default: return false
         }
         return true
@@ -395,8 +402,16 @@ struct LauncherScreen: PaletteScreen {
         return true
     }
 
-    /// ⌘1–⌘9/⌘0 — launch a favorite by position, in either palette size.
+    /// ⌘1–⌘9/⌘0 — launch a favorite by position, in either palette size. While a query is
+    /// typed no favorite is pinned, so ⌘1–⌘9 open that many results down instead.
     private func launchFavorite(at index: Int) -> Bool {
+        if !pinsFavorites {
+            guard index < LauncherList.numberedResultLimit,
+                let row = rows.indices.filter({ entry(at: $0) != nil }).dropFirst(index).first
+            else { return false }
+            activate(at: row)
+            return true
+        }
         guard let app = pinnedFavorites.dropFirst(index).first else { return false }
         core.launcherCoordinator.launch(app)
         return true
@@ -500,6 +515,7 @@ struct LauncherScreen: PaletteScreen {
             meetingCount: meetingCount,
             suggestionCount: suggestionCount,
             matchCount: matchCount,
+            numbersResults: !pinsFavorites,
             scroll: scroll,
             card: leadCard,
             cardSelected: isCardSelected(selection),

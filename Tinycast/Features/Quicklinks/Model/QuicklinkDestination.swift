@@ -53,6 +53,8 @@ enum QuicklinkDestination: Hashable, Sendable {
     /// Whether substituted values need percent-encoding, decided before placeholders resolve.
     static func usesURLEncoding(_ link: String, homeDirectory: String = NSHomeDirectory()) -> Bool {
         let trimmed = link.trimmingCharacters(in: .whitespacesAndNewlines)
+        // mod: fix-quicklink-clipboard — a leading value is the whole destination, `{clipboard}`.
+        if trimmed.hasPrefix("{") { return false }
         return absolutePath(trimmed, homeDirectory: homeDirectory) == nil
     }
 

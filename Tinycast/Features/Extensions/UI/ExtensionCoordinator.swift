@@ -97,7 +97,7 @@ final class ExtensionCoordinator {
         }
         run(
             owner, command: command, arguments: link.arguments, fallbackText: link.fallbackText,
-            launchType: link.launchType)
+            launchType: link.launchType, launchContext: link.context)
     }
 
     // MARK: - Managing one extension from the launcher
@@ -237,7 +237,10 @@ final class ExtensionCoordinator {
         Task {
             if await extensions.popNavigation() { return }
             await extensions.stop()
-            if !palette.pop() { paletteCoordinator.hidePalette() }
+            if !palette.pop() {
+                paletteCoordinator.hidePalette()
+                paletteCoordinator.popToRootNow()  // mod: escape-pop-to-root
+            }
         }
     }
 
