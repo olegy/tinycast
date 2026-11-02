@@ -91,6 +91,7 @@ enum SettingsFileSchema {
         case .fileSearchCommands: return launcher.commandsBinding(for: key, owner: .fileSearch)
         case .notesEnabled: return bind(settings, \.notesEnabled)
         case .notesRendersMarkdown: return bind(settings, \.notesRendersMarkdown)
+        case .notesFitsWindowToText: return bind(settings, \.notesFitsWindowToText)
         case .notesShowsFormattingBar: return bind(settings, \.notesShowsFormattingBar)
         case .notesShowsCharacterCount: return bind(settings, \.notesShowsCharacterCount)
         case .notesTextSize: return bind(settings, \.notesTextSize)

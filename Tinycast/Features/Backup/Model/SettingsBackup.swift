@@ -54,6 +54,7 @@ struct SettingsBackup: Codable {
         var fileSearchShowInLauncher: Bool?
         var notesEnabled: Bool?
         var notesRendersMarkdown: Bool?
+        var notesFitsWindowToText: Bool?
         var notesShowsFormattingBar: Bool?
         var notesShowsCharacterCount: Bool?
         var notesTextSize: String?
@@ -169,6 +170,7 @@ extension SettingsBackup {
             fileSearchShowInLauncher: s.fileSearchShowInLauncher,
             notesEnabled: s.notesEnabled,
             notesRendersMarkdown: s.notesRendersMarkdown,
+            notesFitsWindowToText: s.notesFitsWindowToText,
             notesShowsFormattingBar: s.notesShowsFormattingBar,
             notesShowsCharacterCount: s.notesShowsCharacterCount,
             notesTextSize: s.notesTextSize.rawValue,
@@ -442,6 +444,10 @@ extension SettingsBackup {
         }
         if let flag = s.notesRendersMarkdown {
             settings.notesRendersMarkdown = flag
+            count += 1
+        }
+        if let flag = s.notesFitsWindowToText {
+            settings.notesFitsWindowToText = flag
             count += 1
         }
         if let flag = s.notesShowsFormattingBar {

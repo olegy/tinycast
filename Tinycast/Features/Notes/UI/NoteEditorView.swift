@@ -228,7 +228,7 @@ struct NoteEditorView: NSViewRepresentable {
         textView.textColor = NSColor(Theme.Colors.noteText)
         textView.insertionPointColor = NSColor(Theme.Colors.noteText)
         textView.selectedTextAttributes = [
-            .backgroundColor: NSColor(Theme.Colors.selection),
+            .backgroundColor: NSColor(Theme.Colors.textSelection),
             .foregroundColor: NSColor(Theme.Colors.noteText)
         ]
         textView.isAutomaticQuoteSubstitutionEnabled = false

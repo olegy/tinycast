@@ -15,8 +15,12 @@ enum NoteMarkdownStyler {
 
     /// The literal editor's attributes, and the base every rendered line starts from.
     static var literal: Attributes {
-        [.font: NoteMarkdownTypography.body, .foregroundColor: noteText]
+        [.font: NoteMarkdownTypography.body, .foregroundColor: noteText, .paragraphStyle: bodyParagraph]
     }
+
+    /// Space under each line rather than a height multiple, which lifts markers off their glyphs.
+    private static let lineSpacingRatio: CGFloat = 0.2
+    private static var bodyParagraph: NSParagraphStyle { paragraph { _ in } }
 
     private static let noteText = NSColor(Theme.Colors.noteText)
 
@@ -133,8 +137,9 @@ enum NoteMarkdownStyler {
             case .code:
                 let codeFont = NoteMarkdownTypography.inlineCode(matching: font)
                 if isRevealed { markerLook[.font] = codeFont }
-                let background = color(Theme.Colors.controlSurface)
-                runs.append((inline.contentRange, [.font: codeFont, .backgroundColor: background]))
+                let chip = color(Theme.Colors.controlSurface)
+                runs.append((inline.contentRange, [.font: codeFont, .noteInlineCode: chip]))
+                runs += chipPadding(inline.contentRange, font: codeFont)
             case .link(let destination):
                 runs.append((inline.contentRange, linkLook(URL(string: destination), isRevealed: isRevealed)))
             case .autolink:
@@ -144,6 +149,18 @@ enum NoteMarkdownStyler {
             runs += inline.markerRanges.map { ($0, markerLook) }
         }
         return runs
+    }
+
+    /// Kerning after the character before the span and after its last opens the chip's padding.
+    private static func chipPadding(
+        _ content: NSRange, font: NSFont
+    ) -> [(range: NSRange, attributes: Attributes)] {
+        guard content.location > 0, content.length > 0 else { return [] }
+        let kern: Attributes = [.kern: NoteTextLayoutFragment.chipPadding(for: font)]
+        return [
+            (NSRange(location: content.location - 1, length: 1), kern),
+            (NSRange(location: NSMaxRange(content) - 1, length: 1), kern)
+        ]
     }
 
     /// The span's font: the line font plus the traits of every emphasis span enclosing it.
@@ -184,12 +201,14 @@ enum NoteMarkdownStyler {
     }
 
     /// A wrapped table row hangs under its first line, so each row still reads as one.
-    private static let tableRow: NSParagraphStyle = paragraph { $0.headIndent = Theme.Spacing.lg }
+    private static var tableRow: NSParagraphStyle { paragraph { $0.headIndent = Theme.Spacing.lg } }
 
-    private static let codeParagraph: NSParagraphStyle = paragraph {
-        $0.firstLineHeadIndent = codeInset
-        $0.headIndent = codeInset
-        $0.tailIndent = -codeInset
+    private static var codeParagraph: NSParagraphStyle {
+        paragraph {
+            $0.firstLineHeadIndent = codeInset
+            $0.headIndent = codeInset
+            $0.tailIndent = -codeInset
+        }
     }
 
     private static func indented(by indent: CGFloat, spacingAfter: CGFloat = 0) -> NSParagraphStyle {
@@ -215,6 +234,7 @@ enum NoteMarkdownStyler {
 
     private static func paragraph(_ configure: (NSMutableParagraphStyle) -> Void) -> NSParagraphStyle {
         let style = NSMutableParagraphStyle()
+        style.lineSpacing = (NoteMarkdownTypography.body.pointSize * lineSpacingRatio).rounded()
         configure(style)
         return style
     }

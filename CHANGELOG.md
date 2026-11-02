@@ -10,6 +10,12 @@ offers.
 - **Text Size.** A slider in Settings > Notes makes a note's text larger, in four steps from today's
   size up to 23 points. Headings grow with it; the window's title and footer stay as they are.
 - **Show Character Count** can now be turned off in Settings > Notes.
+- **Lighter headings and roomier lines.** Headings are semibold and closer to the body's size, so a
+  second-level heading no longer reads like a first, and lines have more space between them.
+- **Inline code** in a note sits on a rounded chip with room on both sides, in slightly smaller type.
+- **Selected text in a note** is highlighted in the system's highlight colour instead of grey.
+- **Fit Window to Text** in Settings > Notes can be turned off, so the note window keeps the
+  width and height you set instead of growing and shrinking with the text.
 
 ## 0.12.1-lite.1
 

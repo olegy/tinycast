@@ -33,9 +33,9 @@ commands and global shortcuts can show, search, or extend the collection.
   commands are absent, and enabling alone does not enumerate or create the Notes directory.
 - **The collection may be empty.** Deleting the last note is allowed and creates no replacement; the
   window shows its empty state and Create Note still works from there.
-- **The window's height always fits the note.** Every edit, note switch and bar toggle grows or
-  shrinks it between the 180pt floor and 860pt, or the screen's visible height; past that the editor
-  scrolls. The top edge holds until the bottom would leave the visible frame, then the window moves
+- **The window's height fits the note while Fit Window to Text is on.** Every edit, note switch and
+  bar toggle grows or shrinks it between the 180pt floor and 860pt, or the screen's visible height;
+  past that the editor scrolls. The top edge holds until the bottom would leave the visible frame, then the window moves
   up. A manually dragged height lasts until the next edit. The height is the sum of TextKit's layout
   fragment heights, laid out from the top a paragraph at a time until it passes the tallest window: the
   text view's frame never gets shorter than its clip view, and until the next draw the lines below an
@@ -179,17 +179,25 @@ marked-text ones that post no `textDidChange`, and several are folded into one p
 edited lines and one neighbour on each side are restyled, widened to the rest of the note when a fenced
 block moved and to any list line whose depth changed.
 
-`NoteMarkdownStyler` turns one line into attributes. `NoteMarkdownTypography` sets the body one
-system text style up (title3) and headings at largeTitle, title1 and title2, with or without
-rendering. The Text Size setting replaces the body size and scales the headings by the same ratio;
-code, checkboxes and list slots already follow the body. The body pins SF's Text optical size, so it
-keeps the Text cut's spacing past 20 points, and every fragment (`NoteTextLayoutFragment` and its
-`NoteBlockLayoutFragment` subclass) draws with font smoothing off, which keeps large text from reading
-as bold. Interface Size does not scale Notes. A hidden marker gets a 0.01-point system font and
+`NoteMarkdownStyler` turns one line into attributes. `NoteMarkdownTypography` sets the body at the
+Text Size setting's size (15 points by default) and headings 1 to 3 at 1.3, 1.15 and 1.05 times it,
+all semibold so size alone ranks them, with or without rendering; code, checkboxes and list slots
+also follow the body. Every paragraph style adds a fifth of the body size as `lineSpacing`, space
+below each line: a `lineHeightMultiple` adds it above the glyphs instead, which lifts checkboxes,
+bullets and inline-code chips off the text they mark. Inline code is SF Mono at 0.87 of its span's
+size on a rounded chip that `NoteTextLayoutFragment` draws from the `.noteInlineCode` attribute,
+rather than `.backgroundColor`, which only fills the glyphs edge to edge; kerning after the
+character before the span and after its last character makes room for the chip's side padding,
+measured from the first and last glyph's ink so SF Mono's centred cells do not skew it.
+Selected text takes
+`Theme.Colors.textSelection`, the system highlight colour, rather than the launcher's grey row
+selection. The body pins SF's Text optical size, so it keeps the Text cut's spacing past 20 points,
+and every fragment (`NoteTextLayoutFragment` and its `NoteBlockLayoutFragment` subclass) draws with
+font smoothing off, which keeps large text from reading as bold. Interface Size does not scale Notes. A hidden marker gets a 0.01-point system font and
 a clear colour, so it stays in the string at almost no width. Fence and rule lines are cleared at their
 normal font instead, so they keep their row height. Every list item (bullet, numbered or task) gets 8
 points of space after it, rendered or revealed, so items read as separate rows and moving the caret
-never shifts them; a wrapped item keeps normal line spacing. A restyle writes straight to `NSTextStorage` inside
+never shifts them; a wrapped item keeps the body's line spacing. A restyle writes straight to `NSTextStorage` inside
 `beginEditing` and `endEditing`, then invalidates layout for those lines. It never calls
 `shouldChangeText`, which is what keeps styling off the undo stack.
 
@@ -298,6 +306,10 @@ Settings > Notes > **Render Markdown** is `AppSettings.notesRendersMarkdown`, on
 by settings backups. `NotesCoordinator` exposes it and `NotesView` hands it to `NoteEditorView`. Off
 gives the literal editor: one font and colour, native Return, Tab and shortcuts, and no parsing.
 Flipping it restyles the open note without touching its undo history or marking it dirty.
+
+Settings > Notes > **Fit Window to Text** is `AppSettings.notesFitsWindowToText`, on when absent and
+carried by settings backups. Off skips the height fit entirely, so the window keeps the autosaved frame
+the user dragged it to, in both directions, and a long note scrolls.
 
 Settings > Notes > **Show Formatting Bar** is `AppSettings.notesShowsFormattingBar`, on when absent and
 carried by settings backups. It only takes effect while Render Markdown is on, and its row is disabled

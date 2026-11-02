@@ -71,6 +71,7 @@ enum SettingsFileKey: String, CaseIterable, Sendable {
     case fileSearchCommands = "fileSearch.commands"
     case notesEnabled = "notes.enabled"
     case notesRendersMarkdown = "notes.rendersMarkdown"
+    case notesFitsWindowToText = "notes.fitsWindowToText"
     case notesShowsFormattingBar = "notes.showsFormattingBar"
     case notesShowsCharacterCount = "notes.showsCharacterCount"
     case notesTextSize = "notes.textSize"

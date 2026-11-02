@@ -39,6 +39,7 @@ enum AppSettingsKey: String, CaseIterable {
     case fileSearchShowInLauncher = "fileSearchShowInLauncher"
     case notesEnabled = "notesEnabled"
     case notesRendersMarkdown = "notesRendersMarkdown"
+    case notesFitsWindowToText = "notesFitsWindowToText"
     case notesShowsFormattingBar = "notesShowsFormattingBar"
     case notesShowsCharacterCount = "notesShowsCharacterCount"
     case notesTextSize = "notesTextSize"

@@ -80,6 +80,7 @@ final class NotesCoordinator {
 
     var activeTitle: String { store.activeTitle }
     var rendersMarkdown: Bool { settings.notesRendersMarkdown }
+    var fitsWindowToText: Bool { settings.notesFitsWindowToText }
     var showsFormattingBar: Bool { settings.notesRendersMarkdown && settings.notesShowsFormattingBar }
     var showsCharacterCount: Bool { settings.notesShowsCharacterCount }
     var textSize: NoteTextSize { settings.notesTextSize }

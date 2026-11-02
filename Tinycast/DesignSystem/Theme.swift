@@ -464,6 +464,8 @@ enum Theme {
             dark: .srgbInk(0, alpha: 0.25), light: .srgbInk(0, alpha: 0.25))
         static var roomCardDot: Color { ramp(dark: 0.25, light: 0.25) }
         static let searchFlash = Color.accentColor.opacity(0.35)
+        /// The highlight colour picked in System Settings, which every Mac text field selects in.
+        static let textSelection = Color(nsColor: .selectedTextBackgroundColor)
         static let checkerLight = Color(nsColor: .srgbInk(1, alpha: 0.22))
         static let checkerDark = Color(nsColor: .srgbInk(0, alpha: 0.22))
         /// The violet of the app mark, used only to tint the About support callout.

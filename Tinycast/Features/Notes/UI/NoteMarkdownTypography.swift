@@ -1,13 +1,13 @@
 import AppKit
 
-/// The editor's `NSFont`s: the system text styles one step up, scaled by the Text Size setting.
+/// The editor's `NSFont`s, every heading a fixed ratio of the body the Text Size setting picks.
 @MainActor
 enum NoteMarkdownTypography {
-    private(set) static var body = textCut(ofSize: size(.title3))
-    private(set) static var heading1 = heading(.largeTitle, weight: .bold)
-    private(set) static var heading2 = heading(.title1, weight: .bold)
-    private(set) static var heading3 = heading(.title2, weight: .semibold)
-    private(set) static var inlineCode = NSFont.monospacedSystemFont(ofSize: body.pointSize, weight: .regular)
+    private(set) static var body = textCut(ofSize: NoteTextSize.standard.pointSize)
+    private(set) static var heading1 = heading(scale: 1.3)
+    private(set) static var heading2 = heading(scale: 1.15)
+    private(set) static var heading3 = heading(scale: 1.05)
+    private(set) static var inlineCode = codeFont(matching: body.pointSize)
     private(set) static var codeBlock = NSFont.monospacedSystemFont(ofSize: body.pointSize - 1, weight: .regular)
     /// Small enough that a hidden marker leaves no visible gap, while staying a real glyph run.
     static let hidden = NSFont.systemFont(ofSize: 0.01)
@@ -16,10 +16,10 @@ enum NoteMarkdownTypography {
     static func setBodySize(_ pointSize: CGFloat) -> Bool {
         guard pointSize != body.pointSize else { return false }
         body = textCut(ofSize: pointSize)
-        heading1 = heading(.largeTitle, weight: .bold)
-        heading2 = heading(.title1, weight: .bold)
-        heading3 = heading(.title2, weight: .semibold)
-        inlineCode = NSFont.monospacedSystemFont(ofSize: pointSize, weight: .regular)
+        heading1 = heading(scale: 1.3)
+        heading2 = heading(scale: 1.15)
+        heading3 = heading(scale: 1.05)
+        inlineCode = codeFont(matching: pointSize)
         codeBlock = NSFont.monospacedSystemFont(ofSize: pointSize - 1, weight: .regular)
         return true
     }
@@ -39,10 +39,9 @@ enum NoteMarkdownTypography {
         return NSFont(descriptor: descriptor, size: font.pointSize) ?? font
     }
 
-    /// Keeps each heading's ratio to the body that the unscaled text styles have.
-    private static func heading(_ style: NSFont.TextStyle, weight: NSFont.Weight) -> NSFont {
-        let scale = body.pointSize / size(.title3)
-        return NSFont.systemFont(ofSize: (size(style) * scale).rounded(), weight: weight)
+    /// Semibold throughout: size alone ranks the levels, so no heading reads heavier than the next.
+    private static func heading(scale: CGFloat) -> NSFont {
+        NSFont.systemFont(ofSize: (body.pointSize * scale).rounded(), weight: .semibold)
     }
 
     /// SF switches to its tighter Display cut at 20 points; the body keeps the Text cut at any size.
@@ -55,12 +54,12 @@ enum NoteMarkdownTypography {
 
     private static let textOpticalSize: CGFloat = 17
 
-    private static func size(_ style: NSFont.TextStyle) -> CGFloat {
-        NSFont.preferredFont(forTextStyle: style).pointSize
+    static func inlineCode(matching font: NSFont) -> NSFont {
+        font.pointSize == body.pointSize ? inlineCode : codeFont(matching: font.pointSize)
     }
 
-    static func inlineCode(matching font: NSFont) -> NSFont {
-        font.pointSize == body.pointSize
-            ? inlineCode : NSFont.monospacedSystemFont(ofSize: font.pointSize, weight: .regular)
+    /// SF Mono's wide cells read a size larger than SF Pro, so a code span sits a step smaller.
+    private static func codeFont(matching pointSize: CGFloat) -> NSFont {
+        NSFont.monospacedSystemFont(ofSize: (pointSize * 0.87).rounded(), weight: .regular)
     }
 }

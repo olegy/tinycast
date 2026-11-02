@@ -21,6 +21,7 @@ struct NotesEditorTests {
         testRenderingKeepsSourceAndUndo()
         testHiddenMarkersAndReveal()
         testTextSize()
+        testInlineCodeChip()
         testRestyleFollowsEdits()
         testRenderingOffIsLiteral()
         testTaskSpacing()
@@ -392,7 +393,13 @@ struct NotesEditorTests {
         let input = NoteEditorInput(id: NoteID(rawValue: "Size.md"), source: source, epoch: 1)
         let editor = makeEditor(input: input, rendersMarkdown: true)
         let standardHeading = font(in: editor.textView, at: 2)?.pointSize ?? 0
+        func lineSpacing() -> CGFloat {
+            (editor.textView.textStorage?.attribute(.paragraphStyle, at: 8, effectiveRange: nil)
+                as? NSParagraphStyle)?.lineSpacing ?? 0
+        }
+        let standardSpacing = lineSpacing()
         editor.coordinator.setBodyPointSize(NoteTextSize.largest.pointSize)
+        check("line spacing grows with the text size", standardSpacing > 0 && lineSpacing() > standardSpacing)
         check(
             "a larger text size restyles the body and scales headings with it",
             font(in: editor.textView, at: 8)?.pointSize == CGFloat(NoteTextSize.largest.pointSize)
@@ -403,6 +410,33 @@ struct NotesEditorTests {
             "the standard size restores the original fonts",
             font(in: editor.textView, at: 8)?.pointSize == CGFloat(NoteTextSize.standard.pointSize)
                 && font(in: editor.textView, at: 2)?.pointSize == standardHeading)
+    }
+
+    private static func testInlineCodeChip() {
+        let source = "Title\n\nsay `code` here"
+        let input = NoteEditorInput(id: NoteID(rawValue: "Chip.md"), source: source, epoch: 1)
+        let editor = makeEditor(input: input, rendersMarkdown: true)
+        editor.textView.setSelectedRange(NSRange(location: 0, length: 0))
+        let storage = editor.textView.textStorage ?? NSTextStorage()
+        let code = (source as NSString).range(of: "code")
+        func attribute(_ key: NSAttributedString.Key, at location: Int) -> Any? {
+            storage.attribute(key, at: location, effectiveRange: nil)
+        }
+        let codeFont = attribute(.font, at: code.location) as? NSFont
+        check(
+            "inline code draws a chip instead of a glyph background",
+            attribute(.noteInlineCode, at: code.location) != nil
+                && attribute(.backgroundColor, at: code.location) == nil)
+        check(
+            "inline code is set smaller than the body",
+            (codeFont?.pointSize ?? .infinity) < NoteMarkdownTypography.body.pointSize)
+        let padding = codeFont.map(NoteTextLayoutFragment.chipPadding) ?? 0
+        check(
+            "kerning opens padding on both sides of the chip",
+            padding > 0
+                && attribute(.kern, at: code.location - 1) as? CGFloat == padding
+                && attribute(.kern, at: NSMaxRange(code) - 1) as? CGFloat == padding
+                && attribute(.kern, at: code.location) == nil)
     }
 
     private static func testHiddenMarkersAndReveal() {
@@ -502,8 +536,9 @@ struct NotesEditorTests {
         let storage = editor.textView.textStorage ?? NSTextStorage()
         storage.enumerateAttributes(in: NSRange(location: 0, length: storage.length)) { attributes, _, _ in
             literal =
-                literal && attributes.count == 2
+                literal && attributes.count == 3
                 && attributes[.font] as? NSFont == NoteMarkdownTypography.body
+                && attributes[.paragraphStyle] as? NSParagraphStyle == bodyParagraph
                 && attributes[.noteBlockDecoration] == nil
         }
         check("rendering off leaves exactly the literal attributes", literal)
@@ -540,7 +575,9 @@ struct NotesEditorTests {
             check(
                 "task spacing belongs to its paragraph",
                 style(at: location)?.paragraphSpacing == Theme.Spacing.md)
-            check("wrapped task lines retain native spacing", style(at: location)?.lineSpacing == 0)
+            check(
+                "wrapped task lines keep the body's line spacing",
+                style(at: location)?.lineSpacing == bodyParagraph?.lineSpacing)
         }
         let lists = "- one\n- two\n1. three\n2. four"
         editor.coordinator.update(NoteEditorInput(id: NoteID(rawValue: "Lists.md"), source: lists, epoch: 2))
@@ -572,14 +609,14 @@ struct NotesEditorTests {
             NoteEditorInput(id: NoteID(rawValue: "Spacing.md"), source: source, epoch: 4))
         editor.textView.setSelectedRange(NSRange(location: text.length, length: 0))
         check(
-            "non-list paragraphs retain native spacing",
-            style(at: text.range(of: "plain").location) == nil
+            "non-list paragraphs get only the body's line spacing",
+            style(at: text.range(of: "plain").location) == bodyParagraph
                 && style(at: text.range(of: "- [ ] code").location)?.paragraphSpacing == 0)
         editor.textView.setSelectedRange(NSRange(location: 3, length: 0))
         check("a revealed task keeps its spacing", style(at: 0)?.paragraphSpacing == Theme.Spacing.md)
         editor.textView.setSelectedRange(NSRange(location: 0, length: 6))
         editor.textView.insertText("", replacementRange: editor.textView.selectedRange())
-        check("removing a task marker removes its spacing", style(at: 0) == nil)
+        check("removing a task marker removes its spacing", style(at: 0) == bodyParagraph)
         editor.coordinator.editorUndoManager.undo()
         check("undo restores task source without adding blank lines", editor.textView.string == source)
     }
@@ -1119,6 +1156,10 @@ struct NotesEditorTests {
             onCharacterCountChange: onCountChange,
             onFormattingChange: onFormattingChange,
             onReady: { _ in })
+    }
+
+    private static var bodyParagraph: NSParagraphStyle? {
+        NoteMarkdownStyler.literal[.paragraphStyle] as? NSParagraphStyle
     }
 
     private static func check(_ message: String, _ condition: @autoclosure () -> Bool) {

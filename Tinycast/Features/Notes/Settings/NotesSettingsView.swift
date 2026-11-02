@@ -22,6 +22,11 @@ struct NotesSettingsView: View {
                     Text("Formats as you type.")
                 }
                 .settingsEnabled(settings.notesEnabled)
+                Toggle(isOn: $settings.notesFitsWindowToText) {
+                    SettingsRowTitle(.notesOptions, "Fit Window to Text")
+                    Text("Off keeps the size you set.")
+                }
+                .settingsEnabled(settings.notesEnabled)
                 Toggle(isOn: $settings.notesShowsFormattingBar) {
                     SettingsRowTitle(.notesOptions, "Show Formatting Bar")
                 }

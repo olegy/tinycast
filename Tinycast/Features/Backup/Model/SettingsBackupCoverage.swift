@@ -35,6 +35,7 @@ enum SettingsBackupCoverage {
         "fileSearchShowInLauncher": .fileSearchShowInLauncher,
         "notesEnabled": .notesEnabled,
         "notesRendersMarkdown": .notesRendersMarkdown,
+        "notesFitsWindowToText": .notesFitsWindowToText,
         "notesShowsFormattingBar": .notesShowsFormattingBar,
         "notesShowsCharacterCount": .notesShowsCharacterCount,
         "notesTextSize": .notesTextSize,

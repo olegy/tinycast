@@ -153,7 +153,7 @@ final class NotesWindowController: NSObject, NSWindowDelegate {
     }
 
     private func fitToEditor() {
-        guard let panel, panel.isVisible, !panel.inLiveResize,
+        guard coordinator.fitsWindowToText, let panel, panel.isVisible, !panel.inLiveResize,
             let editor, let clipView = editor.enclosingScrollView?.contentView,
             let visibleFrame = (panel.screen ?? NSScreen.main)?.visibleFrame
         else { return }

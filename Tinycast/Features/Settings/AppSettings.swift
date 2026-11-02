@@ -391,6 +391,10 @@ final class AppSettings {
         didSet { defaults.set(notesRendersMarkdown, forKey: Key.notesRendersMarkdown.rawValue) }
     }
 
+    var notesFitsWindowToText: Bool {
+        didSet { defaults.set(notesFitsWindowToText, forKey: Key.notesFitsWindowToText.rawValue) }
+    }
+
     var notesShowsFormattingBar: Bool {
         didSet { defaults.set(notesShowsFormattingBar, forKey: Key.notesShowsFormattingBar.rawValue) }
     }
@@ -792,6 +796,9 @@ final class AppSettings {
         notesRendersMarkdown =
             defaults.object(forKey: Key.notesRendersMarkdown.rawValue) == nil
             || defaults.bool(forKey: Key.notesRendersMarkdown.rawValue)
+        notesFitsWindowToText =
+            defaults.object(forKey: Key.notesFitsWindowToText.rawValue) == nil
+            || defaults.bool(forKey: Key.notesFitsWindowToText.rawValue)
         notesShowsFormattingBar =
             defaults.object(forKey: Key.notesShowsFormattingBar.rawValue) == nil
             || defaults.bool(forKey: Key.notesShowsFormattingBar.rawValue)
