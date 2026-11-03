@@ -240,7 +240,8 @@ need saying explicitly. Adding it as the view is written costs a line; retrofitt
 Tinycast ships English plus German, Spanish, French, Japanese, Korean, Portuguese, Russian and
 Simplified Chinese. Every string lives in `Tinycast/Resources/Localizable.xcstrings`, keyed by its
 English source text; the compiler extracts the keys, and `./Scripts/sync-strings.sh` writes them into
-the catalog (Xcode's own build does the same in the IDE). The six privacy prompts live in
+the catalog (Xcode's own build does the same in the IDE; `xcodebuild` never does). That script is the
+Debug build of the definition of done, and lint fails on a source string the catalog lacks. The six privacy prompts live in
 `InfoPlist.xcstrings`, keyed by their `Info.plist` key.
 
 - **SwiftUI's own initializers localize literals already** — `Text("…")`, `Button("…")`, `.help("…")`

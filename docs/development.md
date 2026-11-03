@@ -135,7 +135,8 @@ the repo root excludes the generated files and the two off-limits files in `Desi
 The comment policy in [standards.md](standards.md#comments) is deliberately not among its rules.
 
 `lint.sh` also runs `check-localizations.js`, which fails on a string missing from any language, a
-missing plural form, a stale entry, or a translation whose format specifiers differ from the source.
+missing plural form, a stale entry, a translation whose format specifiers differ from the source, or
+a source string the catalog lacks entirely.
 
 ## Localization
 
@@ -144,8 +145,11 @@ missing plural form, a stale entry, or a translation whose format specifiers dif
 ```
 
 `xcodebuild` extracts strings but never writes them back to the catalog — only a build in Xcode's IDE
-does — so run this after changing UI text, then translate what it added (Xcode's catalog editor, or
-the JSON directly). A string whose source changed leaves its old entry stale; delete it. The rules for
+does — which is how untranslated strings used to pile up unnoticed. So this script *is* the Debug
+build in the [definition of done](testing.md#definition-of-done): run it after changing UI text, then
+translate what it added in all eight languages (Xcode's catalog editor, or the JSON directly). A
+string whose source changed leaves its old entry stale; check no source still uses it, then delete
+it. Lint repeats a cheaper, partial version of the missing-string check on every run. The rules for
 writing localizable code are in [standards.md](standards.md#localization).
 
 To see a language without changing the setting, launch the Debug build with

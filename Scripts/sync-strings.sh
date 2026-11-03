@@ -1,6 +1,6 @@
 #!/bin/bash
 # Merge the strings the compiler extracted into Localizable.xcstrings, as an Xcode build in the IDE
-# does; `xcodebuild` alone never writes them back. Run after changing any UI text.
+# does; `xcodebuild` alone never writes them back. This is the definition of done's Debug build.
 set -euo pipefail
 cd "$(dirname "$0")/.." || exit 1
 

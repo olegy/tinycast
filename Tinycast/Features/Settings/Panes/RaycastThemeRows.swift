@@ -42,13 +42,15 @@ struct RaycastThemeRows: View {
         let text = NSPasteboard.general.string(forType: .string)?
             .trimmingCharacters(in: .whitespacesAndNewlines)
         guard let theme = text.flatMap(URL.init(string:)).flatMap(RaycastTheme.init(url:)) else {
-            importNote = "No theme link on the clipboard."
+            importNote = String(localized: "No theme link on the clipboard.")
             return
         }
         SpaceTheme.install(theme)
         imported = SpaceTheme.imported
         if theme.appearance == .dark { dark = theme } else { light = theme }
-        importNote = "\(theme.name) is now the \(theme.appearance.rawValue) theme."
+        importNote = theme.appearance == .dark
+            ? String(localized: "\(theme.name) is now the dark theme.")
+            : String(localized: "\(theme.name) is now the light theme.")
     }
 }
 
@@ -134,7 +136,7 @@ private struct RaycastThemeBrowser: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
             RaycastThemePreview(theme: previewed, slot: slot, opacity: opacity)
-            TextField("Search \(slot.rawValue) themes", text: $query)
+            TextField(slot == .dark ? "Search dark themes" : "Search light themes", text: $query)
                 .textFieldStyle(.roundedBorder)
             ScrollView {
                 LazyVStack(alignment: .leading, spacing: 1) {
@@ -297,7 +299,7 @@ private struct RaycastThemePreview: View {
             HStack(spacing: 6) {
                 Spacer()
                 Text("Open Command").foregroundStyle(colors.ink(1))
-                Text("↵")
+                Text(verbatim: "↵")
                     .foregroundStyle(colors.ink(0.6))
                     .padding(.horizontal, 5)
                     .background(

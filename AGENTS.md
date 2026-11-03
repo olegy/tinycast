@@ -140,7 +140,8 @@ feature's doc, under its own `## Invariants`.
 
 - **User-facing text is localized through `Localizable.xcstrings`**: SwiftUI literals as they are,
   `String(localized:)` wherever text travels as a `String`, one literal per sentence. Run
-  `./Scripts/sync-strings.sh` after changing any, and translate all eight languages in the same change.
+  `./Scripts/sync-strings.sh` after changing any — `xcodebuild` never adds new keys to the catalog —
+  and translate all eight languages in the same change.
   See [standards.md](docs/standards.md#localization).
 - **A new preference also gets a `SettingsFileKey`** and its binding in `SettingsFileSchema`, so the
   opt-in `settings.json` mirror carries it; the exhaustive switch fails the build until it is bound.
@@ -166,7 +167,8 @@ feature's doc, under its own `## Invariants`.
 Each item is explained in [testing.md](docs/testing.md#definition-of-done).
 
 - `./Scripts/run-tests.sh` passes.
-- The Debug build compiles with **no new warnings**.
+- The Debug build — `./Scripts/sync-strings.sh`, which also syncs and checks the string catalog —
+  compiles with **no new warnings**, and its catalog changes are translated and committed.
 - `./Scripts/lint.sh` is clean.
 - `grep -rln 'import AppKit\|import SwiftUI\|import Cocoa' Tinycast/Features/*/Model/` returns nothing.
 - Any doc your change made wrong is fixed in the same commit.

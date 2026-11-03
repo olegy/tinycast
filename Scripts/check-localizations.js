@@ -3,12 +3,15 @@
 //
 // A missing translation still builds and runs: the string just appears in English, in the middle
 // of an otherwise translated window. A translation whose format specifiers differ from the source
-// is worse — `String(format:)` reads the wrong argument, or crashes.
+// is worse — `String(format:)` reads the wrong argument, or crashes. A string the source uses but
+// the catalog lacks is in no language at all, and `xcodebuild` never adds it, so it is caught here.
 //
 // Usage: node Scripts/check-localizations.js   (run by ./Scripts/lint.sh)
 "use strict";
 
+const { execFileSync } = require("child_process");
 const fs = require("fs");
+const os = require("os");
 const path = require("path");
 
 const ROOT = path.join(__dirname, "..");
@@ -77,7 +80,38 @@ function checkPlurals(localization, required, context, problems) {
   }
 }
 
+/** Keys a lightweight parse of the sources finds; the compiler finds more, so this is a floor. */
+function sourceKeys() {
+  const files = [];
+  const walk = (dir) => {
+    for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+      const file = path.join(dir, entry.name);
+      if (entry.isDirectory()) walk(file);
+      else if (entry.name.endsWith(".swift")) files.push(file);
+    }
+  };
+  walk(path.join(ROOT, "Tinycast"));
+  const out = fs.mkdtempSync(path.join(os.tmpdir(), "tinycast-strings-"));
+  try {
+    // `--avoid-arg-placeholder` skips interpolations it cannot type, which would never match a key.
+    execFileSync("xcrun", ["xcstringstool", "extract", "--SwiftUI", "--modern-localizable-strings",
+      "--avoid-arg-placeholder", "--table", "Localizable", "--output-format", "xcstrings",
+      "--output-directory", out, ...files], { stdio: "ignore" });
+    const extracted = path.join(out, "Localizable.xcstrings");
+    return fs.existsSync(extracted) ? Object.keys(JSON.parse(fs.readFileSync(extracted, "utf8")).strings) : [];
+  } finally {
+    fs.rmSync(out, { recursive: true, force: true });
+  }
+}
+
 const problems = [];
+
+const localizable = JSON.parse(fs.readFileSync(path.join(ROOT, CATALOGS[0]), "utf8"));
+for (const key of sourceKeys()) {
+  if (!(key in localizable.strings)) {
+    problems.push(`Localizable.xcstrings: “${key}” is used in source but missing from the catalog`);
+  }
+}
 
 for (const file of CATALOGS) {
   const catalog = JSON.parse(fs.readFileSync(path.join(ROOT, file), "utf8"));

@@ -12,7 +12,7 @@ The mechanical bar, in one place so it cannot drift. All five pass before a chan
 | The harnesses | `./Scripts/run-tests.sh` |
 | Lint, settings search and translations | `./Scripts/lint.sh` |
 | Pure-layer purity | `grep -rln 'import AppKit\|import SwiftUI\|import Cocoa' Tinycast/Features/*/Model/` |
-| A clean build | `xcodebuild … -configuration Debug CODE_SIGNING_ALLOWED=NO`, zero **new** warnings |
+| A clean build, strings synced | `./Scripts/sync-strings.sh` (the Debug build): zero **new** warnings, every string it adds translated |
 | Docs still true | any doc your change made wrong, fixed in the same commit |
 
 There is no CI: every item is on you, run locally. CodeRabbit reviews each PR, but it is a reviewer,
@@ -210,12 +210,14 @@ when touching a pure file:
 
 ## Build and size checks
 
-A clean build is part of the bar; nothing builds the app for you, so this is on you.
+A clean build is part of the bar; nothing builds the app for you, so this is on you. The Debug build
+is `sync-strings.sh`, so the catalog cannot fall behind the source: it builds with
+`CODE_SIGNING_ALLOWED=NO`, merges every string the compiler extracted, then fails until each new one
+is translated. Commit whatever it changes in `Localizable.xcstrings`.
 
 ```sh
 xcodegen generate                 # only after editing project.yml
-xcodebuild build -project Tinycast.xcodeproj -scheme Tinycast -configuration Debug \
-  CODE_SIGNING_ALLOWED=NO
+./Scripts/sync-strings.sh         # the Debug build, plus the string catalog
 xcodebuild build -project Tinycast.xcodeproj -scheme Tinycast -configuration Release \
   CODE_SIGNING_ALLOWED=NO
 find ~/Library/Developer/Xcode/DerivedData -name "Tinycast*.app" -maxdepth 6 -print -quit
@@ -242,6 +244,12 @@ The script then runs `Scripts/check-settings-search.js`, one check SwiftLint can
 `SettingsAnchor` must be claimed by a section, and every row in `SettingsSearchCatalog` must be
 marked by a `SettingsRowTitle`. Either gap compiles and reads fine, and fails only at runtime as a
 search result that navigates and then sits there.
+
+Last, `Scripts/check-localizations.js` checks the catalog: every string in every language, plural
+forms, format specifiers, no stale keys — and a lightweight parse of the sources
+(`xcstringstool extract`) for strings missing from the catalog altogether. That parse cannot see a
+literal passed as a `LocalizedStringResource` parameter, so it is a floor; `sync-strings.sh` is the
+full check.
 
 ## Performance measurement
 
