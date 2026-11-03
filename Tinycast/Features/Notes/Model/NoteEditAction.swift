@@ -18,5 +18,6 @@ enum NoteEditAction: Sendable, Equatable {
     case toggleTask(lineIndex: Int)
     /// The `[] ` input rule.
     case typedSpace
-    case pasteURL(String)
+    /// A URL over selected text links it; a list item into an empty item replaces its marker.
+    case paste(String)
 }

@@ -183,8 +183,7 @@ final class AIChatWindowChrome: NSObject, WindowChrome, NSToolbarDelegate, NSSea
 
     private func handle(_ event: NSEvent, in window: NSWindow) -> Bool {
         let modifiers = event.modifierFlags.intersection([.command, .option, .control, .shift])
-        let key = (ASCIIKeyboardLayout.character(for: event) ?? event.charactersIgnoringModifiers)?
-            .lowercased()
+        let key = ASCIIKeyboardLayout.chordKey(for: event)
         switch (modifiers, key) {
         case ([.command], "b"):
             toggleSidebar()

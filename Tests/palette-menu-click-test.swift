@@ -22,6 +22,7 @@ enum PaletteMode {
 @MainActor
 enum ASCIIKeyboardLayout {
     static func character(for event: NSEvent) -> String? { nil }
+    static func chordKey(for event: NSEvent) -> String? { event.charactersIgnoringModifiers?.lowercased() }
 }
 
 @MainActor

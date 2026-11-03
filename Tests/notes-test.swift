@@ -1009,17 +1009,36 @@ struct NotesTests {
             edit(.typedSpace, "a []|") == nil && edit(.typedSpace, "- []|") == nil
                 && edit(.typedSpace, "[x]|") == nil)
 
-        let url = NoteEditAction.pasteURL(" https://a.com/x \n")
+        let url = NoteEditAction.paste(" https://a.com/x \n")
         check(
             "pasting a URL over text links it",
             edit(url, "see «docs» now") == "see [docs](https://a.com/x)| now")
         check(
             "pasting links only a URL over a one-line selection",
-            edit(.pasteURL("not a url"), "«docs»") == nil && edit(url, "«a\nb»") == nil
+            edit(.paste("not a url"), "«docs»") == nil && edit(url, "«a\nb»") == nil
                 && edit(url, "docs|") == nil)
         check(
             "pasting a URL inside code or a link is plain",
             edit(url, "`«code»`") == nil && edit(url, "[«label»](https://b.com)") == nil)
+
+        check(
+            "pasting an item into an empty one replaces its marker",
+            edit(.paste("- copied"), "- a\n- |") == "- a\n- copied|"
+                && edit(.paste("  * [x] done"), "    - |") == "    * [x] done|"
+                && edit(.paste("1. one\n2. two"), "- |\nnext") == "1. one\n2. two|\nnext")
+        check(
+            "pasting an item is plain unless both are list items",
+            edit(.paste("plain"), "- |") == nil && edit(.paste("- x"), "- a|") == nil
+                && edit(.paste("- x"), "|") == nil)
+        let carets = NoteMarkdownParser.parse("a\n  - item\n2. b")
+        check(
+            "a key-moved caret skips a list marker",
+            NoteMarkdownEditing.caret(afterMoving: 2, backward: false, markdown: carets) == 6
+                && NoteMarkdownEditing.caret(afterMoving: 4, backward: false, markdown: carets) == 6
+                && NoteMarkdownEditing.caret(afterMoving: 5, backward: true, markdown: carets) == 1
+                && NoteMarkdownEditing.caret(afterMoving: 12, backward: false, markdown: carets) == 14
+                && NoteMarkdownEditing.caret(afterMoving: 8, backward: true, markdown: carets) == 8
+                && NoteMarkdownEditing.caret(afterMoving: 0, backward: true, markdown: carets) == 0)
 
         check("⌥⌘C fences the caret's line", edit(.toggleCodeBlock, "a|b") == "```\na|b\n```")
         check(

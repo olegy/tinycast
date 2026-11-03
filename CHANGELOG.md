@@ -21,6 +21,13 @@ offers.
 - **Selected text in a note** is highlighted in the system's highlight colour instead of grey.
 - **Fit Window to Text** in Settings > Notes can be turned off, so the note window keeps the
   width and height you set instead of growing and shrinking with the text.
+- **⌘D selects the word** under the caret, including when the caret sits right after it.
+- **⌘Z works on any keyboard layout.** Undo, redo and the formatting shortcuts in a note, AI
+  Chat's composer and the other text areas no longer stop working while non-Latin layout is active.
+- **Pasting a list item into an empty one** no longer doubles its bullet.
+- **The caret stays after a list bullet.** Moving to the start of a list line with the keyboard
+  stops where a click would, so Backspace removes the bullet instead of joining the line to the one
+  above.
 
 ## 0.12.1-lite.1
 

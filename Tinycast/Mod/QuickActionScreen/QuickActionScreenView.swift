@@ -368,7 +368,7 @@ struct QuickActionTextEditor: NSViewRepresentable {
             if let key = Self.key(for: event), key != .return, key != .shiftReturn {
                 return onKey?(key) == true || super.performKeyEquivalent(with: event)
             }
-            guard isEditable, event.charactersIgnoringModifiers?.lowercased() == "z",
+            guard isEditable, ASCIIKeyboardLayout.chordKey(for: event) == "z",
                 modifiers == .command || modifiers == [.command, .shift]
             else { return super.performKeyEquivalent(with: event) }
             guard !event.isARepeat else { return true }

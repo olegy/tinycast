@@ -240,6 +240,10 @@ reaches autosave.
 - ⇧⌘B adds `> ` to each touched line, or removes one `>` from each when all of them are quotes. Blank
   lines inside a selection, code, tables and rules are left alone.
 - Pasting a single `http` or `https` URL over text selected on one line makes `[text](url)`.
+- Pasting a list item into an empty item replaces the empty item's marker with the pasted one.
+- A caret moved by a key never rests inside a list item's marker: it stops at the content start, and
+  ← from there goes to the end of the line above, so Backspace never joins the item to that line.
+- ⌘D selects the word under the caret, or the word the caret ends.
 - Clicking a checkbox toggles `[ ]` and `[x]` without moving the caret. The hit test uses
   `NoteCheckboxGeometry`, the rect the fragment draws, grown by 3 points.
 - Clicking a rendered link opens it, unless the click lands in the outer 30% of the label's first or
@@ -249,6 +253,7 @@ reaches autosave.
 | Shortcut | Does |
 | --- | --- |
 | ⌘Z, ⇧⌘Z | undo, redo |
+| ⌘D | select word |
 | ⌘B, ⌘I, ⌘E | bold, italic, inline code |
 | ⇧⌘X | strikethrough |
 | ⌥⌘C | code block |
@@ -258,7 +263,8 @@ reaches autosave.
 | ⌥⌘1, ⌥⌘2, ⌥⌘3 | heading 1, 2, 3 |
 | ⌥⌘0 | plain paragraph |
 
-Digits match by key code. The text view sees these chords before `NotesPanel` claims its own, and none
+Digits match by key code and letters through the ASCII-capable layout
+(`ASCIIKeyboardLayout.chordKey`), so a Cyrillic layout keeps every chord. The text view sees these chords before `NotesPanel` claims its own, and none
 collide. In a note, ⌘E replaces AppKit's Use Selection for Find.
 
 AppKit still owns typing, selection, Cut, Copy, Paste, Select All, Find, marked text, emoji, combining
@@ -359,7 +365,7 @@ Cut/Copy/Paste, the native find bar, Unicode and marked-text cases with renderin
 undo isolation, undo and redo shortcut routing, source publication and character count, linear history,
 exact source after styling, hidden and revealed markers, restyling after edits and after undo, block
 decorations and layout fragments, list keys, chords, the task rule, checkbox toggles, link schemes,
-pasting a URL, and the formatting reports and `format(_:)` the formatting bar uses.
+pasting a URL, ⌘D, chords on a Cyrillic layout, carets moved past list markers, and the formatting reports and `format(_:)` the formatting bar uses.
 `Tests/notes-editor-performance.swift` times install, typing, the window fit's height read and caret
 moves on a 100,000-character note; its budget is in `docs/testing.md`. Window chrome is not automated:
 the Notes manual sweep in `docs/testing.md` covers commands, shortcuts, switcher, focus restoration,

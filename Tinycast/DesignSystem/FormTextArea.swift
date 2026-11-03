@@ -112,7 +112,7 @@ struct FormTextArea: NSViewRepresentable {
         override func performKeyEquivalent(with event: NSEvent) -> Bool {
             let modifiers = event.modifierFlags.intersection([.command, .shift, .option, .control])
             guard window?.firstResponder === self, isEditable, !hasMarkedText(),
-                event.charactersIgnoringModifiers?.lowercased() == "z",
+                ASCIIKeyboardLayout.chordKey(for: event) == "z",
                 modifiers == .command || modifiers == [.command, .shift]
             else { return super.performKeyEquivalent(with: event) }
             guard !event.isARepeat else { return true }

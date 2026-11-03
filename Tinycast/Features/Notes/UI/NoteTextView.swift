@@ -105,6 +105,18 @@ final class NoteTextView: NSTextView, InjectableTextView {
         super.insertText(string, replacementRange: replacementRange)
     }
 
+    override func doCommand(by selector: Selector) {
+        super.doCommand(by: selector)
+        let name = NSStringFromSelector(selector)
+        guard rendersMarkdown, let editing, name.hasPrefix("move"), !name.contains("AndModifySelection"),
+            !hasMarkedText(), case let caret = selectedRange(), caret.length == 0
+        else { return }
+        let backward = selector == #selector(moveLeft(_:)) || selector == #selector(moveBackward(_:))
+        let target = NoteMarkdownEditing.caret(
+            afterMoving: caret.location, backward: backward, markdown: editing.markdown)
+        if target != caret.location { setSelectedRange(NSRange(location: target, length: 0)) }
+    }
+
     override func insertTab(_ sender: Any?) {
         guard !perform(.indent) else { return }
         super.insertTab(sender)
@@ -120,9 +132,12 @@ final class NoteTextView: NSTextView, InjectableTextView {
             return super.performKeyEquivalent(with: event)
         }
         let modifiers = event.modifierFlags.intersection([.command, .shift, .option, .control])
-        if event.charactersIgnoringModifiers?.lowercased() == "z",
-            modifiers == .command || modifiers == [.command, .shift]
-        {
+        let key = ASCIIKeyboardLayout.chordKey(for: event)
+        if key == "d", modifiers == .command {
+            if !event.isARepeat { selectWordAtCaret() }
+            return true
+        }
+        if key == "z", modifiers == .command || modifiers == [.command, .shift] {
             guard !event.isARepeat else { return true }
             breakUndoCoalescing()
             if modifiers == .command {
@@ -132,7 +147,7 @@ final class NoteTextView: NSTextView, InjectableTextView {
             }
             return true
         }
-        guard rendersMarkdown, let action = Self.chord(for: event) else {
+        guard rendersMarkdown, let action = Self.chord(for: event, key: key) else {
             return super.performKeyEquivalent(with: event)
         }
         if !event.isARepeat { perform(action) }
@@ -144,11 +159,32 @@ final class NoteTextView: NSTextView, InjectableTextView {
         super.paste(sender)
     }
 
-    /// Pasting a lone URL over selected text makes a link; anything else pastes as plain text.
+    /// A lone URL over selected text makes a link, and a list item fills an empty one in place.
     func pasteLink(from pasteboard: NSPasteboard) -> Bool {
         guard let string = pasteboard.string(forType: .string) else { return false }
-        return perform(.pasteURL(string))
+        return perform(.paste(string))
     }
+
+    /// ⌘D: the word under the caret, or the one the caret ends.
+    func selectWordAtCaret() {
+        let caret = selectedRange()
+        guard caret.length == 0 else { return }
+        let text = string as NSString
+        let isWordCharacter = { (index: Int) in
+            0 <= index && index < text.length
+                && text.rangeOfCharacter(
+                    from: Self.wordCharacters, range: NSRange(location: index, length: 1)
+                ).location != NSNotFound
+        }
+        let anchor =
+            isWordCharacter(caret.location)
+            ? caret.location : isWordCharacter(caret.location - 1) ? caret.location - 1 : nil
+        guard let anchor else { return }
+        setSelectedRange(
+            selectionRange(forProposedRange: NSRange(location: anchor, length: 0), granularity: .selectByWord))
+    }
+
+    private static let wordCharacters = CharacterSet.alphanumerics.union(CharacterSet(charactersIn: "_"))
 
     @discardableResult
     private func perform(_ action: NoteEditAction) -> Bool {
@@ -172,9 +208,8 @@ final class NoteTextView: NSTextView, InjectableTextView {
     }
 
     /// Digits match by key code, since shifted and optioned digits vary by keyboard layout.
-    private static func chord(for event: NSEvent) -> NoteEditAction? {
+    private static func chord(for event: NSEvent, key: String?) -> NoteEditAction? {
         let modifiers = event.modifierFlags.intersection([.command, .shift, .option, .control])
-        let key = event.charactersIgnoringModifiers?.lowercased()
         switch modifiers {
         case [.command]:
             switch key {

@@ -1210,9 +1210,7 @@ struct RootPaletteView: View {
         }
 
         guard !modifiers.isDisjoint(with: [.command, .control]) else { return false }
-        let character =
-            ASCIIKeyboardLayout.character(for: event)?.lowercased()
-            ?? event.charactersIgnoringModifiers?.lowercased()
+        let character = ASCIIKeyboardLayout.chordKey(for: event)
         if modifiers.contains(.control) {
             if character == "n" {
                 moveMenu(1)

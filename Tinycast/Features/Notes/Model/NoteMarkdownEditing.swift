@@ -22,7 +22,8 @@ enum NoteMarkdownEditing {
         case .toggleQuote: return document.toggleQuote(in: selection)
         case .toggleTask(let lineIndex): return document.toggleTask(lineIndex, keeping: selection)
         case .typedSpace: return document.typedSpace(at: selection)
-        case .pasteURL(let string): return document.pasteURL(string, over: selection)
+        case .paste(let string):
+            return document.pasteURL(string, over: selection) ?? document.pasteListItem(string, at: selection)
         }
     }
 
@@ -31,6 +32,15 @@ enum NoteMarkdownEditing {
         let text = source as NSString
         guard selection.location != NSNotFound, NSMaxRange(selection) <= text.length else { return .plain }
         return Document(text: text, markdown: markdown).formatting(of: selection)
+    }
+
+    /// A key-moved caret never rests in a list marker, where Backspace would join the lines.
+    static func caret(afterMoving location: Int, backward: Bool, markdown: NoteMarkdown) -> Int {
+        guard let index = markdown.lineIndex(at: location) else { return location }
+        let line = markdown.lines[index]
+        guard line.kind.isList, location < line.contentRange.location else { return location }
+        guard backward, index > 0 else { return line.contentRange.location }
+        return NSMaxRange(markdown.lines[index - 1].contentRange)
     }
 
     fileprivate typealias Line = NoteMarkdown.Line
@@ -267,6 +277,23 @@ enum NoteMarkdownEditing {
             return NoteEditPlan(
                 range: selection, replacement: replacement,
                 selection: NSRange(location: selection.location + replacement.utf16.count, length: 0))
+        }
+
+        /// A copied item pasted into an empty one replaces its marker rather than nesting a second.
+        func pasteListItem(_ string: String, at selection: NSRange) -> NoteEditPlan? {
+            guard selection.length == 0, let index = markdown.lineIndex(at: selection.location)
+            else { return nil }
+            let line = markdown.lines[index]
+            guard line.kind.isList, selection.location >= line.contentRange.location,
+                text.substring(with: line.contentRange).allSatisfy(\.isWhitespace),
+                NoteMarkdownParser.parse(String(string.prefix { !$0.isNewline })).lines.first?.kind.isList == true
+            else { return nil }
+            let item = String(string.drop { $0 == " " || $0 == "\t" })
+            let start = indentEnd(of: line)
+            return renumbered(
+                NoteEditPlan(
+                    range: NSRange(start..<NSMaxRange(line.contentRange)), replacement: item,
+                    selection: NSRange(location: start + item.utf16.count, length: 0)))
         }
 
         /// The span `toggleInline` unwraps: exact for a selection, enclosing for a caret.

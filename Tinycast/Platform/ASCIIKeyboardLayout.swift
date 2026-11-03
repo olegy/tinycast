@@ -65,6 +65,11 @@ enum ASCIIKeyboardLayout {
             modifiers: event.modifierFlags.contains(.command) ? UInt32(cmdKey >> 8) : 0)
     }
 
+    /// A chord's lowercased key: Russian ⌘Я must still be ⌘Z, as the main menu treats it.
+    @MainActor static func chordKey(for event: NSEvent) -> String? {
+        (character(for: event) ?? event.charactersIgnoringModifiers)?.lowercased()
+    }
+
     /// SwiftUI exposes the input-source character; recover the logical ASCII key from AppKit.
     @MainActor static func keyEquivalent(fallingBackTo key: KeyEquivalent) -> KeyEquivalent {
         guard let event = NSApp.currentEvent,

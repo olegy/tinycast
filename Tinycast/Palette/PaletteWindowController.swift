@@ -108,8 +108,7 @@ final class PaletteWindowController: NSObject, NSWindowDelegate {
         guard !event.isARepeat,
             event.modifierFlags.intersection([.command, .option, .control, .shift]) == .command
         else { return nil }
-        return ASCIIKeyboardLayout.character(for: event)?.lowercased()
-            ?? event.charactersIgnoringModifiers?.lowercased()
+        return ASCIIKeyboardLayout.chordKey(for: event)
     }
 
     /// Shift is allowed, since ⌘+ is a shifted = on most layouts; the base key decides.

@@ -275,6 +275,7 @@ run palette-menu-click-test Tinycast/Platform/Appearance.swift \
 run form-input-test        Tinycast/Platform/Appearance.swift \
                            Tinycast/DesignSystem/Theme.swift Tinycast/Features/Settings/RaycastThemeCore.swift \
                            Tinycast/DesignSystem/InterfaceMetrics.swift \
+                           Tinycast/Platform/ASCIIKeyboardLayout.swift \
                            Tinycast/DesignSystem/FormTextInput.swift \
                            Tinycast/DesignSystem/FormTextArea.swift
 run scroll-reveal-test     Tinycast/DesignSystem/Scrolling/SelectionReveal.swift
@@ -489,6 +490,7 @@ run notes-test             Tinycast/Platform/Signposts.swift \
                            Tinycast/Features/Notes/Model/*.swift \
                            Tinycast/Features/Notes/Service/*.swift
 run notes-editor-test      Tinycast/Platform/Signposts.swift \
+                           Tinycast/Platform/ASCIIKeyboardLayout.swift \
                            Tinycast/Platform/Appearance.swift \
                            Tinycast/DesignSystem/Theme.swift Tinycast/Features/Settings/RaycastThemeCore.swift \
                            Tinycast/DesignSystem/InterfaceMetrics.swift \
@@ -518,6 +520,7 @@ run notes-editor-test      Tinycast/Platform/Signposts.swift \
                            Tinycast/Features/Notes/UI/NoteEditorView.swift
 run -O index notes-editor-performance \
                            Tinycast/Platform/Signposts.swift \
+                           Tinycast/Platform/ASCIIKeyboardLayout.swift \
                            Tinycast/Platform/Appearance.swift \
                            Tinycast/DesignSystem/Theme.swift Tinycast/Features/Settings/RaycastThemeCore.swift \
                            Tinycast/DesignSystem/InterfaceMetrics.swift \

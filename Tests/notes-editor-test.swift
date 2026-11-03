@@ -14,6 +14,8 @@ struct NotesEditorTests {
         testLiteralEditingAndNativeCommands(rendersMarkdown: true)
         testUndoAndRedoShortcuts(rendersMarkdown: false)
         testUndoAndRedoShortcuts(rendersMarkdown: true)
+        testLayoutChordsAndWordSelection()
+        testMovedCaretSkipsListMarkers()
         testUndoIsolation(afterUndo: false)
         testUndoIsolation(afterUndo: true)
         testQuickActionReplacement()
@@ -285,6 +287,41 @@ struct NotesEditorTests {
         let restoredChangeCount = changes.count
         check("empty Undo is handled locally", editor.window.performKeyEquivalent(with: undo))
         check("empty Undo publishes nothing", changes.count == restoredChangeCount)
+    }
+
+    private static func testLayoutChordsAndWordSelection() {
+        let input = NoteEditorInput(id: NoteID(rawValue: "Chords.md"), source: "one two", epoch: 1)
+        let editor = makeEditor(input: input, rendersMarkdown: true)
+        editor.textView.setSelectedRange(NSRange(location: 7, length: 0))
+        editor.textView.insertText("!", replacementRange: editor.textView.selectedRange())
+        let cyrillicUndo = keyDown("я", keyCode: kVK_ANSI_Z, in: editor.window)
+        check("⌘Z on a Cyrillic layout still undoes", editor.window.performKeyEquivalent(with: cyrillicUndo))
+        check("the Cyrillic ⌘Z restored the note", editor.textView.string == "one two")
+
+        let selectWord = keyDown("d", keyCode: kVK_ANSI_D, in: editor.window)
+        editor.textView.setSelectedRange(NSRange(location: 7, length: 0))
+        check("⌘D is claimed", editor.textView.performKeyEquivalent(with: selectWord))
+        check("⌘D at a word's end selects it", editor.textView.selectedRange() == NSRange(location: 4, length: 3))
+        editor.textView.setSelectedRange(NSRange(location: 1, length: 0))
+        _ = editor.textView.performKeyEquivalent(with: selectWord)
+        check("⌘D inside a word selects it", editor.textView.selectedRange() == NSRange(location: 0, length: 3))
+    }
+
+    private static func testMovedCaretSkipsListMarkers() {
+        let source = "first\n- item"
+        let input = NoteEditorInput(id: NoteID(rawValue: "Caret.md"), source: source, epoch: 1)
+        let editor = makeEditor(input: input, rendersMarkdown: true)
+        editor.textView.setSelectedRange(NSRange(location: 10, length: 0))
+        editor.textView.doCommand(by: #selector(NSResponder.moveToBeginningOfLine(_:)))
+        check("line start on a list item stops after its bullet", editor.textView.selectedRange().location == 8)
+        editor.textView.deleteBackward(nil)
+        check("Backspace there removes the bullet", editor.textView.string == "first\nitem")
+        editor.coordinator.editorUndoManager.undo()
+        editor.textView.setSelectedRange(NSRange(location: 8, length: 0))
+        editor.textView.doCommand(by: #selector(NSResponder.moveLeft(_:)))
+        check("← from an item's text reaches the line above", editor.textView.selectedRange().location == 5)
+        editor.textView.doCommand(by: #selector(NSResponder.moveRight(_:)))
+        check("→ into a list item skips its bullet", editor.textView.selectedRange().location == 8)
     }
 
     private static func testUndoIsolation(afterUndo: Bool) {

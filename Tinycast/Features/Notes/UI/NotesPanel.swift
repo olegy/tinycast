@@ -43,7 +43,7 @@ final class NotesPanel: NSPanel {
         if super.performKeyEquivalent(with: event) { return true }
         guard !event.isARepeat else { return false }
         let modifiers = event.modifierFlags.intersection([.command, .option, .control, .shift])
-        let key = event.charactersIgnoringModifiers?.lowercased()
+        let key = ASCIIKeyboardLayout.chordKey(for: event)
         if modifiers == [.command, .option] {
             guard let key, let chord = optionCommandChords[key] else { return false }
             chord()

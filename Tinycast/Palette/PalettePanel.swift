@@ -98,9 +98,7 @@ final class PalettePanel: NSPanel {
         else { return nil }
         let arrow: (key: KeyEquivalent, code: Int)
         // Through the ASCII-capable layout: an IME must not move ⌃N off its physical key.
-        switch ASCIIKeyboardLayout.character(for: event)?.lowercased()
-            ?? event.charactersIgnoringModifiers?.lowercased()
-        {
+        switch ASCIIKeyboardLayout.chordKey(for: event) {
         case "n": arrow = (.downArrow, kVK_DownArrow)
         case "p": arrow = (.upArrow, kVK_UpArrow)
         case "f": arrow = (.rightArrow, kVK_RightArrow)
