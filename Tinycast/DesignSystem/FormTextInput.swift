@@ -35,13 +35,14 @@ struct FormTextInput: NSViewRepresentable {
         context.coordinator.input = self
         let font = metrics.typography.textNSFont(.body)
         if view.font != font { view.font = font }
+        let appearance = view.effectiveAppearance
+        // Reassigning either while the field edits ends the edit, which drops the focus binding.
         let color = NSColor(Theme.Colors.textPrimary)
-        if view.textColor != color { view.textColor = color }
-        let placeholder = NSAttributedString(
-            string: placeholder,
-            attributes: [.font: font, .foregroundColor: NSColor(Theme.Colors.textTertiary)])
-        if view.placeholderAttributedString != placeholder {
-            view.placeholderAttributedString = placeholder
+        if !color.resolves(like: view.textColor, in: appearance) { view.textColor = color }
+        let placeholderColor = NSColor(Theme.Colors.textTertiary)
+        if !view.showsPlaceholder(placeholder, font: font, color: placeholderColor) {
+            view.placeholderAttributedString = NSAttributedString(
+                string: placeholder, attributes: [.font: font, .foregroundColor: placeholderColor])
         }
         (view.cell as? InputCell)?.inset = metrics.spacing.xl
         if view.isEditable != isEnabled { view.isEditable = isEnabled }
@@ -61,6 +62,14 @@ struct FormTextInput: NSViewRepresentable {
         var onFocus: (() -> Void)?
 
         override var alignmentRectInsets: NSEdgeInsets { NSEdgeInsets() }
+
+        func showsPlaceholder(_ string: String, font: NSFont, color: NSColor) -> Bool {
+            guard let current = placeholderAttributedString, current.string == string else { return false }
+            guard current.length > 0 else { return true }
+            let attributes = current.attributes(at: 0, effectiveRange: nil)
+            return attributes[.font] as? NSFont == font
+                && color.resolves(like: attributes[.foregroundColor] as? NSColor, in: effectiveAppearance)
+        }
 
         override func becomeFirstResponder() -> Bool {
             guard super.becomeFirstResponder() else { return false }

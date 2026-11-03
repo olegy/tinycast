@@ -14,7 +14,8 @@ struct FormInputTests {
     }
 
     static func main() {
-        _ = NSApplication.shared
+        // The ink probe finds light pixels, so the system's own appearance must not decide it.
+        NSApplication.shared.appearance = NSAppearance(named: .darkAqua)
         testSingleLine()
         testCapAlignment()
         testTextArea()

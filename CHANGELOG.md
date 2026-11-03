@@ -17,6 +17,11 @@ offers.
 
 - **About** is cleaned up.
 
+### Fixes
+
+- **Form fields keep their focus.** A text field in a launcher form no longer reports losing focus
+  each time the form redraws while you type in it.
+
 ### Notes
 
 - **Text Size.** A slider in Settings > Notes makes a note's text larger, in four steps from today's
