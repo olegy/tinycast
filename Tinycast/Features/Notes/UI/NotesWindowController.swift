@@ -15,14 +15,20 @@ final class NotesWindowController: NSObject, NSWindowDelegate {
 
     init(coordinator: NotesCoordinator) {
         self.coordinator = coordinator
+        super.init()
+        observeTitle()
+        observeStyle()
     }
 
     var isVisible: Bool { panel?.isVisible ?? false }
+    /// A standard window can be visible yet buried under another app's windows.
+    var isFrontmost: Bool { NSApp.isActive && panel?.isKeyWindow == true }
 
     func show(focusEditor: Bool) {
         let panel = ensurePanel()
         if !panel.isVisible { captureFocusTarget() }
         panel.contentView?.layoutSubtreeIfNeeded()
+        if coordinator.windowMode == .standard { NSApp.activate() }
         panel.makeKeyAndOrderFront(nil)
         panel.orderFrontRegardless()
         scheduleFit()
@@ -176,7 +182,8 @@ final class NotesWindowController: NSObject, NSWindowDelegate {
             content: hosting,
             size: Theme.Size.noteWindow,
             styleMask: [.titled, .closable, .miniaturizable, .resizable],
-            acceptsMain: true)
+            acceptsMain: true,
+            activatesApp: coordinator.windowMode == .standard)
         // A title-bar accessory drops AppKit off its centred-title layout, so `NotesView` draws it.
         panel.titleVisibility = .hidden
         panel.titlebarAppearsTransparent = true
@@ -217,7 +224,8 @@ final class NotesWindowController: NSObject, NSWindowDelegate {
                 name: NSView.frameDidChangeNotification, object: close)
         }
         self.panel = panel
-        observeTitle()
+        panel.title = coordinator.activeTitle
+        applyStyle(to: panel)
         return panel
     }
 
@@ -232,7 +240,7 @@ final class NotesWindowController: NSObject, NSWindowDelegate {
         }
         // Centred in the drawn band, not AppKit's shorter one, and clamped so none is clipped.
         let size = leading.frame.height
-        let y = max(0, band - size - (Theme.Size.noteTitlebar - size) / 2)
+        let y = max(0, band - size - (coordinator.titlebarHeight - size) / 2)
         let shift = Theme.Size.noteTrafficLightInset - leading.frame.minX
         guard shift != 0 || leading.frame.origin.y != y else { return }
         for button in buttons {
@@ -260,6 +268,53 @@ final class NotesWindowController: NSObject, NSWindowDelegate {
                 if let panel = self.panel { self.seatTrafficLights(in: panel) }
             }
         }
+    }
+
+    /// Re-armed like the title, so a settings change restyles a window that is already open.
+    private func observeStyle() {
+        withObservationTracking {
+            _ = (coordinator.windowMode, coordinator.paper, coordinator.titlebarHeight)
+        } onChange: { [weak self] in
+            Task { @MainActor in
+                guard let self else { return }
+                self.observeStyle()
+                guard let panel = self.panel else { return }
+                if panel.activatesApp != (self.coordinator.windowMode == .standard) {
+                    self.rebuildPanel()
+                } else {
+                    self.applyStyle(to: panel)
+                }
+            }
+        }
+    }
+
+    private func applyStyle(to panel: NotesPanel) {
+        panel.apply(coordinator.windowMode)
+        panel.appearance = coordinator.paper.forcesLightAppearance ? NSAppearance(named: .aqua) : nil
+        seatTrafficLights(in: panel)
+        panel.invalidateShadow()
+    }
+
+    /// Whether a panel activates is fixed at creation, so a mode change replaces the window.
+    private func rebuildPanel() {
+        guard let old = panel else { return }
+        let wasVisible = old.isVisible
+        coordinator.closeHeadingMenu()
+        coordinator.closeSwitcher(focusEditor: false)
+        old.saveFrame(usingName: Self.frameAutosaveName)
+        old.setFrameAutosaveName("")
+        old.delegate = nil
+        if let close = old.standardWindowButton(.closeButton) {
+            NotificationCenter.default.removeObserver(
+                self, name: NSView.frameDidChangeNotification, object: close)
+        }
+        old.orderOut(nil)
+        fitTask?.cancel()
+        fitTask = nil
+        editorObservers = []
+        editor = nil
+        panel = nil
+        if wasVisible { show(focusEditor: true) }
     }
 
     private var userMovedOn: Bool {

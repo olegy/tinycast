@@ -89,6 +89,10 @@ enum SettingsFileSchema {
         case .notesShowsFormattingBar: return bind(settings, \.notesShowsFormattingBar)
         case .notesShowsCharacterCount: return bind(settings, \.notesShowsCharacterCount)
         case .notesTextSize: return bind(settings, \.notesTextSize)
+        case .notesWindowMode: return bind(settings, \.notesWindowMode)
+        case .notesPaper: return bind(settings, \.notesPaper)
+        case .notesTint: return bind(settings, \.notesTint)
+        case .notesShowsTitleBarButtons: return bind(settings, \.notesShowsTitleBarButtons)
         case .notesFolder: return bind(settings, \.notesFolder, accept: folder)
         case .notesCommands: return launcher.commandsBinding(for: key, owner: .notes)
         case .snippetsShowInLauncher: return bind(settings, \.snippetsShowInLauncher)
@@ -153,6 +157,9 @@ extension AppAppearance: SettingsFileRawValue {}
 extension AppLanguage: SettingsFileRawValue {}
 extension InterfaceSize: SettingsFileRawValue {}
 extension NoteTextSize: SettingsFileRawValue {}
+extension NoteWindowMode: SettingsFileRawValue {}
+extension NotePaper: SettingsFileRawValue {}
+extension NoteTint: SettingsFileRawValue {}
 extension CalcNumberStyle: SettingsFileRawValue {}
 extension SearchSensitivity: SettingsFileRawValue {}
 extension WindowCycle: SettingsFileRawValue {}

@@ -15,10 +15,7 @@ final class NoteSwitcherWindowController: NSObject, NSWindowDelegate {
     func show(under host: NSWindow) {
         let panel = ensurePanel()
         anchor(panel, under: host)
-        if panel.parent !== host {
-            panel.parent?.removeChildWindow(panel)
-            host.addChildWindow(panel, ordered: .above)
-        }
+        panel.attach(to: host)
         panel.makeKeyAndOrderFront(nil)
         panel.invalidateShadow()
     }
@@ -69,7 +66,7 @@ final class NoteSwitcherWindowController: NSObject, NSWindowDelegate {
         let host = host.frame
         let origin = CGPoint(
             x: host.midX - size.width / 2,
-            y: host.maxY - Theme.Size.noteTitlebar - Theme.Size.noteSwitcherDrop - size.height)
+            y: host.maxY - coordinator.titlebarHeight - Theme.Size.noteSwitcherDrop - size.height)
         panel.setFrame(NSRect(origin: origin, size: size), display: false)
     }
 

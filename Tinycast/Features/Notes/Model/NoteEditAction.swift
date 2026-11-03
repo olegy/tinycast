@@ -3,6 +3,7 @@ import Foundation
 enum NoteEditAction: Sendable, Equatable {
     enum InlineStyle: Sendable, CaseIterable { case bold, italic, strikethrough, code }
     enum ListStyle: Sendable { case bullet, ordered, task }
+    enum Direction: Sendable { case up, down }
 
     case newline
     case deleteBackward
@@ -16,6 +17,8 @@ enum NoteEditAction: Sendable, Equatable {
     case toggleCodeBlock
     case toggleQuote
     case toggleTask(lineIndex: Int)
+    /// Swaps the touched items with their neighbouring sibling, nested items travelling along.
+    case moveListItem(Direction)
     /// The `[] ` input rule.
     case typedSpace
     /// A URL over selected text links it; a list item into an empty item replaces its marker.

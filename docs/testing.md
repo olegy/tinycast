@@ -628,6 +628,14 @@ caches, TCC grants and login item, so this cannot disturb an installed copy.
 - Return continues and leaves lists and quotes, Tab and Shift-Tab nest, ordered lists renumber, `[] `
   becomes a task, and every formatting shortcut works and undoes in one step
 - Pasting a URL over selected text makes a link; pasting anything else is plain text
+- ⌃⌘↑ and ⌃⌘↓ move a list item past its sibling with its nested items, stop at the list's ends,
+  renumber an ordered list, and undo in one step
+- Window set to Standard: the note activates Tinycast, another app covers it, it stays on its Space,
+  and Show Notes brings a covered window forward; back to Floating it floats on every Space again
+- Each Paper renders in Dark and Light; Cream and White stay light with dark ink in Dark, the tint
+  swatches show only for Glass, Frosted and Solid, and the switcher matches the paper's appearance
+- Show Title Bar Buttons off leaves a 32pt band with the traffic lights and the centred title; it drags the window, a double-click
+  moves it top-right, and the switcher hangs just below it
 - Copy from a rendered line pastes raw Markdown into another app; a snippet keyword expands inside a
   rendered note and is styled at once
 - The derived title of an Untitled note shows no Markdown markers

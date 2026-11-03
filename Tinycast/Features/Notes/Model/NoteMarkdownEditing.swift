@@ -21,6 +21,7 @@ enum NoteMarkdownEditing {
         case .toggleCodeBlock: return document.toggleCodeBlock(in: selection)
         case .toggleQuote: return document.toggleQuote(in: selection)
         case .toggleTask(let lineIndex): return document.toggleTask(lineIndex, keeping: selection)
+        case .moveListItem(let direction): return document.moveListItem(direction, in: selection)
         case .typedSpace: return document.typedSpace(at: selection)
         case .paste(let string):
             return document.pasteURL(string, over: selection) ?? document.pasteListItem(string, at: selection)
@@ -172,6 +173,106 @@ enum NoteMarkdownEditing {
             }
             guard handled else { return nil }
             return renumbered(plan(edits, selection: selection))
+        }
+
+        /// Siblings share a level and a parent, with no blank or other line between them.
+        func moveListItem(_ direction: NoteEditAction.Direction, in selection: NSRange) -> NoteEditPlan? {
+            let lines = markdown.lines
+            let indexes = markdown.lineIndexes(intersecting: selection)
+            guard let first = indexes.first, let last = indexes.last, lines[first].kind.isList else {
+                return nil
+            }
+            let level = lines[first].level
+            guard indexes.allSatisfy({ lines[$0].kind.isList && lines[$0].level >= level }) else {
+                return nil
+            }
+            let block = first...subtreeEnd(of: last, above: level)
+            switch direction {
+            case .up:
+                guard let previous = previousSibling(before: first, level: level) else { return nil }
+                return renumbered(
+                    swapping(previous...(first - 1), block, movedBlockIsLater: true, selection: selection))
+            case .down:
+                let next = block.upperBound + 1
+                guard next < lines.count, lines[next].kind.isList, lines[next].level == level else {
+                    return nil
+                }
+                let following = next...subtreeEnd(of: next, above: level)
+                return renumbered(
+                    swapping(block, following, movedBlockIsLater: false, selection: selection))
+            }
+        }
+
+        private func subtreeEnd(of index: Int, above level: Int) -> Int {
+            var end = index
+            while end + 1 < markdown.lines.count, markdown.lines[end + 1].kind.isList,
+                markdown.lines[end + 1].level > level
+            {
+                end += 1
+            }
+            return end
+        }
+
+        private func previousSibling(before index: Int, level: Int) -> Int? {
+            for candidate in stride(from: index - 1, through: 0, by: -1) {
+                let line = markdown.lines[candidate]
+                guard line.kind.isList, line.level >= level else { return nil }
+                if line.level == level { return candidate }
+            }
+            return nil
+        }
+
+        /// The heads trade numbers, so renumbering keeps the run counting from where it started.
+        private func swapping(
+            _ earlier: ClosedRange<Int>, _ later: ClosedRange<Int>, movedBlockIsLater: Bool,
+            selection: NSRange
+        ) -> NoteEditPlan {
+            let lines = markdown.lines
+            let start = lines[earlier.lowerBound].range.location
+            let middle = lines[later.lowerBound].range.location
+            let end = NSMaxRange(lines[later.upperBound].range)
+            let upper = NSMutableString(string: text.substring(with: NSRange(start..<middle)))
+            let lower = NSMutableString(string: text.substring(with: NSRange(middle..<end)))
+            var digitDelta = 0
+            if let upperDigits = orderedDigits(of: lines[earlier.lowerBound]),
+                let lowerDigits = orderedDigits(of: lines[later.lowerBound])
+            {
+                let upperNumber = text.substring(with: upperDigits)
+                let lowerNumber = text.substring(with: lowerDigits)
+                upper.replaceCharacters(
+                    in: NSRange(location: upperDigits.location - start, length: upperDigits.length),
+                    with: lowerNumber)
+                lower.replaceCharacters(
+                    in: NSRange(location: lowerDigits.location - middle, length: lowerDigits.length),
+                    with: upperNumber)
+                digitDelta = movedBlockIsLater
+                    ? upperDigits.length - lowerDigits.length : lowerDigits.length - upperDigits.length
+            }
+            let lastLine = lines[later.upperBound]
+            if NSMaxRange(lastLine.contentRange) == NSMaxRange(lastLine.range) {
+                let terminatorLength = middle - NSMaxRange(lines[earlier.upperBound].contentRange)
+                let terminator = NSRange(location: upper.length - terminatorLength, length: terminatorLength)
+                lower.append(upper.substring(with: terminator))
+                upper.deleteCharacters(in: terminator)
+            }
+            let blockStart = movedBlockIsLater ? middle : start
+            let blockHead = lines[movedBlockIsLater ? later.lowerBound : earlier.lowerBound]
+            let newBlockStart = movedBlockIsLater ? start : start + lower.length
+            let digitsEnd = orderedDigits(of: blockHead).map(NSMaxRange) ?? blockStart
+            let moved = { (position: Int) in
+                newBlockStart + position - blockStart + (position >= digitsEnd ? digitDelta : 0)
+            }
+            let selectionStart = moved(selection.location)
+            return NoteEditPlan(
+                range: NSRange(start..<end), replacement: (lower as String) + (upper as String),
+                selection: NSRange(
+                    location: selectionStart, length: moved(NSMaxRange(selection)) - selectionStart))
+        }
+
+        private func orderedDigits(of line: Line) -> NSRange? {
+            guard case .ordered = line.kind else { return nil }
+            let first = indentEnd(of: line)
+            return NSRange(first..<digitsEnd(from: first))
         }
 
         func toggleTask(_ lineIndex: Int, keeping selection: NSRange) -> NoteEditPlan? {

@@ -79,6 +79,8 @@ enum Theme {
         static let noteFooterHeight: CGFloat = 28
         /// Holds the launcher's 36-point action capsule with the same margin its own bar gives it.
         static let noteTitlebar: CGFloat = 52
+        /// Without its buttons, the band only has to hold the traffic lights and the title.
+        static let noteCompactTitlebar: CGFloat = 32
         /// Symmetric, so the title stays centred on the window while clearing lights and capsule.
         static let noteTitleInset: CGFloat = 120
         /// Nine points crowds the palette's 26-point corner, so Notes seats its lights further in.
@@ -485,6 +487,30 @@ enum Theme {
         /// The command output window's page: a flat surface the log sits directly on.
         static let terminalSurface = adaptive(
             dark: .srgbInk(0.07, alpha: 1), light: .srgbInk(0.99, alpha: 1))
+
+        /// Notes' papers: the opaque ones are light in either appearance, so they are literals.
+        enum NotePaper {
+            static let solid = Color(nsColor: .windowBackgroundColor)
+            static let cream = Color(red: 0.969, green: 0.941, blue: 0.882)
+            static let white = Color.white
+            /// The header and footer strips: a neighbouring tone, since a strip of the page's own
+            /// colour would vanish into it.
+            static let systemChrome = Color(nsColor: .windowBackgroundColor)
+            static let creamChrome = Color(red: 0.922, green: 0.882, blue: 0.808)
+            static let whiteChrome = Color(red: 0.945, green: 0.945, blue: 0.961)
+            static let headerOpacity = 0.8
+            static let footerOpacity = 0.6
+        }
+
+        /// Washes, not papers: at this opacity the ink keeps its contrast in either appearance.
+        enum NoteTint {
+            static let opacity = 0.12
+            static let graphite = Color(red: 0.180, green: 0.190, blue: 0.220)
+            static let amber = Color(red: 0.870, green: 0.640, blue: 0.310)
+            static let rose = Color(red: 0.850, green: 0.420, blue: 0.480)
+            static let moss = Color(red: 0.470, green: 0.640, blue: 0.450)
+            static let indigo = Color(red: 0.430, green: 0.480, blue: 0.780)
+        }
 
         enum Syntax {
             static let keyword = pair(dark: 0xFC5FA3, light: 0xAD3DA4)

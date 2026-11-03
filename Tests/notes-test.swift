@@ -901,6 +901,42 @@ struct NotesTests {
         check("Backspace removes a quote marker", edit(.deleteBackward, "> |q") == "|q")
         check("Backspace is native past content start", edit(.deleteBackward, "- b|c") == nil)
 
+        check(
+            "⌃⌘↑ swaps an item with the sibling above",
+            edit(.moveListItem(.up), "- a\n- b|\n- c") == "- b|\n- a\n- c")
+        check(
+            "⌃⌘↓ carries nested items along",
+            edit(.moveListItem(.down), "- |a\n    - a1\n- b\n    - b1")
+                == "- b\n    - b1\n- |a\n    - a1")
+        check(
+            "⌃⌘↑ skips over the sibling's nested items",
+            edit(.moveListItem(.up), "- a\n    - a1\n- b|") == "- b|\n- a\n    - a1")
+        check(
+            "a nested item stays under its parent",
+            edit(.moveListItem(.up), "- a\n    - |a1\n- b") == nil
+                && edit(.moveListItem(.down), "- a\n    - a1|\n- b") == nil)
+        check(
+            "the first and last items stop at the list's ends",
+            edit(.moveListItem(.up), "para\n- |a\n- b") == nil
+                && edit(.moveListItem(.down), "- a\n- b|\n\n- c") == nil)
+        check("moving is native outside a list", edit(.moveListItem(.down), "pa|ra\n- a") == nil)
+        check(
+            "moving onto the last line keeps one terminator per line",
+            edit(.moveListItem(.down), "- a|\n- b") == "- b\n- a|"
+                && edit(.moveListItem(.up), "- a\n- b|") == "- b|\n- a")
+        check(
+            "a moved ordered item keeps the run counting from its start",
+            edit(.moveListItem(.down), "3. a|\n4. b\n5. c") == "3. b\n4. a|\n5. c")
+        check(
+            "a selection moves every sibling it touches",
+            edit(.moveListItem(.up), "- a\n- «b\n- c»\n- d") == "- «b\n- c»\n- a\n- d")
+        check(
+            "a moved task keeps its checkbox",
+            edit(.moveListItem(.down), "- [x] |a\n- [ ] b") == "- [ ] b\n- [x] |a")
+        check(
+            "a move across numbers of different widths keeps the caret in its text",
+            edit(.moveListItem(.down), "9. a|\n10. b") == "9. b\n10. a|")
+
         check("Tab nests a list item", edit(.indent, "- a\n- b|") == "- a\n    - b|")
         check(
             "Tab nests every selected item and keeps the selection on its text",

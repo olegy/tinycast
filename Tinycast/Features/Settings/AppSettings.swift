@@ -344,6 +344,22 @@ final class AppSettings {
         didSet { defaults.set(notesTextSize.rawValue, forKey: Key.notesTextSize.rawValue) }
     }
 
+    var notesWindowMode: NoteWindowMode {
+        didSet { defaults.set(notesWindowMode.rawValue, forKey: Key.notesWindowMode.rawValue) }
+    }
+
+    var notesPaper: NotePaper {
+        didSet { defaults.set(notesPaper.rawValue, forKey: Key.notesPaper.rawValue) }
+    }
+
+    var notesTint: NoteTint {
+        didSet { defaults.set(notesTint.rawValue, forKey: Key.notesTint.rawValue) }
+    }
+
+    var notesShowsTitleBarButtons: Bool {
+        didSet { defaults.set(notesShowsTitleBarButtons, forKey: Key.notesShowsTitleBarButtons.rawValue) }
+    }
+
     /// The notes folder as the user wrote it, `~` allowed; nil keeps it in Application Support.
     var notesFolder: String? {
         didSet { defaults.set(notesFolder, forKey: Key.notesFolder.rawValue) }
@@ -704,6 +720,14 @@ final class AppSettings {
             || defaults.bool(forKey: Key.notesShowsCharacterCount.rawValue)
         notesTextSize =
             defaults.string(forKey: Key.notesTextSize.rawValue).flatMap(NoteTextSize.init) ?? .standard
+        notesWindowMode =
+            defaults.string(forKey: Key.notesWindowMode.rawValue).flatMap(NoteWindowMode.init)
+            ?? .floating
+        notesPaper = defaults.string(forKey: Key.notesPaper.rawValue).flatMap(NotePaper.init) ?? .glass
+        notesTint = defaults.string(forKey: Key.notesTint.rawValue).flatMap(NoteTint.init) ?? .none
+        notesShowsTitleBarButtons =
+            defaults.object(forKey: Key.notesShowsTitleBarButtons.rawValue) == nil
+            || defaults.bool(forKey: Key.notesShowsTitleBarButtons.rawValue)
         notesFolder = defaults.string(forKey: Key.notesFolder.rawValue)
         aiEnabled = defaults.bool(forKey: Key.aiEnabled.rawValue)
         mcpEnabled = defaults.bool(forKey: Key.mcpEnabled.rawValue)

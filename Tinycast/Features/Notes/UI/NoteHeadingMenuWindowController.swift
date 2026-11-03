@@ -14,10 +14,7 @@ final class NoteHeadingMenuWindowController {
     func show(above host: NSWindow) {
         let panel = ensurePanel()
         anchor(panel, above: host)
-        if panel.parent !== host {
-            panel.parent?.removeChildWindow(panel)
-            host.addChildWindow(panel, ordered: .above)
-        }
+        panel.attach(to: host)
         panel.orderFront(nil)
         panel.invalidateShadow()
     }

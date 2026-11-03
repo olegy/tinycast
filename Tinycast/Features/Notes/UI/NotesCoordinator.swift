@@ -84,6 +84,13 @@ final class NotesCoordinator {
     var showsFormattingBar: Bool { settings.notesRendersMarkdown && settings.notesShowsFormattingBar }
     var showsCharacterCount: Bool { settings.notesShowsCharacterCount }
     var textSize: NoteTextSize { settings.notesTextSize }
+    var windowMode: NoteWindowMode { settings.notesWindowMode }
+    var paper: NotePaper { settings.notesPaper }
+    var tint: NoteTint { paper.takesTint ? settings.notesTint : .none }
+    var showsTitleBarButtons: Bool { settings.notesShowsTitleBarButtons }
+    var titlebarHeight: CGFloat {
+        showsTitleBarButtons ? Theme.Size.noteTitlebar : Theme.Size.noteCompactTitlebar
+    }
     var isSearching: Bool { store.isSearching }
     var visibleNotes: [NoteSummary] {
         store.searchQuery.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
@@ -124,7 +131,8 @@ final class NotesCoordinator {
     }
 
     func toggle() {
-        if windowController.isVisible {
+        let buried = windowMode == .standard && !windowController.isFrontmost
+        if windowController.isVisible && !buried {
             hide()
         } else {
             request(.editor)

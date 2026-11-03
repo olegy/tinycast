@@ -159,7 +159,6 @@ struct LanguageTests {
             if code == "en" || code == "fr" {
                 for (key, french) in [
                     "Pop to Root Search": "Revenir à la recherche principale",
-                    "Pop to root": "Revenir à la recherche principale",
                     "Close window and pop to root": "Fermer la fenêtre et revenir à la recherche principale",
                     "Hidden from root search": "Masqué de la recherche principale",
                     "Hide from Root Search": "Masquer de la recherche principale",

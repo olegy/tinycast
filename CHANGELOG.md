@@ -35,6 +35,13 @@ offers.
 - **The caret stays after a list bullet.** Moving to the start of a list line with the keyboard
   stops where a click would, so Backspace removes the bullet instead of joining the line to the one
   above.
+- **Standard window.** Settings > Notes > Window can make the note an ordinary window that other
+  apps cover and that stays on its own Space, instead of floating above everything.
+- **Paper.** The note can be written on Glass, as before, Frosted, Solid, Cream or White, and the
+  first three take an optional tint.
+- **Show Title Bar Buttons** can be turned off, leaving a slimmer title bar with just the window
+  buttons and the note's title.
+- **⌃⌘↑ and ⌃⌘↓ move a list item** up or down among its siblings, nested items with it.
 
 ## 0.12.1-lite.1
 

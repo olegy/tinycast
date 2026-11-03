@@ -54,6 +54,10 @@ struct SettingsBackup: Codable {
         var notesShowsFormattingBar: Bool?
         var notesShowsCharacterCount: Bool?
         var notesTextSize: String?
+        var notesWindowMode: String?
+        var notesPaper: String?
+        var notesTint: String?
+        var notesShowsTitleBarButtons: Bool?
         // `snippetsEnabled` is absent: an import must not enable keystroke listening.
         var customCommandsEnabled: Bool?
         var customCommandsShowInLauncher: Bool?
@@ -164,6 +168,10 @@ extension SettingsBackup {
             notesShowsFormattingBar: s.notesShowsFormattingBar,
             notesShowsCharacterCount: s.notesShowsCharacterCount,
             notesTextSize: s.notesTextSize.rawValue,
+            notesWindowMode: s.notesWindowMode.rawValue,
+            notesPaper: s.notesPaper.rawValue,
+            notesTint: s.notesTint.rawValue,
+            notesShowsTitleBarButtons: s.notesShowsTitleBarButtons,
             customCommandsEnabled: s.customCommandsEnabled,
             customCommandsShowInLauncher: s.customCommandsShowInLauncher,
             snippetsShowInLauncher: s.snippetsShowInLauncher,
@@ -433,6 +441,22 @@ extension SettingsBackup {
         }
         if let raw = s.notesTextSize, let size = NoteTextSize(rawValue: raw) {
             settings.notesTextSize = size
+            count += 1
+        }
+        if let raw = s.notesWindowMode, let mode = NoteWindowMode(rawValue: raw) {
+            settings.notesWindowMode = mode
+            count += 1
+        }
+        if let raw = s.notesPaper, let paper = NotePaper(rawValue: raw) {
+            settings.notesPaper = paper
+            count += 1
+        }
+        if let raw = s.notesTint, let tint = NoteTint(rawValue: raw) {
+            settings.notesTint = tint
+            count += 1
+        }
+        if let flag = s.notesShowsTitleBarButtons {
+            settings.notesShowsTitleBarButtons = flag
             count += 1
         }
         if let flag = s.customCommandsEnabled {

@@ -361,6 +361,15 @@ enum SettingsSearchCatalog {
             .notesNotes, "Enable Notes",
             keywords: ["markdown", "scratchpad"]),
         .init(
+            .notesOptions, "Window",
+            keywords: ["floating", "standard", "always on top", "level", "mode"]),
+        .init(
+            .notesOptions, "Paper",
+            keywords: ["background", "glass", "frosted", "solid", "cream", "white", "tint", "color"]),
+        .init(
+            .notesOptions, "Show Title Bar Buttons",
+            keywords: ["header", "toolbar", "create", "browse", "folder", "minimal"]),
+        .init(
             .notesOptions, "Render Markdown",
             keywords: ["markdown", "formatting", "preview", "raw", "source"]),
         .init(

@@ -16,11 +16,14 @@ final class NotesPanel: NSPanel {
 
     private let acceptsMain: Bool
 
-    init(content: NSView, size: CGSize, styleMask: NSWindow.StyleMask, acceptsMain: Bool) {
+    init(
+        content: NSView, size: CGSize, styleMask: NSWindow.StyleMask, acceptsMain: Bool,
+        activatesApp: Bool = false
+    ) {
         self.acceptsMain = acceptsMain
         super.init(
             contentRect: NSRect(origin: .zero, size: size),
-            styleMask: styleMask.union([.fullSizeContentView, .nonactivatingPanel]),
+            styleMask: styleMask.union(activatesApp ? .fullSizeContentView : [.fullSizeContentView, .nonactivatingPanel]),
             backing: .buffered,
             defer: false
         )
@@ -36,6 +39,31 @@ final class NotesPanel: NSPanel {
         isReleasedWhenClosed = false
         isRestorable = false
         contentView = content
+    }
+
+    /// Fixed at creation: the window server keeps refusing activation after the flag is removed.
+    var activatesApp: Bool { !styleMask.contains(.nonactivatingPanel) }
+
+    func apply(_ mode: NoteWindowMode) {
+        switch mode {
+        case .floating:
+            isFloatingPanel = true
+            level = .floating
+            collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary]
+        case .standard:
+            isFloatingPanel = false
+            level = .normal
+            collectionBehavior = []
+        }
+    }
+
+    /// A child takes its host's level and paper, or it floats over apps a standard host sits under.
+    func attach(to host: NSWindow) {
+        level = host.level
+        appearance = host.appearance
+        guard parent !== host else { return }
+        parent?.removeChildWindow(self)
+        host.addChildWindow(self, ordered: .above)
     }
 
     /// The main menu is offered chords first, so this is the fallback for a non-activating panel.

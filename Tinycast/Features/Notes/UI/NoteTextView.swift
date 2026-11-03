@@ -150,7 +150,8 @@ final class NoteTextView: NSTextView, InjectableTextView {
         guard rendersMarkdown, let action = Self.chord(for: event, key: key) else {
             return super.performKeyEquivalent(with: event)
         }
-        if !event.isARepeat { perform(action) }
+        let repeatsWhileHeld = if case .moveListItem = action { true } else { false }
+        if repeatsWhileHeld || !event.isARepeat { perform(action) }
         return true
     }
 
@@ -207,10 +208,21 @@ final class NoteTextView: NSTextView, InjectableTextView {
         static let nine: UInt16 = 0x19
     }
 
+    private enum ArrowKey {
+        static let down: UInt16 = 0x7D
+        static let up: UInt16 = 0x7E
+    }
+
     /// Digits match by key code, since shifted and optioned digits vary by keyboard layout.
     private static func chord(for event: NSEvent, key: String?) -> NoteEditAction? {
         let modifiers = event.modifierFlags.intersection([.command, .shift, .option, .control])
         switch modifiers {
+        case [.command, .control]:
+            switch event.keyCode {
+            case ArrowKey.up: return .moveListItem(.up)
+            case ArrowKey.down: return .moveListItem(.down)
+            default: return nil
+            }
         case [.command]:
             switch key {
             case "b": return .toggleInline(.bold)

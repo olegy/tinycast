@@ -17,6 +17,33 @@ struct NotesSettingsView: View {
             .settingsAnchor(.notesNotes)
 
             Section {
+                Picker(selection: $settings.notesWindowMode) {
+                    ForEach(NoteWindowMode.allCases) { mode in
+                        Text(mode.title).tag(mode)
+                    }
+                } label: {
+                    SettingsRowTitle(.notesOptions, "Window")
+                    Text(settings.notesWindowMode.detail)
+                }
+                .settingsEnabled(settings.notesEnabled)
+                LabeledContent {
+                    HStack(spacing: Theme.Spacing.md) {
+                        if settings.notesPaper.takesTint { NoteTintSwatches(tint: $settings.notesTint) }
+                        Picker(selection: $settings.notesPaper) {
+                            ForEach(NotePaper.allCases) { paper in
+                                Text(paper.title).tag(paper)
+                            }
+                        } label: {
+                            Text("Paper")
+                        }
+                        .labelsHidden()
+                        .fixedSize()
+                    }
+                } label: {
+                    SettingsRowTitle(.notesOptions, "Paper")
+                    Text(settings.notesPaper.detail)
+                }
+                .settingsEnabled(settings.notesEnabled)
                 Toggle(isOn: $settings.notesRendersMarkdown) {
                     SettingsRowTitle(.notesOptions, "Render Markdown")
                     Text("Formats as you type.")
@@ -25,6 +52,10 @@ struct NotesSettingsView: View {
                 Toggle(isOn: $settings.notesFitsWindowToText) {
                     SettingsRowTitle(.notesOptions, "Fit Window to Text")
                     Text("Off keeps the size you set.")
+                }
+                .settingsEnabled(settings.notesEnabled)
+                Toggle(isOn: $settings.notesShowsTitleBarButtons) {
+                    SettingsRowTitle(.notesOptions, "Show Title Bar Buttons")
                 }
                 .settingsEnabled(settings.notesEnabled)
                 Toggle(isOn: $settings.notesShowsFormattingBar) {
@@ -74,4 +105,36 @@ struct NotesSettingsView: View {
             get: { Double(sizes.firstIndex(of: settings.notesTextSize) ?? 0) },
             set: { settings.notesTextSize = sizes[min(max(Int($0.rounded()), 0), sizes.count - 1)] })
     }
+}
+
+/// One swatch per tint, the plain paper first; the chosen one wears a ring.
+private struct NoteTintSwatches: View {
+    @Binding var tint: NoteTint
+
+    var body: some View {
+        HStack(spacing: Theme.Spacing.sm) {
+            ForEach(NoteTint.allCases) { option in
+                Button { tint = option } label: { swatch(option) }
+                    .buttonStyle(.plain)
+                    .help(option.title)
+                    .accessibilityLabel(option.title)
+                    .accessibilityAddTraits(option == tint ? .isSelected : [])
+            }
+        }
+    }
+
+    private func swatch(_ option: NoteTint) -> some View {
+        Circle()
+            .fill(option.color ?? Theme.Colors.controlSurface)
+            .overlay { Circle().strokeBorder(Theme.Colors.border, lineWidth: 1) }
+            .frame(width: Self.diameter, height: Self.diameter)
+            .padding(Self.ringGap)
+            .overlay {
+                if option == tint { Circle().strokeBorder(Color.accentColor, lineWidth: 2) }
+            }
+            .contentShape(Circle())
+    }
+
+    private static let diameter: CGFloat = 14
+    private static let ringGap: CGFloat = 3
 }

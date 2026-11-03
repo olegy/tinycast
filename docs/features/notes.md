@@ -1,6 +1,6 @@
 # Notes
 
-Notes is an unlimited local collection of plain Markdown files in one persistent floating editor, which
+Notes is an unlimited local collection of plain Markdown files in one persistent editor window, which
 renders the Markdown in place. One window edits one active note at a time; a title-bar button opens the searchable switcher, and launcher
 commands and global shortcuts can show, search, or extend the collection.
 
@@ -125,8 +125,23 @@ Both windows are one `NotesPanel`, a non-activating floating panel that owns the
 ⌘⌫. They differ only in style mask and in the `commandChords` their controller installs: the note window
 claims ⌘N, ⌘P, ⌘O, ⌘F and ⌘W, and the switcher reads ⌘N plus ⌘W and ⌘P as dismissals.
 
+Settings > Notes > **Window** is `AppSettings.notesWindowMode`, a `NoteWindowMode`. **Floating**, the
+default, is the panel above: floating level, on every Space, never activating Tinycast. **Standard** is
+an ordinary window on one Space at the normal level: showing or clicking it activates Tinycast, and
+another app's window covers it. Its panel is created without `.nonactivatingPanel`, because the window
+server keeps refusing activation to a panel that loses the flag later, so a mode change replaces the
+window: the frame is saved, the open note reinstalls from the store and its undo history is reset. Show
+Notes on a covered window brings it to the front rather than hiding it. The switcher and the heading
+menu take their host's level and appearance in `NotesPanel.attach(to:)`, or a floating child would hang
+over the app that covered a standard host. The controller observes the mode, so a change restyles an
+open window.
+
 AppKit draws the note window's chrome. Its 52-point title bar holds the traffic lights, the centred
-active title, and one frosted capsule of Create, Browse, and Open Folder. The title is drawn, not
+active title, and one frosted capsule of Create, Browse, and Open Folder. With Settings > Notes >
+**Show Title Bar Buttons** (`AppSettings.notesShowsTitleBarButtons`, on when absent) off, the capsule
+goes and the band shrinks to 32 points of traffic lights and the centred title, and the switcher hangs
+from that shorter band; the chords still work. The lights are AppKit's own at the SDK's size: an app linked against an older SDK gets
+smaller ones, and redrawing them is not worth losing the native buttons. The title is drawn, not
 native, so it centres on the window; it is not hit-testable, so dragging it moves the window.
 The yellow and green traffic lights are disabled; double-clicking the free title bar moves the
 unchanged window to the top-right of its current screen's visible area.
@@ -244,6 +259,10 @@ reaches autosave.
 - A caret moved by a key never rests inside a list item's marker: it stops at the content start, and
   ← from there goes to the end of the line above, so Backspace never joins the item to that line.
 - ⌘D selects the word under the caret, or the word the caret ends.
+- ⌃⌘↑ and ⌃⌘↓ swap the touched items with the sibling above or below: the item at the same level
+  under the same parent, with no blank or other line between. An item's deeper lines travel with it,
+  and a nested item never leaves its parent. Swapped ordered heads trade numbers, so the run keeps
+  counting from where it started. Held, the chord repeats.
 - Clicking a checkbox toggles `[ ]` and `[x]` without moving the caret. The hit test uses
   `NoteCheckboxGeometry`, the rect the fragment draws, grown by 3 points.
 - Clicking a rendered link opens it, unless the click lands in the outer 30% of the label's first or
@@ -254,6 +273,7 @@ reaches autosave.
 | --- | --- |
 | ⌘Z, ⇧⌘Z | undo, redo |
 | ⌘D | select word |
+| ⌃⌘↑, ⌃⌘↓ | move list item up, down |
 | ⌘B, ⌘I, ⌘E | bold, italic, inline code |
 | ⇧⌘X | strikethrough |
 | ⌥⌘C | code block |
@@ -312,6 +332,18 @@ Settings > Notes > **Render Markdown** is `AppSettings.notesRendersMarkdown`, on
 by settings backups. `NotesCoordinator` exposes it and `NotesView` hands it to `NoteEditorView`. Off
 gives the literal editor: one font and colour, native Return, Tab and shortcuts, and no parsing.
 Flipping it restyles the open note without touching its undo history or marking it dirty.
+
+Settings > Notes > **Paper** is `AppSettings.notesPaper`, a `NotePaper`, Glass when absent.
+`NotePaperBackground` draws it: Glass is the Liquid Glass and scrim the window always had, Frosted the
+popover material, Solid the window background colour, and Cream and White opaque papers whose
+literals live in `Theme.Colors.NotePaper`. Cream and White are light in either appearance, so the
+controller pins the window to Aqua and every adaptive colour resolves its light branch. The tint
+swatches in front of the menu, `AppSettings.notesTint`, show only for the three system papers; an
+opaque paper ignores the stored tint rather than clearing it. A tint is a 0.12 wash from
+`Theme.Colors.NoteTint` over the paper. The title band and the bottom band lie over the paper in the
+paper's chrome tone, at 0.8 and 0.6 opacity: the window background for the three system papers, a
+deeper warm shade for Cream and a cooler grey for White, so a tint reads on the page and not the bars.
+Each paper's row subtitle says what it is.
 
 Settings > Notes > **Fit Window to Text** is `AppSettings.notesFitsWindowToText`, on when absent and
 carried by settings backups. Off skips the height fit entirely, so the window keeps the autosaved frame

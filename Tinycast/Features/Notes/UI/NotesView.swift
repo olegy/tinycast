@@ -9,8 +9,7 @@ struct NotesView: View {
             content
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(Theme.Colors.panelScrim)
-        .background(GlassEffectView())
+        .background(NotePaperBackground(paper: notes.paper, tint: notes.tint))
         .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.panel, style: .continuous))
         // The band above is the title bar; AppKit must not inset the content a second time.
         .ignoresSafeArea()
@@ -25,9 +24,10 @@ struct NotesView: View {
             Color.clear
                 .contentShape(Rectangle())
                 .overlay { NoteTitlebarDragRegion(onDoubleClick: notes.moveToTopRight) }
-            NoteTitlebarActions()
+            if notes.showsTitleBarButtons { NoteTitlebarActions() }
         }
-        .frame(height: Theme.Size.noteTitlebar)
+        .frame(height: notes.titlebarHeight)
+        .background(notes.paper.chrome.opacity(Theme.Colors.NotePaper.headerOpacity))
         .overlay { title }
     }
 
@@ -83,6 +83,7 @@ struct NotesView: View {
         .padding(.trailing, Theme.Spacing.md)
         .frame(minWidth: 0, maxWidth: .infinity, alignment: .trailing)
         .frame(height: Theme.Size.bottomBarHeight)
+        .background(notes.paper.chrome.opacity(Theme.Colors.NotePaper.footerOpacity))
     }
 
     private var emptyState: some View {
@@ -106,6 +107,7 @@ struct NotesView: View {
         Group { if notes.showsCharacterCount { characterCount } }
             .frame(maxWidth: .infinity)
             .frame(height: Theme.Size.noteFooterHeight)
+            .background(notes.paper.chrome.opacity(Theme.Colors.NotePaper.footerOpacity))
     }
 
     private var characterCount: some View {
