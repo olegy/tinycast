@@ -25,10 +25,6 @@ struct SettingsBackup: Codable {
         var clipboardDefaultAction: String?
         var clipboardDisabledApps: [String]?
         var launchAtLogin: Bool?
-        var hyperKey: String?
-        var hyperKeyIncludesShift: Bool?
-        var hyperKeyQuickPress: String?
-        var hyperKeySecureInputCompatibility: Bool?
         var emojiSkinTone: String?
         var emojiGridColumns: Int?
         var showInMenuBar: Bool?
@@ -95,8 +91,6 @@ struct SettingsBackup: Codable {
         var menuBarLinkedEventsOnly: Bool?
         var calendarMenuBarHidesWhenEmpty: Bool?
         var hideCurrentEvent: Int?
-        // Safe to carry: it silences a prompt rather than granting anything.
-        var supportReminders: Bool?
     }
 
     struct HotkeyBackup: Codable {
@@ -142,10 +136,6 @@ extension SettingsBackup {
             clipboardDefaultAction: s.clipboardDefaultAction.rawValue,
             clipboardDisabledApps: s.clipboardDisabledApps,
             launchAtLogin: s.launchAtLogin,
-            hyperKey: s.hyperKey.rawValue,
-            hyperKeyIncludesShift: s.hyperKeyIncludesShift,
-            hyperKeyQuickPress: s.hyperKeyQuickPress.rawValue,
-            hyperKeySecureInputCompatibility: s.hyperKeySecureInputCompatibility,
             emojiSkinTone: s.emojiSkinTone.rawValue,
             emojiGridColumns: s.emojiGridColumns.rawValue,
             showInMenuBar: s.showInMenuBar,
@@ -203,8 +193,7 @@ extension SettingsBackup {
             calendarMenuBarDisplay: s.calendarMenuBarDisplay.rawValue,
             menuBarLinkedEventsOnly: s.menuBarLinkedEventsOnly,
             calendarMenuBarHidesWhenEmpty: s.calendarMenuBarHidesWhenEmpty,
-            hideCurrentEvent: s.hideCurrentEvent.rawValue,
-            supportReminders: s.supportRemindersEnabled)
+            hideCurrentEvent: s.hideCurrentEvent.rawValue)
 
         let hk = core.hotKeys
         var hotkeys = HotkeyBackup()
@@ -331,22 +320,6 @@ extension SettingsBackup {
         }
         if let launch = s.launchAtLogin {
             settings.launchAtLogin = launch
-            count += 1
-        }
-        if let raw = s.hyperKey, let key = HyperKeyPhysicalKey(rawValue: raw) {
-            settings.hyperKey = key
-            count += 1
-        }
-        if let flag = s.hyperKeyIncludesShift {
-            settings.hyperKeyIncludesShift = flag
-            count += 1
-        }
-        if let raw = s.hyperKeyQuickPress, let quick = HyperKeyQuickPress(rawValue: raw) {
-            settings.hyperKeyQuickPress = quick
-            count += 1
-        }
-        if let flag = s.hyperKeySecureInputCompatibility {
-            settings.hyperKeySecureInputCompatibility = flag
             count += 1
         }
         if let raw = s.emojiSkinTone, let tone = EmojiSkinTone(rawValue: raw) {
@@ -582,10 +555,6 @@ extension SettingsBackup {
         }
         if let raw = s.hideCurrentEvent, let hide = HideCurrentEvent(rawValue: raw) {
             settings.hideCurrentEvent = hide
-            count += 1
-        }
-        if let flag = s.supportReminders {
-            settings.supportRemindersEnabled = flag
             count += 1
         }
         return count

@@ -29,7 +29,8 @@ struct LauncherCategorySwitchSection: View {
 struct LauncherItemsSection: View {
     let kind: AppEntry.Kind
     let anchor: SettingsAnchor
-    let searchPrompt: LocalizedStringResource
+    /// Nil for a list short enough to read at a glance, which then gets no filter field.
+    var searchPrompt: LocalizedStringResource?
     var emptyMessage: LocalizedStringResource = "Nothing here yet."
 
     @Environment(AppIndex.self) private var appIndex
@@ -46,7 +47,9 @@ struct LauncherItemsSection: View {
 
     var body: some View {
         Section {
-            SettingsFilterField(prompt: searchPrompt, query: $query)
+            if let searchPrompt {
+                SettingsFilterField(prompt: searchPrompt, query: $query)
+            }
             LauncherItemsList(
                 entries: entries, query: query, isEnabled: visibility.isKindEnabled(kind),
                 emptyMessage: emptyMessage)

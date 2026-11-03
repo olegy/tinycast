@@ -28,10 +28,8 @@ final class HotKeyManager {
         didSet {
             guard recordingAction != oldValue else { return }
             let recording = recordingAction != nil
-            if recording { secureInputPressedActions.removeAll(keepingCapacity: true) }
             center.isPaused = recording
             modifierTapMonitor.isPaused = recording
-            if secureInputEquivalentsIncludeShift != nil { syncSecureInputEquivalents() }
             if let recordingAction {
                 capture.start(action: recordingAction, hotKeys: self)
             } else {
@@ -46,13 +44,6 @@ final class HotKeyManager {
     private let defaults: UserDefaults
     private let center = HotKeyCenter()
     private var modifierTaps: [HotKeyBinding: HotKeyAction] = [:]
-    /// Include Shift for the chord whose combos also answer to ⌃+key; nil when none should.
-    private var secureInputEquivalentsIncludeShift: Bool?
-    private var secureInputEquivalentIDs: [String] = []
-    private var secureInputReplacedActions: [HotKeyAction] = []
-    private var secureInputPressedActions: [String: HotKeyAction] = [:]
-    private var secureInputHint: KeyShortcut?
-    private static let secureInputHintID = "secureInputHint"
     private var bindings: [HotKeyAction: HotKeyBinding] = [:]
     /// Part of `AppIndex`'s cache key: a bound entry leaves the launcher's Suggestions.
     private(set) var revision = 0
@@ -169,7 +160,6 @@ final class HotKeyManager {
 
     func setBinding(_ binding: HotKeyBinding?, for action: HotKeyAction) {
         let previous = bindings[action]
-        clearSecureInputEquivalents()
         if let binding,
             let data = try? encoder.encode(binding),
             let json = String(data: data, encoding: .utf8)
@@ -215,83 +205,6 @@ final class HotKeyManager {
         // A rebuild walks every candidate; only a modifier-only binding changes this map.
         if previous?.usesModifierTapMonitor == true || binding?.usesModifierTapMonitor == true {
             syncModifierTaps()
-        }
-        if secureInputEquivalentsIncludeShift != nil { syncSecureInputEquivalents() }
-    }
-
-    // MARK: - Secure Input
-
-    /// Secure Input hides the Hyper chord from every tap, so its combos also register with ⌃.
-    func setSecureInputEquivalents(includesShift: Bool?) {
-        guard includesShift != secureInputEquivalentsIncludeShift else { return }
-        secureInputEquivalentsIncludeShift = includesShift
-        syncSecureInputEquivalents()
-    }
-
-    func setSecureInputHint(_ shortcut: KeyShortcut?, onPress: @escaping () -> Void) {
-        guard shortcut != secureInputHint else { return }
-        secureInputHint = shortcut
-        center.unregister(id: Self.secureInputHintID)
-        guard let shortcut else { return }
-        center.register(id: Self.secureInputHintID, shortcut: shortcut, onKeyDown: { _ in onPress() })
-    }
-
-    /// Rebuilt wholesale, like the modifier-tap map, so an equivalent cannot outlive its binding.
-    private func syncSecureInputEquivalents() {
-        clearSecureInputEquivalents()
-        guard let includesShift = secureInputEquivalentsIncludeShift else { return }
-        let chord = KeyShortcut.hyperChord(includesShift: includesShift)
-        let actions = candidateActions
-        let originalActions = actions.reduce(into: [KeyShortcut: HotKeyAction]()) { result, action in
-            if let shortcut = binding(for: action)?.shortcut { result[shortcut] = action }
-        }
-        for action in actions {
-            guard let equivalent = binding(for: action)?.shortcut?.secureInputEquivalent(of: chord)
-            else { continue }
-            let original = originalActions[equivalent]
-            if let original {
-                center.unregister(id: original.defaultsKey)
-                secureInputReplacedActions.append(original)
-            }
-            let id = "secureInputEquivalent." + action.defaultsKey
-            var isPressed = false
-            center.register(
-                id: id, shortcut: equivalent,
-                onKeyDown: { [weak self] flags in
-                    guard let self else { return }
-                    if !isPressed {
-                        isPressed = true
-                        secureInputPressedActions[id] =
-                            ModifierKey.rightControl.isHeld(in: flags) ? action : original
-                    }
-                    if let selected = secureInputPressedActions[id] { perform(selected) }
-                },
-                onKeyUp: { [weak self] in
-                    isPressed = false
-                    self?.secureInputPressedActions.removeValue(forKey: id)
-                })
-            secureInputEquivalentIDs.append(id)
-        }
-    }
-
-    private func clearSecureInputEquivalents() {
-        secureInputPressedActions.removeAll(keepingCapacity: true)
-        secureInputEquivalentIDs.forEach { center.unregister(id: $0) }
-        secureInputEquivalentIDs.removeAll(keepingCapacity: true)
-        secureInputReplacedActions.forEach(register)
-        secureInputReplacedActions.removeAll(keepingCapacity: true)
-    }
-
-    /// Include Shift redefines the chord, and a stored combo has the old one baked in.
-    func retargetHyperBindings(includesShift: Bool) {
-        for action in candidateActions {
-            guard let shortcut = bindings[action]?.shortcut else { continue }
-            let retargeted = shortcut.retargetingHyper(includesShift: includesShift)
-            guard retargeted != shortcut else { continue }
-            let binding = HotKeyBinding.combo(retargeted)
-            // Skip a collision rather than clobber it: the second registration would fail silently.
-            guard conflictOwner(of: binding, excluding: action) == nil else { continue }
-            setBinding(binding, for: action)
         }
     }
 
@@ -364,7 +277,7 @@ final class HotKeyManager {
         guard let shortcut = binding(for: action)?.shortcut else { return }
         center.register(
             id: action.defaultsKey, shortcut: shortcut,
-            onKeyDown: { [weak self] _ in self?.perform(action) })
+            onKeyDown: { [weak self] in self?.perform(action) })
     }
 
     /// Rebuilt wholesale, so the map can't drift from what is on disk.

@@ -1,6 +1,6 @@
 import Foundation
 
-/// The four modifiers a double-tap may bind; Caps Lock belongs to the Hyper Key.
+/// The four modifiers a double-tap may bind.
 enum DoubleTapModifier: String, CaseIterable, Codable, Sendable {
     case control
     case option

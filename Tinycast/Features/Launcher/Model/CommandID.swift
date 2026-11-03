@@ -42,11 +42,8 @@ enum CommandID: String, CaseIterable, Sendable {
     case createSnippet = "command:create-snippet"
     case exportSettings = "command:export-settings"
     case importSettings = "command:import-settings"
-    case importFromRaycast = "command:import-from-raycast"
     case checkForUpdates = "command:check-for-updates"
-    case settings = "command:settings"
     case about = "command:about"
-    case support = "command:support"
     case quit = "command:quit"
 
     var name: String { String(localized: nameResource) }
@@ -95,11 +92,8 @@ enum CommandID: String, CaseIterable, Sendable {
         case .createSnippet: return "Create Snippet"
         case .exportSettings: return "Export Backup"
         case .importSettings: return "Import Backup"
-        case .importFromRaycast: return "Import from Raycast"
         case .checkForUpdates: return "Check for Updates"
-        case .settings: return "Tinycast Settings"
         case .about: return "About Tinycast"
-        case .support: return "Support Tinycast"
         case .quit: return "Quit Tinycast"
         }
     }
@@ -145,11 +139,8 @@ enum CommandID: String, CaseIterable, Sendable {
         case .createSnippet: return "plus.rectangle.on.rectangle"
         case .exportSettings: return "square.and.arrow.up"
         case .importSettings: return "square.and.arrow.down"
-        case .importFromRaycast: return "arrow.down.doc"
         case .checkForUpdates: return "arrow.down.circle"
-        case .settings: return "gearshape"
         case .about: return "info.circle"
-        case .support: return "heart"
         case .quit: return "power"
         }
     }

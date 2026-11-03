@@ -173,29 +173,6 @@ final class AppSettings {
         }
     }
 
-    /// The physical key remapped to the Hyper chord; `HyperKeyManager` reacts via its observer.
-    var hyperKey: HyperKeyPhysicalKey {
-        didSet { defaults.set(hyperKey.rawValue, forKey: Key.hyperKey.rawValue) }
-    }
-
-    var hyperKeyIncludesShift: Bool {
-        didSet { defaults.set(hyperKeyIncludesShift, forKey: Key.hyperKeyIncludesShift.rawValue) }
-    }
-
-    var hyperKeyQuickPress: HyperKeyQuickPress {
-        didSet {
-            defaults.set(hyperKeyQuickPress.rawValue, forKey: Key.hyperKeyQuickPress.rawValue)
-        }
-    }
-
-    var hyperKeySecureInputCompatibility: Bool {
-        didSet {
-            defaults.set(
-                hyperKeySecureInputCompatibility,
-                forKey: Key.hyperKeySecureInputCompatibility.rawValue)
-        }
-    }
-
     /// Preferred skin tone applied to modifier-capable emoji at render and copy time.
     var emojiSkinTone: EmojiSkinTone {
         didSet { defaults.set(emojiSkinTone.rawValue, forKey: Key.emojiSkinTone.rawValue) }
@@ -616,11 +593,6 @@ final class AppSettings {
         }
     }
 
-    /// Whether the support window may reopen itself; off means never ask again.
-    var supportRemindersEnabled: Bool {
-        didSet { defaults.set(supportRemindersEnabled, forKey: Key.supportReminders.rawValue) }
-    }
-
     /// Whether settings.json mirrors these settings; `AppCore` starts and stops the mirror.
     var settingsFileEnabled: Bool {
         didSet { defaults.set(settingsFileEnabled, forKey: Key.settingsFileEnabled.rawValue) }
@@ -663,19 +635,6 @@ final class AppSettings {
         automaticallyCheckForUpdates =
             defaults.object(forKey: Key.automaticallyCheckForUpdates.rawValue) == nil
             || defaults.bool(forKey: Key.automaticallyCheckForUpdates.rawValue)
-        hyperKey =
-            defaults.string(forKey: Key.hyperKey.rawValue).flatMap(HyperKeyPhysicalKey.init)
-            ?? .none
-        // Defaults to true, so absence must be distinguished from a stored `false`.
-        hyperKeyIncludesShift =
-            defaults.object(forKey: Key.hyperKeyIncludesShift.rawValue) == nil
-            || defaults.bool(forKey: Key.hyperKeyIncludesShift.rawValue)
-        hyperKeyQuickPress =
-            defaults.string(forKey: Key.hyperKeyQuickPress.rawValue)
-            .flatMap(HyperKeyQuickPress.init)
-            ?? .none
-        hyperKeySecureInputCompatibility = defaults.bool(
-            forKey: Key.hyperKeySecureInputCompatibility.rawValue)
         emojiSkinTone =
             defaults.string(forKey: Key.emojiSkinTone.rawValue).flatMap(EmojiSkinTone.init) ?? .none
         emojiGridColumns =
@@ -836,9 +795,6 @@ final class AppSettings {
         quicklinkConfirmsBeforeDelete =
             defaults.object(forKey: Key.quicklinkConfirmsBeforeDelete.rawValue) == nil
             || defaults.bool(forKey: Key.quicklinkConfirmsBeforeDelete.rawValue)
-        supportRemindersEnabled =
-            defaults.object(forKey: Key.supportReminders.rawValue) == nil
-            || defaults.bool(forKey: Key.supportReminders.rawValue)
         settingsFileEnabled = defaults.bool(forKey: Key.settingsFileEnabled.rawValue)
     }
 }

@@ -254,21 +254,12 @@ final class LauncherCoordinator {
         case .importSettings:
             dismissPalette()
             Task { await BackupActions.runImportCommand(core: core) }
-        case .importFromRaycast:
-            dismissPalette()
-            settingsCoordinator.showBackupSettings()
         case .checkForUpdates:
             dismissPalette()
             core.updateCoordinator.checkForUpdates()
-        case .settings:
-            dismissPalette()
-            settingsCoordinator.showSettings()
         case .about:
             dismissPalette()
             settingsCoordinator.showAbout()
-        case .support:
-            dismissPalette()
-            core.supportCoordinator.showSupport()
         case .quit:
             NSApp.terminate(nil)
         }

@@ -9,6 +9,12 @@ offers.
 
 - **Dictation** is gone, along with its settings, the microphone button in AI Chat and the
   microphone permission.
+- **Hyper Key** is gone.
+- Commands cleanup.
+
+### Settings
+
+- **About** is cleaned up.
 
 ### Notes
 

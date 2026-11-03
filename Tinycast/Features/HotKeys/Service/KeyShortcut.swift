@@ -20,14 +20,8 @@ struct KeyShortcut: Hashable, Sendable {
         self.init(carbonKeyCode: keyCode, carbonModifiers: Self.carbonModifiers(from: flags))
     }
 
-    /// The chord ✦ stands for, nil without a Hyper key; a closure, so a toggle re-renders keycaps.
-    @MainActor static var displayedHyperChord: () -> NSEvent.ModifierFlags? = { nil }
-
     /// One string per keycap in canonical order (🌐⌃⌥⇧⌘), with the key glyph last.
-    @MainActor var keycaps: [String] {
-        Self.collapsedModifierSymbols(from: modifierFlags, hyperChord: Self.displayedHyperChord())
-            + [keyGlyph]
-    }
+    @MainActor var keycaps: [String] { Self.modifierSymbols(from: modifierFlags) + [keyGlyph] }
 
     var modifierFlags: NSEvent.ModifierFlags { Self.modifierFlags(from: carbonModifiers) }
 
@@ -49,39 +43,6 @@ struct KeyShortcut: Hashable, Sendable {
         if flags.contains(.command) { carbon |= cmdKey }
         if flags.contains(.function) { carbon |= kEventKeyModifierFnMask }
         return carbon
-    }
-
-    // MARK: - The Hyper chord
-
-    /// ⌃⌥⌘, plus ⇧ when Include Shift is on — the one place the chord is spelled out.
-    static func hyperChord(includesShift: Bool) -> NSEvent.ModifierFlags {
-        includesShift ? [.control, .option, .shift, .command] : [.control, .option, .command]
-    }
-
-    /// Re-points a chord recorded against the other Hyper set. docs/features/hotkeys.md
-    func retargetingHyper(includesShift: Bool) -> KeyShortcut {
-        let stale = Self.hyperChord(includesShift: !includesShift)
-        guard modifierFlags.isSuperset(of: stale) else { return self }
-        let retargeted =
-            modifierFlags.subtracting(stale).union(Self.hyperChord(includesShift: includesShift))
-        return KeyShortcut(
-            carbonKeyCode: carbonKeyCode, carbonModifiers: Self.carbonModifiers(from: retargeted))
-    }
-
-    func secureInputEquivalent(of hyperChord: NSEvent.ModifierFlags) -> KeyShortcut? {
-        guard modifierFlags.isSuperset(of: hyperChord) else { return nil }
-        let reduced = modifierFlags.subtracting(hyperChord).union(.control)
-        return KeyShortcut(
-            carbonKeyCode: carbonKeyCode, carbonModifiers: Self.carbonModifiers(from: reduced))
-    }
-
-    static func collapsedModifierSymbols(
-        from flags: NSEvent.ModifierFlags, hyperChord: NSEvent.ModifierFlags?
-    ) -> [String] {
-        guard let hyperChord, flags.isSuperset(of: hyperChord) else {
-            return modifierSymbols(from: flags)
-        }
-        return [HyperKeyPhysicalKey.hyperGlyph] + modifierSymbols(from: flags.subtracting(hyperChord))
     }
 
     /// Modifier symbols in fixed 🌐⌃⌥⇧⌘ order.

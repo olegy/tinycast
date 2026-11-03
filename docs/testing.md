@@ -128,9 +128,7 @@ If a change touches anything in the right column, the harness on the left is man
 | `form-input-test` | Native field/textarea sizing, editing alignment, placeholders, Tab, Unicode selection, undo and code fonts |
 | `palette-placement-test` | `DesignSystem/Theme.swift`, `Palette/PalettePlacement.swift` |
 | `palette-menu-click-test` | `Palette/PalettePanel.swift` — complete click-away presses and subsequent control activation |
-| `hotkey-test` | `HotKeys/Model/DoubleTapModifier.swift`, `DoubleTapDetector.swift`, `ModifierKey.swift`, `ModifierKeyDetector.swift`, `HotKeyBinding.swift`, `HotKeySpelling.swift`, `HyperKey.swift`, `HIDKeyMapping.swift`, `HotKeyAction.swift`, `Service/KeyShortcut.swift`, and the command→action mapping in `Launcher/Model/CommandID.swift` |
-| `hyper-key-test` | `HotKeys/Model/HIDKeyMapping.swift`, `HyperKeyConflictPolicy.swift`, `Service/KeyboardRemapper.swift` — mapping ownership, refused writes, crash recovery, device reconnection, conflict severities, Modifier Keys and Karabiner parsing |
-| `hotkey-dispatch-test` | `HotKeys/Service/HotKeyManager.swift` — Secure Input side isolation, shared Control registrations, press routing and recording; isolated preferences and simulated Carbon registration |
+| `hotkey-test` | `HotKeys/Model/DoubleTapModifier.swift`, `DoubleTapDetector.swift`, `ModifierKey.swift`, `ModifierKeyDetector.swift`, `HotKeyBinding.swift`, `HotKeySpelling.swift`, `HotKeyAction.swift`, `Service/KeyShortcut.swift`, and the command→action mapping in `Launcher/Model/CommandID.swift` |
 | `fallback-test` | `Launcher/Model/Fallback.swift`, plus the `CommandID` and `Quicklink` ids it is built from |
 | `dictionary-test` | `Dictionary/Model/DictionaryEntry.swift`, `DictionaryMarkup.swift` — a real XHTML record and the plain-text fallback, read into page blocks |
 | `callout-test` | `DesignSystem/Theme.swift`, `HotKeys/UI/CalloutPlacement.swift` |
@@ -168,7 +166,6 @@ If a change touches anything in the right column, the harness on the left is man
 | `backup-archive-test` | all of `Backup/Model/`, plus `Backup/Service/BackupStaging.swift` |
 | `updates-test` | `Updates/Model/` — version precedence, channel filtering, install route, readiness |
 | `update-check-test` | `UpdateCheckStore` — stopping, in-flight cancellation, cached prompt suppression, restart and independent manual checking |
-| `support-test` | `Support/Model/` — when the support reminder comes due, and a clock moved backwards |
 | `ai-provider-test` | `AI/Model/` and `AISettingsStore` — instruction composition, provider requests and streams, route settings, protocol framing and CLI launch encodings |
 | `apple-intelligence-test` | On-device status, snapshot deltas, transcript assembly and error mapping; real generation is opt-in |
 | `syntax-highlight-test` | `AI/Model/SyntaxGrammar.swift`, `SyntaxHighlighter.swift`, `SyntaxStructuredLexers.swift` — every grammar's tokens, language aliases, the size limit and streaming prefixes |
@@ -502,22 +499,7 @@ caches, TCC grants and login item, so this cannot disturb an installed copy.
   toggles that app
 - Recording captures a shortcut, and the old binding does not fire while recording
 - A conflicting binding is rejected and names its current owner
-- A double-tap binding fires; Hyper Key remaps and its status dot is green
-- Each Hyper Key choice — Caps Lock and all eight Left/Right modifiers — sends the chord, and Quick
-  Press is offered for Caps Lock only. Plug in a second keyboard: Caps Lock is Hyper on it too
-- Lock the screen: Caps Lock types capitals in the password field; unlocking restores Hyper. Sleep
-  and wake do the same
-- With Hyperkey running, the status reads Blocked and a HUD names it; quitting Hyperkey restores
-  Hyper without a relaunch. Diagnostics… lists BetterTouchTool as a warning when it runs
-- Remap Caps Lock in Keyboard ▸ Modifier Keys: Diagnostics… reports it with the keyboard's name
-- In a password field, Hyper with Caps Lock shows the Secure Input HUD. Turn on Secure Input
-  Compatibility: a Hyper shortcut now fires there, and Diagnostics… names the Secure Input holder
-- With Secure Input held, record Hyper+J with and without Secure Input Compatibility: both save ✦J,
-  never F18 or ⌃J, and a quick Hyper+J leaves Caps Lock off
-- Quit Tinycast: Caps Lock types capitals again on every keyboard, the built-in one included
-- With Karabiner-Elements running and Caps Lock left alone there, Hyper with Caps Lock still works;
-  quit Tinycast and Karabiner's own remaps keep working. Remap Caps Lock in Karabiner instead:
-  Diagnostics… reports a Karabiner conflict
+- A double-tap binding fires
 - Every binding survives quit and relaunch
 - `Enable Commands` off leaves every pane-owned command listed, searchable and firing — Notes,
   Clipboard, Emoji, File Search, Snippets, Quicklinks, Calendar, AI and the two layout commands
@@ -805,7 +787,7 @@ caches, TCC grants and login item, so this cannot disturb an installed copy.
   gain and output audio stay unchanged. Switch the default input and repeat; an unavailable or
   externally controlled mute reports failure. Rapid repeats while a change is pending are ignored
 - Holding a bound hotkey does **not** stack dialogs
-- Lock Screen locks from a global hotkey with the palette closed, including a Hyper-key binding
+- Lock Screen locks from a global hotkey with the palette closed
 - Window commands move the window you were last in; cycle-on-repeat steps ½ → ⅓ → ⅔
 - "Top Half" lands flush with the top of the visible frame, on a secondary display too
 - A command with the Notes window focused places Notes, not the app behind it

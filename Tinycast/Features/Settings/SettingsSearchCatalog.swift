@@ -165,21 +165,6 @@ enum SettingsSearchCatalog {
             .generalAppearance, "Drag to move the launcher",
             keywords: ["move", "position", "window"]),
         .init(
-            .generalHyperKey, "Hyper Key",
-            keywords: ["modifier", "remap", "caps lock", "capslock"]),
-        .init(
-            .generalHyperKey, "Quick Press",
-            keywords: ["tap", "escape", "single press"]),
-        .init(
-            .generalHyperKey, "Show ✦ for another app's Hyper key",
-            keywords: ["glyph", "karabiner", "hyperkey", "external", "modifier"]),
-        .init(
-            .generalHyperKey, "Include Shift (⇧)",
-            keywords: ["modifier", "chord"]),
-        .init(
-            .generalHyperKey, "Secure Input Compatibility",
-            keywords: ["password", "secure input", "right control"]),
-        .init(
             .generalCalculator, "Number format",
             keywords: ["decimal", "comma", "separator", "locale", "region", "thousands"]),
         .init(
@@ -651,12 +636,6 @@ enum SettingsSearchCatalog {
             keywords: ["version", "licence", "license", "credits"]),
         .init(
             .aboutAbout, "Check for Updates",
-            keywords: ["version", "upgrade", "release"]),
-        .init(
-            group: .aboutLinks, "Links",
-            keywords: ["github", "source", "issues", "website"]),
-        .init(
-            .aboutLinks, "Support",
-            keywords: ["donate", "sponsor", "funding"])
+            keywords: ["version", "upgrade", "release", "github", "source"])
     ]
 }

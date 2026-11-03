@@ -67,7 +67,7 @@ Add a token rather than a magic number when introducing a new value.
 
 `AppSettings.interfaceSize` scales the palette and the surfaces that float with it — the ⌘K menu, the
 extension list panel, Quick Actions, dialogs and HUDs. Settings, Onboarding,
-Support, Update, About and Notes never scale.
+Update, About and Notes never scale.
 
 `DesignSystem/InterfaceMetrics.swift` stores **only a scale** and derives every value from the `Theme`
 literal, so `Theme` stays the one place a number is written down. **In any view a scaled surface can
@@ -124,7 +124,7 @@ Notes has no corner of its own: it clips to `panel`, so the two floating surface
 
 `dialog` sits between `menuPanel` and `panel` so a dialog reads as a smaller sibling of the palette, not a second palette.
 
-`menu` is the shared small-control corner (sidebar tiles, About link pills); `menuRow` is the slightly rounder hover highlight behind popover-menu rows.
+`menu` is the shared small-control corner (sidebar tiles); `menuRow` is the slightly rounder hover highlight behind popover-menu rows.
 
 Always `RoundedRectangle(cornerRadius:, style: .continuous)` — continuous corners everywhere, never `.circular`.
 
@@ -724,7 +724,7 @@ system-drawn and a pane reads exactly as macOS System Settings does.
   transcript scrolls under it. `.fullSizeContentView` and `titlebarSeparatorStyle = .none` stay — the
   content still runs under the bar, and a hairline would split the surface the band unifies. Both also
   clear `isMovableByWindowBackground`: stock Settings isn't dragged by its content, and a drag across a
-  transcript selects text. Onboarding, Updates, Support and Command Output keep the transparent
+  transcript selects text. Onboarding, Updates and Command Output keep the transparent
   titlebar they were tuned for. Never hand-draw a header band; a main surface takes the system's
   material, not `glassEffect`.
 - `SettingsComponents.swift` holds only what more than one pane or editor needs: **`SettingsRow`**,
@@ -760,7 +760,7 @@ system-drawn and a pane reads exactly as macOS System Settings does.
   ⌘F focuses the field, Escape clears it.
 - **`SettingsSearchCatalog` is hand-written, and that is the only option.** A `Form` cannot be asked
   what rows it holds, so a new row is searchable only once it is listed there — with its anchor, its
-  title and the keywords the title doesn't contain ("caps lock" for Hyper Key).
+  title and the keywords the title doesn't contain ("monitor" for Follow the cursor across displays).
   Matching reuses `FuzzyMatch` (`Launcher/Model/SearchRelevance.swift`), multi-term like `NoteSearch`:
   every term must hit the title, the breadcrumb or a keyword, a title hit outranks the rest, and a
   pane outranks its own rows so a bare "clipboard" lands on the pane. `Tests/settings-history-test.swift`

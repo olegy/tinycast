@@ -189,8 +189,8 @@ it is missing. The flag is intentionally excluded from settings backups, so impo
 enable keystroke listening.
 
 **Accessibility is the only permission snippets need.** The keyword listener installs a listen-only
-`CGEventTap`, which the Accessibility grant already authorizes — the same grant `HyperKeyTap` uses for
-its _modifying_ tap, and the same one clipboard pasting needs. Input Monitoring is deliberately not
+`CGEventTap`, which the Accessibility grant already authorizes — the same grant `ModifierTapMonitor` uses, and
+the same one clipboard pasting needs. Input Monitoring is deliberately not
 used: `CGPreflightListenEventAccess()` reports success whenever Accessibility is granted, so a second
 permission would show as permanently granted while never appearing in System Settings, which cannot be
 managed or revoked. It is managed where it always was, in **Settings → Permissions**.

@@ -17,7 +17,6 @@ struct SettingsAnchor: Hashable, Sendable {
 extension SettingsAnchor {
     static let generalGlobalShortcuts = Self(tab: .general, title: "Global Shortcuts")
     static let generalSearch = Self(tab: .general, title: "Search")
-    static let generalHyperKey = Self(tab: .general, title: "Hyper Key")
     static let generalAppearance = Self(tab: .general, title: "Appearance")
     static let generalCalculator = Self(tab: .general, title: "Calculator")
     static let generalGeneral = Self(tab: .general, title: "General")
@@ -121,7 +120,6 @@ extension SettingsAnchor {
     static let backupSettingsFile = Self(tab: .backup, title: "Settings File")
 
     static let aboutAbout = Self(tab: .about, title: "About")
-    static let aboutLinks = Self(tab: .about, title: "Links")
 }
 
 enum SettingsTarget: Hashable, Sendable {

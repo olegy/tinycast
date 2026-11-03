@@ -7,10 +7,6 @@ enum SettingsBackupCoverage {
         "clipboardRetentionDays": .clipboardRetention,
         "clipboardDefaultAction": .clipboardDefaultAction,
         "clipboardDisabledApps": .clipboardDisabledApps,
-        "hyperKey": .hyperKey,
-        "hyperKeyIncludesShift": .hyperKeyIncludesShift,
-        "hyperKeyQuickPress": .hyperKeyQuickPress,
-        "hyperKeySecureInputCompatibility": .hyperKeySecureInputCompatibility,
         "showInMenuBar": .showInMenuBar,
         "automaticallyCheckForUpdates": .automaticallyCheckForUpdates,
         "emojiSkinTone": .emojiSkinTone,
@@ -68,8 +64,7 @@ enum SettingsBackupCoverage {
         "calendarMenuBarDisplay": .calendarMenuBarDisplay,
         "menuBarLinkedEventsOnly": .menuBarLinkedEventsOnly,
         "calendarMenuBarHidesWhenEmpty": .calendarMenuBarHidesWhenEmpty,
-        "hideCurrentEvent": .hideCurrentEvent,
-        "supportReminders": .supportReminders
+        "hideCurrentEvent": .hideCurrentEvent
     ]
 
     /// The `SettingsData` fields no `AppSettings` key stands behind, and what they read instead.

@@ -14,7 +14,6 @@ struct CommandsSettingsView: View {
             LauncherItemsSection(
                 kind: .command,
                 anchor: .commandsCommands,
-                searchPrompt: "Search commands…",
                 emptyMessage: LocalizedStringResource("commands-empty", defaultValue: "Nothing here yet."))
 
             FeatureSwitchSection(

@@ -65,16 +65,6 @@ enum RaycastImport {
                     hasSettings = true
                 }
             }
-            if options.contains(.shortcuts) {
-                if let shift = backup.settings?.hyperKeyIncludesShift {
-                    settings.hyperKeyIncludesShift = shift
-                    hasSettings = true
-                }
-                if let key = backup.settings?.hyperKey {
-                    settings.hyperKey = key
-                    hasSettings = true
-                }
-            }
 
             let keepClipboard = options.contains(.clipboardHistory)
             // The per-app exclusion list belongs to clipboard history, not to settings as a whole.

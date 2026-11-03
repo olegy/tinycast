@@ -96,8 +96,6 @@ struct GeneralSettingsView: View {
                 SettingsSectionHeader(.generalAppearance)
             }
 
-            HyperKeySettingsSection()
-
             Section {
                 Picker(selection: $settings.calcNumberStyle) {
                     ForEach(CalcNumberStyle.allCases) { style in

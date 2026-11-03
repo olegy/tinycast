@@ -36,7 +36,6 @@ enum SettingsFileSchema {
         case .popToRootTimeout: return bind(settings, \.popToRootTimeout)
         case .escapeKeyBehavior: return bind(settings, \.escapeKeyBehavior)
         case .autoSwitchInputSource: return bind(settings, \.autoSwitchInputSourceID)
-        case .supportReminders: return bind(settings, \.supportRemindersEnabled)
         case .language: return bind(settings, \.language)
         case .appearance: return bind(settings, \.appearance)
         case .interfaceSize: return bind(settings, \.interfaceSize)
@@ -44,11 +43,6 @@ enum SettingsFileSchema {
         case .showFavoritesInCompactMode: return bind(settings, \.showFavoritesInCompactMode)
         case .openOnCursorScreen: return bind(settings, \.openOnCursorScreen)
         case .paletteDraggable: return bind(settings, \.paletteDraggable)
-        case .hyperKey: return bind(settings, \.hyperKey)
-        case .hyperKeyIncludesShift: return bind(settings, \.hyperKeyIncludesShift)
-        case .hyperKeyQuickPress: return bind(settings, \.hyperKeyQuickPress)
-        case .hyperKeySecureInputCompatibility:
-            return bind(settings, \.hyperKeySecureInputCompatibility)
         case .calcNumberStyle: return bind(settings, \.calcNumberStyle)
         case .launcherShowsSuggestions: return bind(settings, \.launcherShowsSuggestions)
         case .rootSearchSensitivity: return bind(settings, \.rootSearchSensitivity)
@@ -159,8 +153,6 @@ extension AppAppearance: SettingsFileRawValue {}
 extension AppLanguage: SettingsFileRawValue {}
 extension InterfaceSize: SettingsFileRawValue {}
 extension NoteTextSize: SettingsFileRawValue {}
-extension HyperKeyPhysicalKey: SettingsFileRawValue {}
-extension HyperKeyQuickPress: SettingsFileRawValue {}
 extension CalcNumberStyle: SettingsFileRawValue {}
 extension SearchSensitivity: SettingsFileRawValue {}
 extension WindowCycle: SettingsFileRawValue {}

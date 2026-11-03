@@ -25,8 +25,6 @@ final class AppCore {
         syntheticEventTag: Paster.tinycastEventTag)
     let textInjector: TextInjector
     let hotKeys = HotKeyManager()
-    @ObservationIgnored private(set) lazy var hyperKey = HyperKeyManager(
-        settings: settings, hotKeys: hotKeys)
     let windowMover = WindowMover()
     let spaceSwitcher = SpaceSwitcher()
     let inputSourceSwitcher = InputSourceSwitcher()
@@ -49,7 +47,6 @@ final class AppCore {
     let calendarStore = CalendarStore()
     let meetingClock = MeetingClock()
     let updateChecker = UpdateCheckStore()
-    let supportReminders: SupportReminderStore
     let emojiIndex = EmojiIndex()
     let frequentEmoji = FrequentEmojiStore()
     let pinnedEmoji = PinnedEmojiStore()
@@ -200,8 +197,6 @@ final class AppCore {
         paletteCoordinator: paletteCoordinator)
     @ObservationIgnored private(set) lazy var updateCoordinator = UpdateCoordinator(
         store: updateChecker, core: self)
-    @ObservationIgnored private(set) lazy var supportCoordinator = SupportCoordinator(
-        store: supportReminders, core: self)
     @ObservationIgnored private(set) lazy var quickActionCoordinator = QuickActionCoordinator(
         settings: settings, store: quickActionSettings, customActions: customQuickActions,
         injector: textInjector, appIndex: appIndex, hotKeys: hotKeys, favorites: favorites,
@@ -242,7 +237,6 @@ final class AppCore {
         self.launcherRanking = launcherRanking
         self.settings = settings
         self.chatHistory = chatHistory
-        supportReminders = SupportReminderStore(settings: settings)
         aiChats = AIChatSurfacesState(history: chatHistory)
         appIndex = AppIndex(ranking: launcherRanking, aliases: aliases)
         let clipboardManager = ClipboardManager(store: clipboardStore, settings: settings)
@@ -336,10 +330,7 @@ final class AppCore {
                 self?.updateCoordinator.presentIfAvailable(release) ?? true
             }
             updateCoordinator.applyAutomaticChecking()
-            supportReminders.onDue = { [weak self] in self?.supportCoordinator.presentIfDue() }
-            supportReminders.start()
 
-            hyperKey.healthTicker = healthTicker
             hotKeys.modifierTapMonitor.healthTicker = healthTicker
             snippetListener.healthTicker = healthTicker
 
@@ -396,13 +387,6 @@ final class AppCore {
                 guard case .command(let id) = action else { return true }
                 return appIndex.isCommandEnabled(id)
             }
-            KeyShortcut.displayedHyperChord = { [settings] in
-                // tinycast-space: another app can own the Hyper key and still want the ✦ glyph.
-                guard settings.hyperKey != .none
-                    || UserDefaults.standard.bool(forKey: "spaceHyperGlyphWithoutRemap")
-                else { return nil }
-                return KeyShortcut.hyperChord(includesShift: settings.hyperKeyIncludesShift)
-            }
             SystemActionRunner.onAsyncFailure = { [weak self] id, failure in
                 self?.systemActionCoordinator.presentSystemActionFailure(id: id, failure: failure)
             }
@@ -413,9 +397,6 @@ final class AppCore {
                 windowRoomIDs: Set(rooms.rooms.map(\.id)),
                 customWindowSizeIDs: Set(customWindowSizes.sizes.map(\.id)),
                 quickActionIDs: Set(customQuickActions.actions.map(\.id)))
-            // After `hotKeys.start`: Secure Input equivalents are built from the loaded bindings.
-            hyperKey.onProblem = { [weak self] in self?.showMessage($0, tone: .danger) }
-            hyperKey.start()
 
             snippetsStore.onSnapshot = { [weak self] snapshot in
                 guard let self else { return }
@@ -446,7 +427,6 @@ final class AppCore {
         if aiChatCoordinator.focusExisting() { return }
         if onboardingCoordinator.focusExisting() { return }
         if updateCoordinator.focusExisting() { return }
-        if supportCoordinator.focusExisting() { return }
         if customCommandCoordinator.focusOutputWindow() { return }
         paletteCoordinator.showPalette(mode: .launcher, restoreAnyMode: true)
     }
@@ -546,8 +526,6 @@ final class AppCore {
     func prepareForTermination() {
         settingsFile?.flush()
         clipboardTextIndexer?.stop()
-        // HID remaps first: they outlive the process.
-        hyperKey.prepareForTermination()
         windowLayoutCoordinator.prepareForTermination()
         roomCoordinator.prepareForTermination()
         inputSourceSwitcher.endSession()
@@ -700,8 +678,6 @@ final class AppCore {
                 _ = $0.fileSearchRemovedDefaultPatterns
             }, reproject: { $0.fileSearchCoordinator.applyPolicy() })
         track({ _ = $0.snippetsEnabled }, reproject: { $0.snippetCoordinator.applySnippetsEnabled() })
-        // Not a feature switch, but the same re-projection: a combo has the chord's ⇧ bit baked in.
-        track({ _ = $0.hyperKeyIncludesShift }, reproject: { $0.applyHyperChord() })
         track(
             { _ = $0.snippetsShowInLauncher },
             reproject: { $0.snippetCoordinator.applySnippetsLauncherPresence() })
@@ -789,12 +765,6 @@ final class AppCore {
         mcpCoordinator.applyEnabled()
     }
 
-    /// Without a Hyper key the chord means nothing, so a literal ⌃⌥⌘ combo is left as recorded.
-    private func applyHyperChord() {
-        guard settings.hyperKey != .none else { return }
-        hotKeys.retargetHyperBindings(includesShift: settings.hyperKeyIncludesShift)
-    }
-
     private func applySnippetsFolder() {
         let repository = Self.snippetsRepository(for: settings)
         Task { await snippetsStore.relocate(to: repository) }
@@ -867,8 +837,6 @@ final class AppCore {
             isShowingDialog: isShowingDialog,
             isPaletteVisible: paletteCoordinator.isVisible)
     }
-
-    var canInterruptUser: Bool { UpdateReadiness.evaluate(currentActivity) == nil }
 
     // MARK: - Dialogs, routed here so `dialogs` stays the single owner
 

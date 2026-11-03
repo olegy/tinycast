@@ -29,7 +29,7 @@ no Sparkle and no appcast: the releases feed is the feed. Releases are published
 - **Nothing is installed unless every check passes.** Bundle id, version and signature are all checked
   on the expanded copy before `replaceItemAt` runs, and the running app survives any failure untouched.
 - **Relaunching goes through `NSApp.terminate`, never `exit`.** That is what flushes a pending note
-  draft and hands back the Hyper Key's HID-level caps remap, which outlives the process.
+  draft.
   Relaunch schedules termination through the main run loop, outside any Swift task or dispatch
   callback, so AppKit's nested termination loop can run the main-actor cleanup. The delegate returns
   `terminateLater` and replies when cleanup finishes, preserving system logout and shutdown requests.
