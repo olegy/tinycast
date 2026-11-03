@@ -58,8 +58,5 @@ node_modules/
 *.tmp
 *.orig
 
-# Real Raycast exports carry the author's clipboard history; the harness builds its own fixtures.
-*.rayconfig
-
 # Local signing identity for this Mac (Scripts/install.sh, Scripts/release.sh).
 keys/

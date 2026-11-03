@@ -10,6 +10,7 @@ offers.
 - **Dictation** is gone, along with its settings, the microphone button in AI Chat and the
   microphone permission.
 - **Hyper Key** is gone.
+- **Raycast import** is gone.
 - Commands cleanup.
 
 ### Settings

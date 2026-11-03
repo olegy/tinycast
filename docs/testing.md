@@ -59,8 +59,7 @@ a compiler diagnostic is far longer than `PIPE_BUF`, so eleven workers streaming
 interleave into nonsense.
 
 A `run` line takes two optional markers before the harness name. `-O` compiles that harness optimised,
-which is worth it only where the run dominates the compile — `raycast-test` spends 47 seconds in
-scrypt at `-Onone` and one second at `-O`. `slow` dispatches it in the first wave, so the longest
+which is worth it only where the run dominates the compile. `slow` dispatches it in the first wave, so the longest
 harnesses are not still running after everything else has finished.
 
 The script is the **only** place the harness set is written down. Nothing runs it for you, so run it
@@ -148,7 +147,6 @@ If a change touches anything in the right column, the harness on the left is man
 | `snippets-test` | all of `Snippets/Model/` and `Snippets/Service/`, plus editor drafts, placeholder selection and `Platform/HealthTicker.swift` |
 | `notes-test` | all of `Notes/Model/` and `Notes/Service/`, including the Markdown parser, edit plans and reveal policy, plus the real fuzzy matcher and signposts |
 | `notes-editor-test` | the Notes editor, rendered and literal, with real TextKit 2 and AppKit editing objects: styling, reveal, layout fragments, keys, chords, checkboxes and links |
-| `raycast-test` | `Backup/Service/RaycastDecoder.swift`, `Scrypt.swift`, `Platform/Compression/Zlib.swift`, `Clipboard/Model/RaycastClipboardImport.swift` and import-time clipboard retention |
 | `symbols-test` | `Extensions/Service/SymbolCatalog.swift`, against this machine's CoreGlyphs |
 | `ext-store-test` | `Extensions/Model/` — GitHub source parsing and URLs, the store and Git tree parsers |
 | `ext-refresh-test` | `Extensions/Model/ExtensionRefreshPolicy.swift` — interval parsing, due dates, backoff, subtitle fallback, indicator state, Refresh Now refusals |

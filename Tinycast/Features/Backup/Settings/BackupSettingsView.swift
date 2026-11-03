@@ -3,13 +3,6 @@ import SwiftUI
 
 struct BackupSettingsView: View {
     @Environment(AppCore.self) private var core
-    private var runningApps: RunningAppsMonitor { core.runningApps }
-    @State private var raycastFile: URL?
-    @State private var passphrase = ""
-    @State private var importing = false
-    @State private var status: Status?
-    @State private var selection: RaycastImportOptions = .all
-    @State private var isRaycastExport = false
     @State private var exportSelection = BackupCategory.all
     @State private var importSelection: Set<BackupCategory> = []
     @State private var exporting = false
@@ -25,24 +18,11 @@ struct BackupSettingsView: View {
         case failure(String)
     }
 
-    private var raycastRunning: Bool {
-        runningApps.runningBundleIDs.contains(where: BackupActions.isRaycastBundleID)
-    }
-
     /// Turning it on may ask first, so the switch follows the setting rather than the click.
     private var settingsFileSync: Binding<Bool> {
         Binding(
             get: { core.settings.settingsFileEnabled },
             set: { enabled in Task { await BackupActions.setSettingsFileEnabled(enabled, core: core) } })
-    }
-
-    private var raycastFileSubtitle: String {
-        guard let name = raycastFile?.lastPathComponent else {
-            return String(localized: "A .rayconfig file from Raycast 2.0 or later.")
-        }
-        return isRaycastExport
-            ? String(localized: "\(name) — Raycast export")
-            : String(localized: "\(name) — not a Raycast export")
     }
 
     var body: some View {
@@ -90,44 +70,6 @@ struct BackupSettingsView: View {
             }
 
             Section {
-                LabeledContent {
-                    Button("Choose…") { chooseRaycastFile() }
-                } label: {
-                    SettingsRowTitle(.backupImportFromRaycast, "Raycast Export")
-                    Text(raycastFileSubtitle)
-                }
-                LabeledContent {
-                    RevealableSecureField(
-                        title: String(localized: "Passphrase"), text: $passphrase,
-                        prompt: Text("Export password")
-                    )
-                    .labelsHidden()
-                    .textFieldStyle(.roundedBorder)
-                    // LabeledContent right-aligns its value text, caret and all; a field reads left.
-                    .multilineTextAlignment(.leading)
-                    .frame(width: 160)
-                    .onSubmit(runRaycastImport)
-                } label: {
-                    Text("Passphrase")
-                }
-                RaycastImportSelection(selection: $selection)
-                conflictNotice
-                LabeledContent {
-                    if importing {
-                        ProgressView().controlSize(.small)
-                    } else {
-                        Button("Import") { runRaycastImport() }
-                            .disabled(!isRaycastExport || passphrase.isEmpty || selection.isEmpty)
-                    }
-                } label: {
-                    Text("Import")
-                }
-                if let status { statusRow(status) }
-            } header: {
-                SettingsSectionHeader(.backupImportFromRaycast)
-            }
-
-            Section {
                 Toggle(isOn: settingsFileSync) {
                     SettingsRowTitle(.backupSettingsFile, "Sync settings file")
                     Text(BackupActions.settingsFilePath)
@@ -147,27 +89,6 @@ struct BackupSettingsView: View {
         .formStyle(.grouped)
         .settingsScrollTarget(.backup)
         .onDisappear { if !importingBackup { discardStagedBackup() } }
-    }
-
-    @ViewBuilder
-    private var conflictNotice: some View {
-        if raycastRunning {
-            LabeledContent {
-                Button("Quit Raycast") { BackupActions.quitRaycast() }
-            } label: {
-                Label(
-                    "Raycast is running — quit it to avoid hotkey conflicts.",
-                    systemImage: "exclamationmark.triangle.fill"
-                )
-                .foregroundStyle(.orange)
-            }
-        } else {
-            Label(
-                "Unset matching Raycast shortcuts to avoid conflicts.",
-                systemImage: "info.circle"
-            )
-            .foregroundStyle(.secondary)
-        }
     }
 
     @ViewBuilder
@@ -254,31 +175,5 @@ struct BackupSettingsView: View {
         openedStaging?.discard()
         openedStaging = nil
         openedManifest = nil
-    }
-
-    private func chooseRaycastFile() {
-        guard let url = BackupActions.pickRaycastFile() else { return }
-        raycastFile = url
-        isRaycastExport = BackupActions.isRaycastExport(url)
-        status = nil
-    }
-
-    private func runRaycastImport() {
-        guard let file = raycastFile, isRaycastExport, !passphrase.isEmpty, !selection.isEmpty,
-            !importing
-        else { return }
-        importing = true
-        status = nil
-        Task {
-            defer { importing = false }
-            do {
-                let outcome = try await BackupActions.importRaycast(
-                    core: core, file: file, passphrase: passphrase, options: selection)
-                status = .success(BackupActions.raycastText(outcome))
-                passphrase = ""
-            } catch {
-                status = .failure(error.localizedDescription)
-            }
-        }
     }
 }

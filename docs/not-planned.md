@@ -35,8 +35,6 @@ launchers. We accept that to keep the app simple.
   ([#1411](https://github.com/abue-ammar/tinycast/issues/1411))
 - **Updates on accounts without admin rights.** The built-in updater must write to the Applications
   folder. **Instead:** install and update with Homebrew. ([#1340](https://github.com/abue-ammar/tinycast/issues/1340))
-- **Import from Alfred, or from old Raycast exports.** Import works with Raycast v2 exports only.
-  ([#624](https://github.com/abue-ammar/tinycast/issues/624), [#1373](https://github.com/abue-ammar/tinycast/issues/1373))
 
 ## Typing in other languages
 
@@ -159,7 +157,6 @@ Tinycast is an all-in-one launcher, not a full window manager. Its window tools 
 - **Voice control, screen reading, or AI command suggestions.** Tinycast won't become a Siri-style
   assistant. ([#1550](https://github.com/abue-ammar/tinycast/issues/1550), [#1151](https://github.com/abue-ammar/tinycast/issues/1151), [#1145](https://github.com/abue-ammar/tinycast/issues/1145))
 - **AI-powered "smart" search.** Search stays fast and on-device. ([#1574](https://github.com/abue-ammar/tinycast/issues/1574), [#1528](https://github.com/abue-ammar/tinycast/issues/1528), [#1114](https://github.com/abue-ammar/tinycast/issues/1114))
-- **Old Raycast AI chats on import.** Raycast doesn't share that data. ([#1286](https://github.com/abue-ammar/tinycast/issues/1286))
 - **Quick Action results inside the palette, or a preview that stays open.** **Instead:** copy the
   result with its copy button. ([#1360](https://github.com/abue-ammar/tinycast/issues/1360), [#1023](https://github.com/abue-ammar/tinycast/issues/1023))
 - **A proxy setting.** ([#430](https://github.com/abue-ammar/tinycast/issues/430))

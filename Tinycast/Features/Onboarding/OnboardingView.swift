@@ -5,7 +5,6 @@ import SwiftUI
 /// The first-launch wizard, built from the app's own controls; re-runnable from Settings.
 struct OnboardingView: View {
     @State private var step = 0
-    @State private var model = OnboardingModel()
     @Environment(AppCore.self) private var core
     @Environment(AppSettings.self) private var settings
     @Environment(HotKeyManager.self) private var hotKeys
@@ -13,7 +12,7 @@ struct OnboardingView: View {
     @State private var accessibilityTrusted = Permissions.isAccessibilityTrusted()
     private let refreshTimer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
 
-    private static let lastStep = 3
+    private static let lastStep = 2
     static let width: CGFloat = 520
     /// Only until the first layout measures the real one, which is what the window then takes.
     static let initialSize = CGSize(width: width, height: 352)
@@ -89,7 +88,6 @@ struct OnboardingView: View {
         switch step {
         case 0: String(localized: "Welcome to Tinycast")
         case 1: String(localized: "Enable Pasting")
-        case 2: String(localized: "Import from Raycast")
         default: String(localized: "You're all set")
         }
     }
@@ -98,7 +96,6 @@ struct OnboardingView: View {
         switch step {
         case 0: Text("Set a shortcut to summon the launcher from anywhere.")
         case 1: Text("Let Tinycast paste items back into the app you were using.")
-        case 2: Text("Bring your shortcuts, favorites, and clipboard history along.")
         default: readyMessage
         }
     }
@@ -106,7 +103,6 @@ struct OnboardingView: View {
     private var heroSymbol: String {
         switch step {
         case 1: "accessibility"
-        case 2: "wand.and.stars"
         default: "checkmark"
         }
     }
@@ -114,7 +110,6 @@ struct OnboardingView: View {
     private var heroTint: Color {
         switch step {
         case 1: .blue
-        case 2: .orange
         default: .green
         }
     }
@@ -133,7 +128,6 @@ struct OnboardingView: View {
         switch step {
         case 0: shortcutStep
         case 1: accessibilityStep
-        case 2: raycastStep
         default: doneStep
         }
     }
@@ -179,38 +173,6 @@ struct OnboardingView: View {
         }
     }
 
-    private var raycastStep: some View {
-        VStack(alignment: .leading, spacing: Theme.Spacing.md) {
-            OnboardingCard {
-                OnboardingRow(
-                    title: String(localized: "Raycast Export"),
-                    subtitle: model.fileSubtitle,
-                    systemImage: "doc.badge.gearshape", tint: .orange
-                ) {
-                    Button("Choose…") { model.chooseFile() }.controlSize(.small)
-                }
-                OnboardingDivider()
-                OnboardingRow(
-                    title: String(localized: "Passphrase"),
-                    subtitle: String(localized: "The password you set when exporting from Raycast."),
-                    systemImage: "key", tint: .gray
-                ) {
-                    RevealableSecureField(title: String(localized: "Passphrase"), text: $model.passphrase)
-                        .textFieldStyle(.roundedBorder)
-                        .frame(width: 150)
-                        .onSubmit { model.run(core: core) }
-                }
-            }
-            RaycastImportSelection(selection: $model.selection)
-                .padding(.horizontal, Theme.Spacing.xs)
-            if let status = model.status {
-                importStatus(status)
-            } else {
-                caption(String(localized: "Optional — you can import later in Settings › Backup."))
-            }
-        }
-    }
-
     private var doneStep: some View {
         caption(String(localized: "Everything's ready. Hit Get Started to open the launcher."))
             .frame(maxWidth: .infinity, alignment: .center)
@@ -243,58 +205,30 @@ struct OnboardingView: View {
                         .buttonStyle(.plain)
                         .foregroundStyle(.secondary)
                 }
-                if step == 2 && model.importing {
-                    Button {
-                    } label: {
-                        HStack(spacing: Theme.Spacing.sm) {
-                            ProgressView().controlSize(.small)
-                            Text("Importing…")
-                        }
-                    }
+                Button(primaryTitle, action: primaryAction)
                     .buttonStyle(.borderedProminent)
                     .controlSize(.large)
-                    .disabled(true)
-                } else {
-                    Button(primaryTitle, action: primaryAction)
-                        .buttonStyle(.borderedProminent)
-                        .controlSize(.large)
-                        .disabled(primaryDisabled)
-                        .keyboardShortcut(.defaultAction)
-                }
+                    .keyboardShortcut(.defaultAction)
             }
         }
     }
 
     private var showsSkip: Bool {
-        (step == 1 && !accessibilityTrusted) || (step == 2 && !model.didImport)
+        step == 1 && !accessibilityTrusted
     }
 
     private var primaryTitle: String {
         switch step {
         case 0: String(localized: "Continue")
         case 1: accessibilityTrusted ? String(localized: "Continue") : String(localized: "Grant Access")
-        case 2:
-            if model.didImport {
-                String(localized: "Continue")
-            } else if model.importing {
-                String(localized: "Importing…")
-            } else {
-                String(localized: "Import")
-            }
         default: String(localized: "Get Started")
         }
-    }
-
-    private var primaryDisabled: Bool {
-        step == 2 && !model.didImport && !model.canImport
     }
 
     private func primaryAction() {
         switch step {
         case 1 where !accessibilityTrusted:
             Permissions.openAccessibilitySettings()
-        case 2 where !model.didImport:
-            model.run(core: core)
         case Self.lastStep:
             core.onboardingCoordinator.finishOnboarding()
         default:
@@ -313,25 +247,6 @@ struct OnboardingView: View {
             .font(.caption)
             .foregroundStyle(.tertiary)
             .padding(.horizontal, Theme.Spacing.xs)
-    }
-
-    @ViewBuilder
-    private func importStatus(_ status: OnboardingModel.ImportStatus) -> some View {
-        switch status {
-        case .success(let message):
-            statusLine(message, systemImage: "checkmark.circle.fill", tint: .green)
-        case .failure(let message):
-            statusLine(message, systemImage: "exclamationmark.triangle.fill", tint: .orange)
-        }
-    }
-
-    private func statusLine(_ message: String, systemImage: String, tint: Color) -> some View {
-        HStack(alignment: .top, spacing: Theme.Spacing.sm) {
-            Image(systemName: systemImage).foregroundStyle(tint)
-            Text(message).font(.caption).foregroundStyle(.secondary)
-                .fixedSize(horizontal: false, vertical: true)
-        }
-        .padding(.horizontal, Theme.Spacing.xs)
     }
 
     private var statusBadge: some View {
@@ -359,62 +274,4 @@ struct OnboardingView: View {
         }
         return NSApp.applicationIconImage
     }()
-}
-
-/// The import step's state and async call, off the view so the body stays declarative.
-@MainActor
-@Observable
-final class OnboardingModel {
-    enum ImportStatus {
-        case success(String)
-        case failure(String)
-    }
-
-    var file: URL?
-    var passphrase = ""
-    var importing = false
-    var status: ImportStatus?
-    var selection: RaycastImportOptions = .all
-    var isRaycastExport = false
-
-    var canImport: Bool {
-        isRaycastExport && !passphrase.isEmpty && !selection.isEmpty && !importing
-    }
-    var didImport: Bool {
-        if case .success = status { return true }
-        return false
-    }
-
-    var fileSubtitle: String {
-        guard let name = file?.lastPathComponent else {
-            return String(localized: "Choose a .rayconfig file exported from Raycast v2.0 or newer.")
-        }
-        return isRaycastExport
-            ? String(localized: "\(name) — Raycast export")
-            : String(localized: "\(name) — not a Raycast export")
-    }
-
-    func chooseFile() {
-        guard let url = BackupActions.pickRaycastFile() else { return }
-        file = url
-        isRaycastExport = BackupActions.isRaycastExport(url)
-        status = nil
-    }
-
-    func run(core: AppCore) {
-        guard canImport, let file else { return }
-        importing = true
-        status = nil
-        Task {
-            defer { importing = false }
-            do {
-                let outcome = try await BackupActions.importRaycast(
-                    core: core, file: file, passphrase: passphrase, options: selection)
-                status = .success(BackupActions.raycastText(outcome))
-                passphrase = ""
-            } catch {
-                status = .failure(error.localizedDescription)
-            }
-        }
-    }
 }
