@@ -62,7 +62,7 @@ since it names a place on this Mac.
 
 `NoteID` is the relative filename. A rename therefore returns a new identity; there are no per-note
 launcher items, hotkeys, favorites, or visibility settings that could retain the old one. Immediate
-regular `.md` children are sorted by modification date, then localized title. Subdirectories, hidden
+regular `.md` children are sorted by display title in Finder order (`localizedStandardCompare`), then by filename. Subdirectories, hidden
 files, and symbolic links are ignored.
 
 Create uses `Untitled.md`, then `Untitled 2.md`, and so on, and rename claims a free name by the same
@@ -113,8 +113,10 @@ failed flush retains the draft for retry.
 - **Create Note** creates and selects one unique Untitled note, including from an empty channel.
 - **Search Notes** shows the same panel with the switcher open and its search field focused.
 
-Command-N creates, Command-P opens or refocuses the switcher, Command-O opens the Notes folder, and
-Command-F opens AppKit's find bar in the active note. Escape closes the find bar or switcher before
+Command-N creates, Command-T opens or refocuses the switcher, Command-O opens the Notes folder, and
+Command-F opens AppKit's find bar in the active note, and Control-X asks to move it to the Trash, as
+the switcher's Trash button does. F1 and F2 select the previous and next note in
+that name order, wrapping at either end; a held key switches once, and its repeats are swallowed. Escape closes the find bar or switcher before
 hiding; Command-W and the red traffic light both hide directly. Hiding
 restores the prior external application or Tinycast window and flushes without delaying the order-out —
 but only while that app is still the frontmost one, so closing a window the user has already left behind
@@ -123,7 +125,7 @@ Command-Q is bound to nothing app-wide, so no chord over Notes can quit Tinycast
 
 Both windows are one `NotesPanel`, a non-activating floating panel that owns the Escape rule and reads
 ⌘⌫. They differ only in style mask and in the `commandChords` their controller installs: the note window
-claims ⌘N, ⌘P, ⌘O, ⌘F and ⌘W, and the switcher reads ⌘N plus ⌘W and ⌘P as dismissals.
+claims ⌘N, ⌘T, ⌘O, ⌘F, ⌘W, ⌃X, F1 and F2, and the switcher reads ⌘N plus ⌘W and ⌘T as dismissals.
 
 Settings > Notes > **Window** is `AppSettings.notesWindowMode`, a `NoteWindowMode`. **Floating**, the
 default, is the panel above: floating level, on every Space, never activating Tinycast. **Standard** is
@@ -137,7 +139,8 @@ over the app that covered a standard host. The controller observes the mode, so 
 open window.
 
 AppKit draws the note window's chrome. Its 52-point title bar holds the traffic lights, the centred
-active title, and one frosted capsule of Create, Browse, and Open Folder. With Settings > Notes >
+active title — followed, while the folder holds more than one note, by a regular-weight `• x/y`: the
+note's place in the name order and the folder's count — and one frosted capsule of Create, Browse, and Open Folder. With Settings > Notes >
 **Show Title Bar Buttons** (`AppSettings.notesShowsTitleBarButtons`, on when absent) off, the capsule
 goes and the band shrinks to 32 points of traffic lights and the centred title, and the switcher hangs
 from that shorter band; the chords still work. The lights are AppKit's own at the SDK's size: an app linked against an older SDK gets
@@ -246,7 +249,7 @@ after it. Nil means AppKit handles the key natively. `NoteTextView.performEdit` 
 `shouldChangeText`, `replaceCharacters` and `didChangeText`, so each gesture is one undo step and
 reaches autosave.
 
-- Return continues a list or quote and leaves it on an empty item. Tab and Shift-Tab nest list items
+- Return continues a list or quote and leaves it on an empty item. Tab and Shift-Tab, or ⌘] and ⌘[, nest list items
   by four spaces. Backspace at an item's content start outdents it, then removes its marker. These
   edits renumber the ordered run they touch in the same undo step.
 - Typing `[] ` or `[ ] ` at the start of a paragraph makes `- [ ] `.

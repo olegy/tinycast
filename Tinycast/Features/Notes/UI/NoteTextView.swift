@@ -229,6 +229,8 @@ final class NoteTextView: NSTextView, InjectableTextView {
             case "i": return .toggleInline(.italic)
             case "e": return .toggleInline(.code)
             case "k": return .toggleLink
+            case "]": return .indent
+            case "[": return .outdent
             default: return nil
             }
         case [.command, .shift]:

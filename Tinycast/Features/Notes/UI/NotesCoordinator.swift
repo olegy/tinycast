@@ -67,6 +67,13 @@ final class NotesCoordinator {
     }
 
     var hasActiveNote: Bool { store.activeID != nil }
+    /// The active note's 1-based place in the name-ordered folder; nil while it holds one note.
+    var activePosition: (index: Int, count: Int)? {
+        let notes = store.summaries
+        guard notes.count > 1, let index = notes.firstIndex(where: { $0.id == store.activeID })
+        else { return nil }
+        return (index + 1, notes.count)
+    }
     /// UTF-16 units, straight off the text storage: the only length TextKit hands back in O(1).
     var characterCountLabel: String {
         String(localized: "\(characterCount) characters")
@@ -145,6 +152,14 @@ final class NotesCoordinator {
 
     func searchNotes() {
         request(.search)
+    }
+
+    /// Wraps at either end, so F1 and F2 cycle the folder.
+    func selectAdjacentNote(_ offset: Int) {
+        let notes = store.summaries
+        guard notes.count > 1, let index = notes.firstIndex(where: { $0.id == store.activeID })
+        else { return }
+        select(notes[(index + offset + notes.count) % notes.count].id)
     }
 
     func openSwitcher() {
@@ -274,6 +289,11 @@ final class NotesCoordinator {
 
     func trashSwitcherSelection() {
         guard let id = switcherSelection ?? store.activeID else { return }
+        trash(id)
+    }
+
+    func trashActiveNote() {
+        guard let id = store.activeID else { return }
         trash(id)
     }
 

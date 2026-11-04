@@ -10,6 +10,10 @@ final class NotesPanel: NSPanel {
     var commandChords: [String: () -> Void] = [:]
     /// The same, for ⌥⌘-letter chords.
     var optionCommandChords: [String: () -> Void] = [:]
+    /// Bare function keys by key code; their repeats are swallowed so a held key never beeps.
+    var functionKeys: [Int: () -> Void] = [:]
+    /// ⌃-letter chords, read in `sendEvent` so the text view's key bindings never see them first.
+    var controlChords: [String: () -> Void] = [:]
     /// False for the heading menu, so the editor keeps its caret, reveal and chords beneath it.
     var acceptsKey = true
     var onMouseDown: (() -> Void)?
@@ -86,6 +90,20 @@ final class NotesPanel: NSPanel {
 
     override func sendEvent(_ event: NSEvent) {
         if event.type == .leftMouseDown || event.type == .rightMouseDown { onMouseDown?() }
+        if event.type == .keyDown, let action = functionKeys[Int(event.keyCode)],
+            event.modifierFlags.isDisjoint(with: [.command, .option, .control, .shift])
+        {
+            if !event.isARepeat { action() }
+            return
+        }
+        if event.type == .keyDown,
+            event.modifierFlags.intersection([.command, .option, .control, .shift]) == .control,
+            (firstResponder as? NSTextView)?.isFieldEditor != true,
+            let key = ASCIIKeyboardLayout.chordKey(for: event), let chord = controlChords[key]
+        {
+            if !event.isARepeat { chord() }
+            return
+        }
         // The search and rename fields own Escape while they are editing.
         guard event.type == .keyDown, Int(event.keyCode) == kVK_Escape, !event.isARepeat,
             (firstResponder as? NSTextView)?.isFieldEditor != true

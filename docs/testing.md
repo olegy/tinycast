@@ -597,8 +597,10 @@ caches, TCC grants and login item, so this cannot disturb an installed copy.
   visibility checkboxes and recorders are the only ones — Settings > Commands lists none of the three
 - Show Notes opens the last active note and focuses an already visible window without hiding it
 - Create Note makes one unique Untitled file, including as the first action in an empty channel
-- Command-P and the Browse button focus search, arrows move selection, Return opens, and Command-N
+- Command-T and the Browse button focus search, arrows move selection, Return opens, and Command-N
   creates
+- The switcher lists notes by name; F1 and F2 cycle through them, and the title shows `• x/y` only
+  while the folder holds more than one note
 - Empty switcher search reads the complete recent list; title and body searches rank correctly and a
   superseded query never publishes
 - An Untitled note titles itself from its first line as it is typed, in the title bar and — after the
@@ -677,7 +679,7 @@ caches, TCC grants and login item, so this cannot disturb an installed copy.
   the heading button's tooltip does not show while its menu is open
 - The heading menu opens above the capsule, aligned to its left edge, shows the current level checked,
   and applies a level on click; it closes on Escape, on a click anywhere in the note window (including
-  the heading button itself, which must not reopen it), on typing, on ⌘P, and when another app is clicked
+  the heading button itself, which must not reopen it), on typing, on ⌘T, and when another app is clicked
 - At the smallest window size all eleven controls show and the count is hidden, the note's text keeps
   its inset in both states, the heading menu still opens in full above the capsule, and widening the
   window brings the count back

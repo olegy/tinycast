@@ -31,13 +31,22 @@ struct NotesView: View {
         .overlay { title }
     }
 
+    /// The position never truncates, so the name gives way first.
     private var title: some View {
-        Text(notes.activeTitle)
-            .font(Theme.Typography.noteTitle)
-            .lineLimit(1)
-            .truncationMode(.tail)
-            .padding(.horizontal, Theme.Size.noteTitleInset)
-            .allowsHitTesting(false)
+        HStack(spacing: Theme.Spacing.xs) {
+            Text(notes.activeTitle)
+                .lineLimit(1)
+                .truncationMode(.tail)
+            if let position = notes.activePosition {
+                Text(verbatim: "• \(position.index)/\(position.count)")
+                    .fontWeight(.regular)
+                    .monospacedDigit()
+                    .fixedSize()
+            }
+        }
+        .font(Theme.Typography.noteTitle)
+        .padding(.horizontal, Theme.Size.noteTitleInset)
+        .allowsHitTesting(false)
     }
 
     @ViewBuilder
@@ -155,7 +164,7 @@ private struct NoteTitlebarActions: View {
                 notes.createNote)
             action(
                 "rectangle.stack", String(localized: "Browse Notes"),
-                String(localized: "Browse Notes  ⌘P"), notes.searchNotes)
+                String(localized: "Browse Notes  ⌘T"), notes.searchNotes)
             action(
                 "folder", String(localized: "Open Notes Folder"),
                 String(localized: "Open Notes Folder  ⌘O"), notes.openNotesFolder)

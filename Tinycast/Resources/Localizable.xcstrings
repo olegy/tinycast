@@ -26226,54 +26226,54 @@
         }
       }
     },
-    "Browse Notes  ⌘P" : {
+    "Browse Notes  ⌘T" : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Notizen durchsuchen  ⌘P"
+            "value" : "Notizen durchsuchen  ⌘T"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Explorar notas  ⌘P"
+            "value" : "Explorar notas  ⌘T"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Parcourir les notes  ⌘P"
+            "value" : "Parcourir les notes  ⌘T"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "メモを参照  ⌘P"
+            "value" : "メモを参照  ⌘T"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "메모 둘러보기  ⌘P"
+            "value" : "메모 둘러보기  ⌘T"
           }
         },
         "pt" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Explorar notas  ⌘P"
+            "value" : "Explorar notas  ⌘T"
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Просмотр заметок  ⌘P"
+            "value" : "Просмотр заметок  ⌘T"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "浏览笔记  ⌘P"
+            "value" : "浏览笔记  ⌘T"
           }
         }
       }

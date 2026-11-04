@@ -256,8 +256,11 @@ struct NotesRepository: Sendable {
     }
 
     private func summaryPrecedes(_ lhs: NoteSummary, _ rhs: NoteSummary) -> Bool {
-        if lhs.modifiedAt != rhs.modifiedAt { return lhs.modifiedAt > rhs.modifiedAt }
-        return lhs.displayTitle.localizedCaseInsensitiveCompare(rhs.displayTitle) == .orderedAscending
+        switch lhs.displayTitle.localizedStandardCompare(rhs.displayTitle) {
+        case .orderedAscending: true
+        case .orderedDescending: false
+        case .orderedSame: lhs.id.rawValue < rhs.id.rawValue
+        }
     }
 
     private func folded(_ value: String) -> String {

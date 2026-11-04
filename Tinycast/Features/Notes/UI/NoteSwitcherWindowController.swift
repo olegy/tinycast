@@ -55,7 +55,7 @@ final class NoteSwitcherWindowController: NSObject, NSWindowDelegate {
         panel.commandChords = [
             "n": { [weak coordinator] in coordinator?.createNote() },
             "w": dismiss,
-            "p": dismiss
+            "t": dismiss
         ]
         self.panel = panel
         return panel

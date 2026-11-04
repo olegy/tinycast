@@ -47,6 +47,12 @@ offers.
 - **Show Title Bar Buttons** can be turned off, leaving a slimmer title bar with just the window
   buttons and the note's title.
 - **⌃⌘↑ and ⌃⌘↓ move a list item** up or down among its siblings, nested items with it.
+- **⌘] and ⌘[ indent and outdent** a list item, like Tab and Shift-Tab.
+- **⌘T opens the note switcher**, instead of ⌘P.
+- **Notes are listed by name** rather than by when they were last changed.
+- **F1 and F2 switch to the previous and next note**, wrapping around at either end, and the title
+  shows the note's place in the folder, such as `• 3/7`, when there is more than one.
+- **⌃X moves the open note to the Trash**, after the same confirmation as the switcher's Trash button.
 
 ## 0.12.1-lite.1
 

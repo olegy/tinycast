@@ -1,4 +1,5 @@
 import AppKit
+import Carbon.HIToolbox
 import SwiftUI
 
 @MainActor
@@ -202,13 +203,20 @@ final class NotesWindowController: NSObject, NSWindowDelegate {
         panel.onDeleteChord = { [weak coordinator] in coordinator?.handleDeleteShortcut() ?? false }
         panel.commandChords = [
             "n": { [weak coordinator] in coordinator?.createNote() },
-            "p": { [weak coordinator] in coordinator?.searchNotes() },
+            "t": { [weak coordinator] in coordinator?.searchNotes() },
             "o": { [weak coordinator] in coordinator?.openNotesFolder() },
             "f": { [weak self] in self?.editor?.find(.showFindInterface) },
             "w": { [weak panel] in panel?.performClose(nil) }
         ]
         panel.optionCommandChords = [
             "t": { [weak coordinator] in coordinator?.toggleFormattingBar() }
+        ]
+        panel.controlChords = [
+            "x": { [weak coordinator] in coordinator?.trashActiveNote() }
+        ]
+        panel.functionKeys = [
+            kVK_F1: { [weak coordinator] in coordinator?.selectAdjacentNote(-1) },
+            kVK_F2: { [weak coordinator] in coordinator?.selectAdjacentNote(1) }
         ]
         panel.setFrameAutosaveName(Self.frameAutosaveName)
         if !panel.setFrameUsingName(Self.frameAutosaveName) { panel.center() }
