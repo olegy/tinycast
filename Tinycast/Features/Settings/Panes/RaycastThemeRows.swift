@@ -255,7 +255,7 @@ private struct RaycastThemePreview: View {
 
         func accent(_ index: Int, _ fallback: Color) -> Color { color(index) ?? fallback }
 
-        /// Tinycast's own scrim when there is no theme, as `Theme.Colors.panelScrim` draws it.
+        /// Without a theme, the palette keeps the scrim it always drew over its glass.
         var background: Color {
             color(0)?.opacity(opacity) ?? (isDark ? Color.black.opacity(0.40) : Color.white.opacity(0.55))
         }

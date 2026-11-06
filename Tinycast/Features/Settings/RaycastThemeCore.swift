@@ -214,7 +214,7 @@ enum SpaceTheme {
         Color(
             nsColor: NSColor(name: nil) { appearance in
                 guard let palette = state.withLock({ $0(appearance) }) else {
-                    // `Theme.Colors.panelScrim`'s own values.
+                    // The palette's own scrim, which it keeps without a theme.
                     return appearance.isDark ? .srgbInk(0, alpha: 0.40) : .srgbInk(1, alpha: 0.55)
                 }
                 return palette[keyPath: keyPath].withAlphaComponent(backgroundOpacity)

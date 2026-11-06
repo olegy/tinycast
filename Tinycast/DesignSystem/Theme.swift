@@ -73,6 +73,8 @@ enum Theme {
         /// Room above the search row, constant so typing never shifts the bar.
         static let headerPadding: CGFloat = 10
         static let compactHeight: CGFloat = headerHeight + headerPadding * 2
+        /// Native glass contours and interaction effects draw outside their layout bounds.
+        static let paletteGlassOutset: CGFloat = 4
         /// How close a dragged palette must be to the invisible vertical centre line.
         static let paletteSnapDistance: CGFloat = 8
         /// A restored position needs this much bar on a display to still be grabbable.
@@ -391,15 +393,6 @@ enum Theme {
             })
         }
 
-        /// The ramp's inverse: the scrim darkens the dark surface and lightens the light one.
-        static var panelScrim: Color {
-            // tinycast-space: a Raycast theme lays its background over the glass instead.
-            SpaceTheme.observe()
-            return Color(nsColor: NSColor(name: nil) {
-                SpaceTheme.ink(.background, in: $0, dark: 0.40, light: 0.55)
-                    ?? ($0.isDark ? .srgbInk(0, alpha: 0.40) : .srgbInk(1, alpha: 0.55))
-            })
-        }
         static let dialogDimming = adaptive(
             dark: .srgbInk(0, alpha: 0.34), light: .srgbInk(0, alpha: 0.34))
         /// Find's marks, the Mac's own yellow: every match faint, the current one solid.
@@ -430,8 +423,8 @@ enum Theme {
         static var controlHover: Color { ramp(dark: 0.16, light: 0.14) }
         /// A held control is stronger than hover, so mouse-down always reads.
         static var controlPressed: Color { ramp(dark: 0.24, light: 0.20) }
-        static var compactShortcutGlassSelection: Color { ramp(dark: 1, light: 0) }
-        static var compactShortcutSelection: Color { ramp(dark: 0.20, light: 0.55) }
+        static let compactShortcutSelectionTint = adaptive(
+            dark: .srgbInk(0.55, alpha: 1), light: .srgbInk(0, alpha: 0.40))
         static let compactShortcutSelectedInk = adaptive(
             dark: .srgbInk(1, alpha: 1), light: .srgbInk(1, alpha: 1))
         /// Control borders: outlined kbd chips.
