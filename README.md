@@ -34,8 +34,8 @@ third-party dependencies, macOS 26 or later.
 - **Snippets** — reusable Markdown templates with dynamic placeholders, arguments, nested references
   and optional keyword expansion.
 - **Custom commands** — run named shell commands through fuzzy search or their own global hotkeys.
-- **Window management** — 35 Rectangle-style actions: halves, quarters, thirds, sizing, nudging,
-  display moves, fullscreen and Spaces.
+- **Window management** — 39 Rectangle-style actions: halves, quarters, thirds, sizing, nudging,
+  edge moves, display moves, fullscreen and Spaces.
 - **System actions** — lock, sleep, restart, empty trash, toggle appearance, Bluetooth, mute, hidden
   files, and more.
 - **Calendar and meetings** — your next meeting on the empty palette and in the menu bar, one key to
