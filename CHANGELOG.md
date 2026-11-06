@@ -3,7 +3,7 @@
 What is new in each Tinycast Lite release. The update window shows the section of the version it
 offers.
 
-## Next
+## 0.12.8-lite.2
 
 ### Removed
 
@@ -12,6 +12,7 @@ offers.
 - **Hyper Key** is gone.
 - **Raycast import** is gone.
 - **Notes** are gone completely.
+- **Snippets** are gone completely: keyword expansion, the Snippets pane and its commands, snippet shortcuts and links, the backup category and *Save as Snippet* in Clipboard History. Quicklinks keep every placeholder they had. Their leftover settings, and the `snippets` and `notes` sections in `settings.json`, are cleaned up on first launch.
 - Commands cleanup.
 
 ### Settings

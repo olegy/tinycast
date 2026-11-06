@@ -1,6 +1,6 @@
 import Foundation
 
-enum SnippetTemplateEngine {
+enum TemplateEngine {
     struct ExpansionContext: Sendable {
         /// Clipboard history, most recent first: `{clipboard}` is offset 0.
         let clipboardHistory: [String]
@@ -70,38 +70,15 @@ enum SnippetTemplateEngine {
         let text: String
         let cursorOffsetFromEnd: Int?
         let missingArguments: [MissingArgument]
-        /// Counts nested `{snippet:…}` too, which a parse of the top-level text alone would miss.
         let readsSelection: Bool
     }
 
-    /// Formatting the result asks for: none for a snippet, percent-encoding for a quicklink URL.
+    /// Formatting the result asks for: none for plain text, percent-encoding for a quicklink URL.
     enum ValueEncoding: Sendable {
         case none
         case percentEncoding
     }
 
-    private static let maximumReferenceDepth = 5
-    private static let comparisonLocale = Locale(identifier: "en_US_POSIX")
-
-    static func expand(
-        _ record: StoredSnippet,
-        snippets: [StoredSnippet],
-        context: ExpansionContext,
-        userArguments: [String: String] = [:]
-    ) -> ExpansionResult {
-        result(
-            of: expandText(
-                record.snippet.text,
-                snippets: snippets.sorted { $0.id < $1.id },
-                context: context,
-                userArguments: userArguments,
-                encoding: .none,
-                depth: 0,
-                visitedIDs: [record.id]
-            ))
-    }
-
-    /// Expands a non-snippet template; `{snippet:…}` has nothing to resolve and stays as text.
     static func expand(
         text: String,
         context: ExpansionContext,
@@ -111,12 +88,9 @@ enum SnippetTemplateEngine {
         result(
             of: expandText(
                 text,
-                snippets: [],
                 context: context,
                 userArguments: userArguments,
-                encoding: encoding,
-                depth: 0,
-                visitedIDs: []
+                encoding: encoding
             ))
     }
 
@@ -154,18 +128,6 @@ enum SnippetTemplateEngine {
             text += value
         }
 
-        mutating func append(_ nested: Expansion) {
-            let insertionOffset = text.count
-            if cursorCharacterOffset == nil, let nestedCursor = nested.cursorCharacterOffset {
-                cursorCharacterOffset = insertionOffset + nestedCursor
-            }
-            text += nested.text
-            readsSelection = readsSelection || nested.readsSelection
-            for argument in nested.missingArguments {
-                addMissingArgument(argument)
-            }
-        }
-
         mutating func markCursor() {
             if cursorCharacterOffset == nil {
                 cursorCharacterOffset = text.count
@@ -189,7 +151,6 @@ enum SnippetTemplateEngine {
         case uuid(modifiers: [Modifier])
         case argument(ArgumentToken, source: String, modifiers: [Modifier])
         case cursor
-        case snippetReference(key: String, source: String)
     }
 
     private struct DateTimeToken {
@@ -233,12 +194,9 @@ enum SnippetTemplateEngine {
 
     private static func expandText(
         _ text: String,
-        snippets: [StoredSnippet],
         context: ExpansionContext,
         userArguments: [String: String],
-        encoding: ValueEncoding,
-        depth: Int,
-        visitedIDs: Set<StoredSnippet.ID>
+        encoding: ValueEncoding
     ) -> Expansion {
         var result = Expansion()
         for segment in parseSegments(text) {
@@ -268,26 +226,6 @@ enum SnippetTemplateEngine {
                 }
             case .cursor:
                 result.markCursor()
-            case .snippetReference(let key, let source):
-                guard depth < maximumReferenceDepth,
-                    let target = resolveReference(key, snippets: snippets),
-                    !visitedIDs.contains(target.id)
-                else {
-                    result.append(source)
-                    continue
-                }
-                var nestedVisited = visitedIDs
-                nestedVisited.insert(target.id)
-                result.append(
-                    expandText(
-                        target.snippet.text,
-                        snippets: snippets,
-                        context: context,
-                        userArguments: userArguments,
-                        encoding: encoding,
-                        depth: depth + 1,
-                        visitedIDs: nestedVisited
-                    ))
             }
         }
         return result
@@ -388,11 +326,6 @@ enum SnippetTemplateEngine {
         if head == "cursor" {
             return modifiers.isEmpty ? .cursor : nil
         }
-        if head.hasPrefix("snippet:") {
-            let key = head.dropFirst("snippet:".count).trimmingCharacters(in: .whitespaces)
-            guard !key.isEmpty, modifiers.isEmpty else { return nil }
-            return .snippetReference(key: key, source: source)
-        }
 
         guard let token = parseToken(head) else { return nil }
         switch token.command {
@@ -415,11 +348,6 @@ enum SnippetTemplateEngine {
         case "argument", "query":
             guard let argument = parseArgument(token) else { return nil }
             return .argument(argument, source: source, modifiers: modifiers)
-        case "snippet":
-            guard let name = token.parameters["name"]?.trimmingCharacters(in: .whitespaces),
-                !name.isEmpty, token.hasOnly(["name"]), modifiers.isEmpty
-            else { return nil }
-            return .snippetReference(key: name, source: source)
         default:
             return nil
         }
@@ -657,29 +585,5 @@ enum SnippetTemplateEngine {
             }
         }
         return nil
-    }
-
-    // MARK: - References
-
-    private static func resolveReference(
-        _ key: String,
-        snippets: [StoredSnippet]
-    ) -> StoredSnippet? {
-        let normalizedKey = normalizeReference(key)
-        // A disabled snippet is not expandable alone, so nesting must not make it so.
-        let candidates = snippets.filter { $0.snippet.isEnabled }
-        if let nameMatch = candidates.first(where: {
-            normalizeReference($0.snippet.name) == normalizedKey
-        }) {
-            return nameMatch
-        }
-        return candidates.first(where: {
-            guard let keyword = $0.snippet.keyword else { return false }
-            return normalizeReference(keyword) == normalizedKey
-        })
-    }
-
-    private static func normalizeReference(_ value: String) -> String {
-        value.folding(options: [.caseInsensitive], locale: comparisonLocale)
     }
 }

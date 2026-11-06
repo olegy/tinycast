@@ -16,7 +16,6 @@ enum HotKeyAction: Hashable, Sendable {
     case quicklink(id: UUID)
     case quickAction(id: UUID)
     case appleShortcut(id: UUID)
-    case snippet(id: StoredSnippet.ID)
     /// Keyed by `AppEntry.id`, which is what survives a reinstall of the extension.
     case extensionCommand(entryID: String)
 
@@ -37,7 +36,6 @@ enum HotKeyAction: Hashable, Sendable {
         case .quicklink(let id): "hotkey.quicklink." + id.uuidString.lowercased()
         case .quickAction(let id): "hotkey.quickAction." + id.uuidString.lowercased()
         case .appleShortcut(let id): "hotkey.appleShortcut." + id.uuidString.lowercased()
-        case .snippet(let id): "hotkey.snippet." + id
         case .extensionCommand(let entryID): "hotkey.extensionCommand." + entryID
         }
     }

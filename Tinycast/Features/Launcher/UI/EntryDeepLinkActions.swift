@@ -16,12 +16,7 @@ enum EntryDeepLinkActions {
             core.showMessage("No launcher entry for this link", tone: .danger)
             return true
         }
-        // A snippet pastes where the caret is, which a hidden palette must work out itself.
-        if entry.kind == .snippet, let snippetID = StoredSnippet.id(fromEntryID: entry.id) {
-            core.snippetCoordinator.expandSnippetFromHotKey(id: snippetID)
-        } else {
-            core.launcherCoordinator.launch(entry)
-        }
+        core.launcherCoordinator.launch(entry)
         return true
     }
 

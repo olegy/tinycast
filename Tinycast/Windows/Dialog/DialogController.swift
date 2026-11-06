@@ -78,22 +78,6 @@ final class DialogController: NSObject, NSWindowDelegate {
         return Float32(volume.level)
     }
 
-    func fillSnippetArguments(
-        snippetName: String, arguments: [SnippetTemplateEngine.MissingArgument]
-    ) async -> [String: String]? {
-        let state = SnippetArgumentsState(arguments: arguments)
-        let request = DialogRequest(
-            title: snippetName, message: String(localized: "Fill in the template fields."),
-            symbol: "curlybraces", tone: .neutral,
-            actions: [
-                DialogAction(title: String(localized: "Expand")),
-                DialogAction(title: String(localized: "Cancel"), role: .cancel)
-            ],
-            defaultIndex: 0, cancelIndex: 1, accessory: .snippetArguments(state))
-        guard await present(request) == 0 else { return nil }
-        return state.values
-    }
-
     func editClipboardText(_ text: String) async -> String? {
         let state = ClipboardEditState(text: text)
         let request = DialogRequest(
@@ -115,7 +99,7 @@ final class DialogController: NSObject, NSWindowDelegate {
             let width =
                 switch request.accessory {
                 case nil, .volume: metrics.size.dialogCompactWidth
-                case .snippetArguments, .clipboardText: metrics.size.dialogWidth
+                case .clipboardText: metrics.size.dialogWidth
                 }
             let content = hostingView(
                 DialogView(

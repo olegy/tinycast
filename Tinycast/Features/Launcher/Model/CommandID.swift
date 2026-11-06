@@ -35,8 +35,6 @@ enum CommandID: String, CaseIterable, Sendable {
     case searchQuicklinks = "command:search-quicklinks"
     case importQuicklinks = "command:import-quicklinks"
     case exportQuicklinks = "command:export-quicklinks"
-    case searchSnippets = "command:search-snippets"
-    case createSnippet = "command:create-snippet"
     case exportSettings = "command:export-settings"
     case importSettings = "command:import-settings"
     case checkForUpdates = "command:check-for-updates"
@@ -49,7 +47,7 @@ enum CommandID: String, CaseIterable, Sendable {
 
     static let compactBarOptions: [CommandID] =
         defaultCompactBarCommands + [
-            .searchSnippets, .mySchedule, .quickAI
+            .mySchedule, .quickAI
         ]
 
     static let compactBarLimit = 4
@@ -104,8 +102,6 @@ enum CommandID: String, CaseIterable, Sendable {
         case .searchQuicklinks: return "Search Quicklinks"
         case .importQuicklinks: return "Import Quicklinks"
         case .exportQuicklinks: return "Export Quicklinks"
-        case .searchSnippets: return "Search Snippets"
-        case .createSnippet: return "Create Snippet"
         case .exportSettings: return "Export Backup"
         case .importSettings: return "Import Backup"
         case .checkForUpdates: return "Check for Updates"
@@ -148,8 +144,6 @@ enum CommandID: String, CaseIterable, Sendable {
         case .searchQuicklinks: return Quicklink.sfSymbol
         case .importQuicklinks: return "square.and.arrow.down"
         case .exportQuicklinks: return "square.and.arrow.up"
-        case .searchSnippets: return "curlybraces"
-        case .createSnippet: return "plus.rectangle.on.rectangle"
         case .exportSettings: return "square.and.arrow.up"
         case .importSettings: return "square.and.arrow.down"
         case .checkForUpdates: return "arrow.down.circle"
@@ -194,7 +188,7 @@ enum CommandID: String, CaseIterable, Sendable {
         case .searchFiles: 70
         case .mySchedule: 60
         case .searchEmoji: 50
-        case .createQuicklink, .createSnippet: 30
+        case .createQuicklink: 30
         default: nil
         }
     }

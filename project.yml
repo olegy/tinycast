@@ -11,8 +11,8 @@ settings:
   base:
     # Tinycast Lite: the upstream version it is based on plus a Lite revision, e.g. 0.12.1-lite.1.
     # Bump the revision for every build installed with new changes and for every release.
-    TINYCAST_UPSTREAM_VERSION: "0.12.1"
-    TINYCAST_LITE_REVISION: "1"
+    TINYCAST_UPSTREAM_VERSION: "0.12.8"
+    TINYCAST_LITE_REVISION: "2"
     MARKETING_VERSION: "$(TINYCAST_UPSTREAM_VERSION)-lite.$(TINYCAST_LITE_REVISION)"
     CURRENT_PROJECT_VERSION: "$(TINYCAST_UPSTREAM_VERSION).$(TINYCAST_LITE_REVISION)"
     SWIFT_VERSION: "6.0"

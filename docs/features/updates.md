@@ -35,7 +35,7 @@ no Sparkle and no appcast: the releases feed is the feed. Releases are published
   termination is synchronous, and system logout and shutdown requests are honoured as they arrive.
   A reopen is scheduled once, only when termination is committed, and waits for the old process to exit.
 - **An automatic prompt defers to whatever the user is doing, and is never spent unshown.**
-  `UpdateReadiness` withholds it while a snippet is expanding, an extension command is running, an
+  `UpdateReadiness` withholds it while text is being pasted, an extension command is running, an
   uninstall is trashing, a shortcut is being recorded, a prompt or dialog is up, or the palette is
   open. A withheld prompt is still owed: `presentIfAvailable` answers `false`, the version is left
   unannounced, and the pump re-offers it every two minutes for half an hour before falling back to
@@ -118,7 +118,7 @@ later quit and reopen. A launch of any other version only clears it, so a brew o
 reports.
 
 Nothing here touches `~/Library/Preferences`, `~/Library/Caches` or `Application Support`, so no
-setting, clipboard entry or snippet is affected by an update.
+setting, clipboard entry or quicklink is affected by an update.
 
 ## Releasing into it
 

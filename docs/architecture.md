@@ -24,7 +24,7 @@ Independently of the folder tree, every mature subsystem has converged on the sa
 │ PaletteRowIndex ·                                                          │
 │ Uninstall{Target,SearchRoot,Rules,Protection,Plan} ·                       │
 │ Quicklink{,Destination,Store,Archive} · AppleShortcut ·                    │
-│ Snippets/Model/* ·                                                         │
+│ TemplateEngine ·                                                           │
 │ ShellCommandRunner · DoubleTap{Modifier,Detector} · ClipboardStore ·       │
 │ AppSettingsKey · SettingsBackupCoverage                                    │
 │ SettingsFile{JSON,Key,Value,Format,Binding,Issue,Identity} ·               │
@@ -42,7 +42,7 @@ Independently of the folder tree, every mature subsystem has converged on the sa
 │ RoomWindowSweep · RoomRunner ·                                             │
 │ IconCache · WindowMover · UninstallScanner · UninstallRunner ·             │
 │ SystemActionRunner · QuicklinkLauncher · TextInjector ·             │
-│ SnippetKeywordListener · CurrencyRateStore · Paster ·                      │
+│ CurrencyRateStore · Paster ·                                               │
 │ HotKeyCenter · ModifierTapMonitor · RunningAppsMonitor ·                   │
 │ CalendarStore · MeetingLauncher · MeetingClock · CameraSession ·           │
 │ AXMenuAccess · WindowZOrder · WindowSwitchSweep ·                          │
@@ -88,14 +88,13 @@ the shared primitives and system shims every feature draws on. Neither may depen
 ## Single-owner core
 
 `AppCore.shared` (`App/AppCore.swift`) is a `@MainActor` singleton owning every long-lived thing in the
-app: the stores (`AppIndex`, `ClipboardStore`, `SnippetsStore`, `QuicklinkStore`, `CustomCommandStore`,
+app: the stores (`AppIndex`, `ClipboardStore`, `QuicklinkStore`, `CustomCommandStore`,
 `FavoritesStore`, `VisibilityStore`, `AliasStore`, `LauncherRankingStore`, `CalculatorHistoryStore`,
 `CurrencyRateStore`, `FrequentEmojiStore`, `CalendarStore`), the managers, monitors and clocks
 (`ClipboardManager`, the opt-in `ClipboardTextIndexer`, the opt-in `SettingsFileRepository`,
-`HotKeyManager`, `RunningAppsMonitor`,
-`SnippetKeywordListener`), the shared state
+`HotKeyManager`, `RunningAppsMonitor`), the shared state
 (`AppSettings`, `PaletteState`, `FileSearchSession`, `MenuSearchSession`, `UninstallSession`,
-`MeetingClock`), the twenty-one feature coordinators, and the
+`MeetingClock`), the twenty feature coordinators, and the
 window controllers.
 
 `AppDelegate.applicationDidFinishLaunching` calls `AppCore.shared.start(launchedByUser:)` and nothing
@@ -228,7 +227,7 @@ Tinycast/
   Features/
     PaletteRowIndex.swift   the flat selection index — palette-owned, so it sits at the top
     Launcher/ Clipboard/ Calculator/ Calendar/ Emoji/ FileSearch/ MenuSearch/
-    Quicklinks/ Snippets/ Uninstall/ SystemActions/ CustomCommands/ HotKeys/ Backup/
+    Quicklinks/ Templates/ TextInjection/ Uninstall/ SystemActions/ CustomCommands/ HotKeys/ Backup/
     WindowManagement/ Onboarding/ Updates/ AI/ Settings/
     Extensions/
         Model/      pure — the harness inputs

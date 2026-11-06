@@ -18,7 +18,7 @@ third-party dependencies, macOS 26 or later.
   or every app at once.
 - **Global hotkey** — one shortcut summons the palette from anywhere.
 - **Per-app hotkeys** — bind a key to an app; press it to toggle (focus/hide).
-- **Deeplinks** — run any command, window action, quicklink, snippet, note or chat from a
+- **Deeplinks** — run any command, window action, quicklink or chat from a
   `tinycast://` URL, for Karabiner-Elements, Shortcuts or scripts. A link can carry text and
   arguments, and a link from outside asks before it acts. Copy Deeplink (⇧⌘C) gives you the link.
 - **Search Files** — find files and folders instantly from a private index of the folders you choose,
@@ -31,8 +31,6 @@ third-party dependencies, macOS 26 or later.
   input, the clipboard or the date.
 - **Apple Shortcuts** — search and run the shortcuts you built in the Shortcuts app, with aliases and
   global hotkeys.
-- **Snippets** — reusable Markdown templates with dynamic placeholders, arguments, nested references
-  and optional keyword expansion.
 - **Custom commands** — run named shell commands through fuzzy search or their own global hotkeys.
 - **Window management** — 39 Rectangle-style actions: halves, quarters, thirds, sizing, nudging,
   edge moves, display moves, fullscreen and Spaces.
@@ -62,10 +60,8 @@ After that Tinycast updates itself from this repository's releases.
 
 ## Permissions
 
-**Accessibility** — needed when Tinycast pastes or expands text into another app, and the only
-permission snippet keyword expansion needs. You're prompted when you first use a feature that needs
-it; grant access in **System Settings → Privacy & Security → Accessibility**. Snippets ship
-disabled, and keystrokes are matched locally, never stored and never sent anywhere.
+**Accessibility** — needed when Tinycast pastes text into another app. You're prompted when you first
+use a feature that needs it; grant access in **System Settings → Privacy & Security → Accessibility**.
 
 ## Using it
 
@@ -73,7 +69,6 @@ disabled, and keystrokes are matched locally, never stored and never sent anywhe
 2. Press it anywhere → the palette floats in. Type to filter, **↵** to launch.
 3. **Tab** switches between Apps and Clipboard; **↑/↓** move, **Esc** dismisses.
 4. **Settings → Shortcuts** — search an app or custom command and record a global shortcut.
-5. **Settings → Snippets** — enable the feature, then create templates with expansion keywords.
 
 ## Building from source
 

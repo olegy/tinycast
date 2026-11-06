@@ -20,9 +20,6 @@ final class AppCore {
     let clipboardStore = ClipboardStore()
     @ObservationIgnored private var clipboardTextIndexer: ClipboardTextIndexer?
     let clipboardManager: ClipboardManager
-    let snippetsStore: SnippetsStore
-    let snippetListener = SnippetKeywordListener(
-        syntheticEventTag: Paster.tinycastEventTag)
     let textInjector: TextInjector
     let hotKeys = HotKeyManager()
     let windowMover = WindowMover()
@@ -78,19 +75,13 @@ final class AppCore {
     var pendingWindowLayoutEdit: WindowLayoutEditRequest?
     var pendingExtensionStoreInstall: ExtensionDeepLink.StoreInstall?
 
-    @ObservationIgnored private(set) lazy var snippetCoordinator = SnippetCoordinator(
-        store: snippetsStore, listener: snippetListener, injector: textInjector,
-        clipboardStore: clipboardStore, appIndex: appIndex, settings: settings,
-        windowController: windowController, paletteCoordinator: paletteCoordinator,
-        palette: palette,
-        showMessage: { [unowned self] in self.showMessage($0, tone: $1) }, core: self)
     @ObservationIgnored private(set) lazy var quicklinkCoordinator = QuicklinkCoordinator(
         store: quicklinks, settings: settings,
         appIndex: appIndex, injector: textInjector, hotKeys: hotKeys, favorites: favorites,
         visibility: visibility, ranking: launcherRanking, aliases: aliases,
         windowController: windowController,
         paletteCoordinator: paletteCoordinator,
-        clipboardHistory: { [unowned self] in self.snippetCoordinator.clipboardHistoryForExpansion() },
+        clipboardHistory: { [unowned self] in self.clipboardCoordinator.textHistoryForTemplates() },
         core: self)
 
     @ObservationIgnored private(set) lazy var paletteCoordinator = PaletteCoordinator(
@@ -149,7 +140,7 @@ final class AppCore {
         quicklinkCoordinator: quicklinkCoordinator,
         windowCommandCoordinator: windowCommandCoordinator,
         windowLayoutCoordinator: windowLayoutCoordinator,
-        snippetCoordinator: snippetCoordinator, fileSearchCoordinator: fileSearchCoordinator,
+        fileSearchCoordinator: fileSearchCoordinator,
         menuSearchCoordinator: menuSearchCoordinator,
         windowSwitchCoordinator: windowSwitchCoordinator,
         extensionCoordinator: extensionCoordinator,
@@ -236,10 +227,7 @@ final class AppCore {
         let clipboardManager = ClipboardManager(store: clipboardStore, settings: settings)
         self.clipboardManager = clipboardManager
         extensions = ExtensionManager(clipboardStore: clipboardStore)
-        snippetsStore = SnippetsStore(repository: Self.snippetsRepository(for: settings))
-        textInjector = TextInjector(
-            clipboardManager: clipboardManager,
-            settings: settings)
+        textInjector = TextInjector(clipboardManager: clipboardManager)
     }
 
     func start(launchedByUser: Bool) {
@@ -248,6 +236,7 @@ final class AppCore {
             // Shorten AppKit's ~2–3s tooltip delay; registration domain, so a user default wins.
             UserDefaults.standard.register(defaults: ["NSInitialToolTipDelay": 250])
             CompactFavoritesMigration.run(settingsFileEnabled: settings.settingsFileEnabled)
+            SnippetsRemovalMigration.run(settingsFileEnabled: settings.settingsFileEnabled)
             NSApp.setActivationPolicy(.accessory)
             applyAppearance()
             applyMotion()
@@ -320,7 +309,6 @@ final class AppCore {
             updateCoordinator.applyAutomaticChecking()
 
             hotKeys.modifierTapMonitor.healthTicker = healthTicker
-            snippetListener.healthTicker = healthTicker
 
             hotKeys.onTogglePalette = { [weak self] in self?.paletteCoordinator.togglePalette() }
             hotKeys.onRunCommand = { [weak self] id in self?.launcherCoordinator.runCommand(id) }
@@ -348,9 +336,6 @@ final class AppCore {
             }
             hotKeys.onRunAppleShortcut = { [weak self] id in
                 self?.appleShortcutCoordinator.run(id: id)
-            }
-            hotKeys.onExpandSnippet = { [weak self] id in
-                self?.snippetCoordinator.expandSnippetFromHotKey(id: id)
             }
             hotKeys.onRunExtensionCommand = { [weak self] entryID in
                 self?.extensionCoordinator.runExtensionCommand(entryID: entryID)
@@ -380,20 +365,6 @@ final class AppCore {
                 windowRoomIDs: Set(rooms.rooms.map(\.id)),
                 customWindowSizeIDs: Set(customWindowSizes.sizes.map(\.id)),
                 quickActionIDs: Set(customQuickActions.actions.map(\.id)))
-
-            snippetsStore.onSnapshot = { [weak self] snapshot in
-                guard let self else { return }
-                self.snippetCoordinator.applySnippetsLauncherPresence()
-                self.snippetListener.update(snapshot.records)
-                self.hotKeys.removeSnippetBindings(keeping: snapshot.fileIDs)
-            }
-            // Off out of the box, so an unused feature costs no load, watcher or tap.
-            if settings.snippetsEnabled {
-                Task { await snippetsStore.start() }
-                snippetCoordinator.startSnippetKeywordListener()
-            }
-            // Unconditional: a disabled feature has to take its command rows down with it.
-            snippetCoordinator.applySnippetsLauncherPresence()
 
             observeFeatureSwitches()
 
@@ -483,8 +454,6 @@ final class AppCore {
             return customWindowSizes.size(id: id)?.name
         case .appleShortcut(let id):
             return appleShortcutCoordinator.name(of: id)
-        case .snippet(let id):
-            return snippetsStore.record(id: id)?.snippet.name
         case .extensionCommand(let entryID):
             return appIndex.apps.first { $0.kind == .extensionCommand && $0.id == entryID }?.name
         case .togglePalette, .command, .systemAction, .windowCommand:
@@ -536,8 +505,6 @@ final class AppCore {
         roomCoordinator.prepareForTermination()
         inputSourceSwitcher.endSession()
         textInjector.prepareForTermination()
-        snippetListener.stop()
-        snippetsStore.stop()
         aiChats.reset()
         chatGPTSubscription.stop()
         mcpOAuth.stop()
@@ -682,10 +649,6 @@ final class AppCore {
                 _ = $0.fileSearchIgnorePatterns
                 _ = $0.fileSearchRemovedDefaultPatterns
             }, reproject: { $0.fileSearchCoordinator.applyPolicy() })
-        track({ _ = $0.snippetsEnabled }, reproject: { $0.snippetCoordinator.applySnippetsEnabled() })
-        track(
-            { _ = $0.snippetsShowInLauncher },
-            reproject: { $0.snippetCoordinator.applySnippetsLauncherPresence() })
         track({ _ = $0.appearance }, reproject: { $0.applyAppearance() })
         track({ _ = $0.animationsEnabled }, reproject: { $0.applyMotion() })
         track({ _ = $0.language }, reproject: { $0.offerLanguageRelaunch() })
@@ -699,7 +662,6 @@ final class AppCore {
         track(
             { _ = $0.extensionsShowInLauncher },
             reproject: { $0.extensionCoordinator.applyExtensionsLauncherPresence() })
-        track({ _ = $0.snippetsFolder }, reproject: { $0.applySnippetsFolder() })
         trackChatRoute()
     }
 
@@ -778,16 +740,6 @@ final class AppCore {
         mcpCoordinator.applyEnabled()
     }
 
-    private func applySnippetsFolder() {
-        let repository = Self.snippetsRepository(for: settings)
-        Task { await snippetsStore.relocate(to: repository) }
-    }
-
-    private static func snippetsRepository(for settings: AppSettings) -> SnippetRepository {
-        SnippetRepository(
-            snippetsDirectory: AppPaths.contentFolder(settings.snippetsFolder, named: "Snippets"))
-    }
-
     private func applyWindowCommandsPresence() {
         let visible = settings.windowManagementEnabled && settings.windowManagementShowInLauncher
         appIndex.setWindowCommandsVisible(visible)
@@ -834,7 +786,7 @@ final class AppCore {
 
     var currentActivity: UpdateActivity {
         UpdateActivity(
-            isExpandingSnippet: textInjector.isDelivering,
+            isPastingText: textInjector.isDelivering,
             isRunningExtension: extensions.running != nil,
             isUninstalling: uninstall.isTrashing,
             isRecordingHotKey: hotKeys.recordingAction != nil,
@@ -895,12 +847,6 @@ final class AppCore {
 
     func pickVolume(current: Float32) async -> Float32? {
         await dialogs.pickVolume(current: current)
-    }
-
-    func fillSnippetArguments(
-        snippetName: String, arguments: [SnippetTemplateEngine.MissingArgument]
-    ) async -> [String: String]? {
-        await dialogs.fillSnippetArguments(snippetName: snippetName, arguments: arguments)
     }
 
     func editClipboardText(_ text: String) async -> String? {

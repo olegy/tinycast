@@ -77,7 +77,6 @@ Settings shortcut field; only the Settings window sets it.
 | `tinycast://custom-command/<uuid>`          | Runs a custom command                                           |
 | `tinycast://quicklink/<uuid>`               | Opens a quicklink                                               |
 | `tinycast://apple-shortcut/<uuid>`          | Runs an Apple Shortcut                                          |
-| `tinycast://snippet/<percent-encoded path>` | Expands a snippet                                               |
 | `tinycast://chat/<uuid>`                    | Opens that saved chat in the AI Chat window                     |
 | `tinycast://settings/<tab>`                 | Opens Settings on a tab (`SettingsTab.slug`)                    |
 | `tinycast://extensions/<owner>/<ext>/<cmd>` | Extension command, see [extensions.md](extensions.md#deeplinks) |
@@ -110,14 +109,13 @@ ignored, because each built-in already knows whether it shows a screen.
 | `command/ai-chat`            | `fallbackText` is typed into Quick AI, never sent                                            |
 | `command/ai-chat-window`     | `fallbackText` joins the window's unsent line, never sent                                    |
 | `command/create-quicklink`   | `context` `{name, link, openWith}`, or a list of them; `fallbackText` is the link            |
-| `command/create-snippet`     | `context` `{name, text, keyword}`, or a list of them; `fallbackText` is the text             |
 | `quicklink/<uuid>`           | `arguments` by argument name; `fallbackText` fills the first required one                    |
 | `custom-command/<uuid>`      | `arguments` as `["a", "b"]`, or by argument name; `fallbackText` is `$1`                     |
 | `system-action/set-volume`   | `arguments` `{volume}`, `["50"]` or `fallbackText`: `0`–`100`, `%` allowed; skips the picker |
 | `window-size`                | `arguments` `{width, height, anchor, x, y}`: `1200` is points, `60%` a share of the screen   |
 
 The search screens are `clipboard-history`, `search-emoji`, `calculator-history`,
-`search-quicklinks`, `search-files`, `define`, `search-snippets`, `search-custom-commands`,
+`search-quicklinks`, `search-files`, `define`, `search-custom-commands`,
 `search-menu-items` and `switch-windows`. A missing quicklink or custom-command argument opens the
 row's fields, as a hotkey with no selection does. Any other target ignores its input.
 
@@ -127,9 +125,6 @@ row's fields, as a hotkey with no selection does. Any other target ignores its i
 - `openWith` is kept only when it names an installed app's bundle ID.
 - A window size refuses, rather than clamps, a value outside what a saved size allows. `anchor` is a
   `WindowLayoutAnchor` raw value (`top-left`, `center`, …) and `x`/`y` shift it in points.
-- Create Snippet with no input — from a link, a hotkey or the launcher — starts from the text
-  selected in the app in front, read through Accessibility (`AccessibilityText.selection(in:)`),
-  never by sending ⌘C.
 
 ## Consent
 
@@ -139,7 +134,7 @@ so a new command fails to build until it is classed:
 
 - **Never asks without input**: anything that only opens a Tinycast screen or editor — search
   screens, Settings, chats, the create commands, Quick AI.
-- **Always asks**: window commands and sizes, layouts, rooms, system actions, quicklinks, snippets,
+- **Always asks**: window commands and sizes, layouts, rooms, system actions, quicklinks,
   custom commands, Apple Shortcuts, custom Quick Actions, the AI text actions, Paste Sequentially,
   Open Camera, the meeting commands and Capture Window Layout.
 
@@ -152,7 +147,7 @@ takes key and a stray Return must not run anything. A target that does not exist
 unknown link before any question, so a page cannot learn what exists by asking.
 
 Always Allow stores `DeepLinkConsentPolicy.key(entryID:input:)`: the row alone, or the row with its
-exact input, the row's ID percent-encoded so a `?` in a snippet path cannot fake the split. A grant
+exact input, the row's ID percent-encoded so a `?` in it cannot fake the split. A grant
 never covers different input, so a Karabiner key with fixed text asks once and an attacker's text
 still asks. A search link's row is `search`. A size spelled out in a link is one target,
 `window-size`, whatever the size.
@@ -178,7 +173,7 @@ app, so it does not take the menu bar, and the menu-bar owner is still the app t
 `FrontmostApp.current` returns that app when Tinycast itself is frontmost with no window of its own
 in key. `PaletteCoordinator.targetApp`, `WindowTarget.current()` and the palette's record of the app
 it covered all use it, so a window command, or a paste from a palette a link opened, reaches the
-right app. Pasting with the palette closed still needs the target app active, so snippets and Paste
+right app. Pasting with the palette closed still needs the target app active, so quicklinks and Paste
 Sequentially want `open -g`.
 
 ## Karabiner-Elements

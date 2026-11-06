@@ -433,7 +433,7 @@ struct FuzzTest {
             ("微信", "微信", "a Chinese name typed in Chinese"), ("weixin", "微信", "…as pinyin"),
             ("wx", "微信", "…as pinyin initials"), ("wyyyl", "网易云音乐", "…initials of a longer name"),
             ("telegram", "Телеграм", "a Cyrillic name typed in Latin"),
-            ("sig", "Signature Block", "a snippet's keyword"),
+            ("sig", "Signature Block", "an alternate title"),
             ("brew", "Search", "an extension's title lists its commands"),
             ("window", "Switch Windows", "an ordinary command still matches a category prefix")
         ]
@@ -484,12 +484,12 @@ struct FuzzTest {
             Candidate(name: "Search Files", priority: 70), Candidate(name: "Clipboard History", priority: 80),
             Candidate(name: "My Schedule", priority: 60),
             Candidate(name: "Search Emoji & Symbols", priority: 50),
-            Candidate(name: "Create Snippet", priority: 30)
+            Candidate(name: "Create Quicklink", priority: 30)
         ]
         check(
             "a new user gets the built-ins, highest priority first",
             select(commands) == [
-                "Clipboard History", "Search Files", "My Schedule", "Search Emoji & Symbols", "Create Snippet"
+                "Clipboard History", "Search Files", "My Schedule", "Search Emoji & Symbols", "Create Quicklink"
             ])
         let used = [Candidate(name: "Safari", frecency: 40), Candidate(name: "Slack", frecency: 300)]
         check(

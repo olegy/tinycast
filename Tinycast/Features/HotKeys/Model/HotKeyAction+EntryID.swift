@@ -24,8 +24,6 @@ extension HotKeyAction {
             self = .quicklink(id: id)
         } else if let id = AppleShortcut.id(fromEntryID: entryID) {
             self = .appleShortcut(id: id)
-        } else if let id = StoredSnippet.id(fromEntryID: entryID) {
-            self = .snippet(id: id)
         } else {
             return nil
         }
@@ -44,7 +42,6 @@ extension HotKeyAction {
         case .customCommand(let id): CustomCommand.entryIDPrefix + id.uuidString.lowercased()
         case .quicklink(let id): Quicklink.entryIDPrefix + id.uuidString.lowercased()
         case .appleShortcut(let id): AppleShortcut.entryID(for: id)
-        case .snippet(let id): StoredSnippet.entryIDPrefix + id
         case .togglePalette, .app, .settingsPane, .extensionCommand: nil
         }
     }

@@ -411,12 +411,12 @@ and every shortcut stays editable afterwards.
   window commands, inside the same section. Custom sizes and their bindings ride in settings backups.
 - **Settings** — `windowManagementEnabled` (off), `windowManagementShowInLauncher` (on), `windowGap`
   (0), `windowCycle` (`.off`), `windowWrapsDisplays` (on) and `windowKeepsProportions` (on). All six
-  ride in settings backups: unlike `snippetsEnabled` they grant no permission class of their own.
+  ride in settings backups: unlike `quickActionsEnabled` they grant no permission class of their own.
 - **Per-command visibility** reuses `VisibilityStore` as-is; clearing a recorded shortcut is how a
   hotkey is disabled, so there is no separate per-command enabled flag. Each command and custom-size
   row carries an alias field, dimmed while its entry is hidden from the launcher. Window commands
   deliberately get **no** launcher-category pane of their own — they are managed inside Settings ›
-  Window Management, the same call already made for snippets.
+  Window Management.
 
 ## Testing
 

@@ -13,7 +13,7 @@ in `Features/Settings/` (`Model/`, `Service/`, `SettingsFileSchema.swift`), the 
   deleting it, or updating the app never loses a setting, so there is nothing to migrate.
 - **Off by default, and only the pane turns it on.** `settingsFileEnabled` has no key in the file and is
   excluded from backups: a file or an import must never switch on something that reads a file.
-- **A capability grant never has a key.** Snippets, Extensions, Calendar access, Auto Join, Camera
+- **A capability grant never has a key.** Extensions, Calendar access, Auto Join, Camera
   Preview, Quick Actions, MCP and clipboard text recognition are switched on only in the app, which
   asks first. `settings-file-test` checks those paths stay absent.
 - **Removing a key ships a migration that strips it.** The import reports a key it no longer knows on
@@ -26,8 +26,8 @@ in `Features/Settings/` (`Model/`, `Service/`, `SettingsFileSchema.swift`), the 
   record's field left out or of the wrong type keeps its value, and `null` clears it.
 - **Applying the file never writes it.** Only a change made in the app rewrites the file, so hand
   formatting stays until then.
-- **Content and machine state never enter it.** Snippets, custom commands, quicklinks, MCP
-  servers and AI connections stay where they are — the file can say which folder snippets live in, never what is in them — as do the palette's position, the extension toolchain,
+- **Content and machine state never enter it.** Custom commands, quicklinks, MCP servers and AI
+  connections stay where they are, as do the palette's position, the extension toolchain,
   the shortcuts and aliases of content, extensions and Apple Shortcuts, and what a room learns by
   being entered.
 
@@ -131,7 +131,6 @@ Where a number has a special case, the case is a word:
 | `calendar.menuBarUpcomingEvents` | `"today"`, or 2, 5, 10, 30 minutes before |
 | `calendar.hideCurrentEventAfterMinutes` | `"never"`, 0 (as it starts), 5, 10, 30 |
 | `windowManagement.gap` | 0 to 64 |
-| `snippets.folder` | an absolute or `~/` path, or `null` for Application Support |
 
 On first launch, `general.language` is set to the primary system language if supported, otherwise
 `"en"`. That explicit choice is saved; later system-language changes do not change it.

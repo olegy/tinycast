@@ -142,7 +142,7 @@ If a change touches anything in the right column, the harness on the left is man
 | `palette-placement-test` | `DesignSystem/Theme.swift`, `Palette/PalettePlacement.swift` |
 | `palette-menu-click-test` | `Palette/PalettePanel.swift` — complete click-away presses and subsequent control activation |
 | `hotkey-test` | `HotKeys/Model/DoubleTapModifier.swift`, `DoubleTapDetector.swift`, `ModifierKey.swift`, `ModifierKeyDetector.swift`, `HotKeyBinding.swift`, `HotKeySpelling.swift`, `HotKeyAction.swift`, `Service/KeyShortcut.swift`, and the command→action mapping in `Launcher/Model/CommandID.swift` |
-| `deeplink-test` | `DeepLinks/Model/`, `HotKeys/Model/HotKeyAction+EntryID.swift`, `Settings/SettingsTab.swift` — every bindable command, window command and system action round-trips through its link and its entry ID, stored rows by UUID, snippet paths through percent-encoding, case folding, the channel's scheme, the links that must not resolve (Raycast schemes, the `extensions` host), input decoding, encoding and its refusals (bytes, not characters), batches, field filling, consent classes and keys, the quicklink loop rule, chat and window-size links, and every Settings tab slug |
+| `deeplink-test` | `DeepLinks/Model/`, `HotKeys/Model/HotKeyAction+EntryID.swift`, `Settings/SettingsTab.swift` — every bindable command, window command and system action round-trips through its link and its entry ID, stored rows by UUID, case folding, the channel's scheme, the links that must not resolve (Raycast schemes, the `extensions` host), input decoding, encoding and its refusals (bytes, not characters), batches, field filling, consent classes and keys, the quicklink loop rule, chat and window-size links, and every Settings tab slug |
 | `fallback-test` | `Launcher/Model/Fallback.swift`, plus the `CommandID` and `Quicklink` ids it is built from |
 | `dictionary-test` | `Dictionary/Model/DictionaryEntry.swift`, `DictionaryMarkup.swift` — a real XHTML record and the plain-text fallback, read into page blocks |
 | `callout-test` | `DesignSystem/Theme.swift`, `HotKeys/UI/CalloutPlacement.swift` |
@@ -159,7 +159,8 @@ If a change touches anything in the right column, the harness on the left is man
 | `quicklink-test` | all of `Quicklinks/Model/`, plus editor drafts and placeholder selection |
 | `quicklink-coordinator-test` | Opening and requested arguments, launcher editing, current enabled-state preservation, deletion during editing and feature gates; no platform effects or on-screen focus checks |
 | `apple-shortcut-test` | all of `AppleShortcuts/Model/` — the `shortcuts list` parser and entry ids |
-| `snippets-test` | all of `Snippets/Model/` and `Snippets/Service/`, plus editor drafts, placeholder selection and `Platform/HealthTicker.swift` |
+| `template-test` | `Templates/Model/TemplateEngine.swift` — every placeholder, parameter and modifier, argument order, cursor offsets, encoding and the Raycast aliases, against an injected clock, locale and UUIDs |
+| `text-injection-test` | `TextInjection/Service/` — the delivery queue, completion, AX confirmation, Unicode chunking, the pasteboard lease and the borrowed ⌘C, and in-process insertion into our own editor |
 | `symbols-test` | `Extensions/Service/SymbolCatalog.swift`, against this machine's CoreGlyphs |
 | `ext-store-test` | `Extensions/Model/` — GitHub source parsing and URLs, the store and Git tree parsers |
 | `ext-refresh-test` | `Extensions/Model/ExtensionRefreshPolicy.swift` — interval parsing, due dates, backoff, subtitle fallback, indicator state, Refresh Now refusals |
@@ -174,6 +175,7 @@ If a change touches anything in the right column, the harness on the left is man
 | `settings-backup-test` | `Settings/AppSettingsKey.swift`, `Backup/Model/SettingsBackupCoverage.swift` |
 | `settings-file-test` | `Settings/Model/` and `Settings/Service/` — key paths, value tokens, the printer and parser, and the repository's import, replace, save, reload and symlink handling on a scratch folder |
 | `compact-favorites-migration-test` | `Migrations/CompactFavoritesMigration.swift` — strips the retired key and keeps every other value, and leaves a file with other problems to the import |
+| `snippets-removal-migration-test` | `Migrations/SnippetsRemovalMigration.swift` — retires exactly the Snippets defaults, strips the `snippets` section alongside the Notes section and compact favorites key, and leaves a file with other problems to the import |
 | `window-file-test` | `WindowManagement/Model/WindowManagementFileFormat.swift` — command shortcuts, custom sizes, layouts and rooms as settings.json spells them, hand edits and bad records |
 | `launcher-settings-file-test` | Launcher settings application — invalid records, partial edits, deferred bundles, shortcut moves and records outside search scopes; isolated preferences and in-memory scan/Carbon effects |
 | `backup-archive-test` | all of `Backup/Model/`, plus `Backup/Service/BackupStaging.swift` |
@@ -377,7 +379,6 @@ Measured at the end of the 2026 refactor, on `main`. Useful as orders of magnitu
 | Comment density | 1,653 of 27,289 source lines (6.1%) |
 | The harness suite | ~15 s wall clock, 11-way parallel (~98 s serial, ~140 s before either) |
 | `palette-selection-test` | 111,684 assertions — a tripwire: a change in this count means the row-order model moved |
-| `SnippetKeywordPolicy` match | 7 µs/keystroke at 50 keywords, 59 µs at 1,000 — the `lowercased()` is 0.09 µs of it |
 | `ClipboardStore.pinnedItems` | 27–127 µs per uncached search, 1,000-row window — no cache earns its invalidation yet |
 | `count items of trash` | 5,000 ms against a cold Finder on an *empty* Trash, 110 ms warm — why AppleScript is detached |
 
@@ -445,7 +446,7 @@ caches, TCC grants and login item, so this cannot disturb an installed copy.
 - With macOS set to a decimal-comma region (Italian), `2,3 + 1,5` answers `3,8`, `max(2,5; 3)`
   answers `3`, and ↵ pastes `3,8`; General ▸ Calculator ▸ Number format `English` restores `2.3 + 1.5`
   and re-renders past Calculator History in the chosen format
-- Section headers appear in order: Favorites, Applications, System Settings, Quicklinks, Snippets,
+- Section headers appear in order: Favorites, Applications, System Settings, Quicklinks,
   System Actions, Window Management, Custom Commands, Commands
 - With a non-ASCII input source active, ⌘K opens Actions; ↑/↓ move it, ↵ activates, Escape closes it
 - In either ⌘K Actions panel, typing filters immediately in the bottom search band without changing
@@ -523,7 +524,7 @@ caches, TCC grants and login item, so this cannot disturb an installed copy.
 - A double-tap binding fires
 - Every binding survives quit and relaunch
 - `Enable Commands` off leaves every pane-owned command listed, searchable and firing —
-  Clipboard, Emoji, File Search, Snippets, Quicklinks, Calendar, AI and the two layout commands
+  Clipboard, Emoji, File Search, Quicklinks, Calendar, AI and the two layout commands
 
 ### Uninstall
 
@@ -603,16 +604,6 @@ caches, TCC grants and login item, so this cannot disturb an installed copy.
 - Choosing the Search Files fallback right after opens on the same results without a pause
 - With Pop to Root Search delayed, close and reopen before the timeout: the launcher keeps its query
   and file results. Let the timeout expire, or use Immediately: reopening starts with an empty query
-
-### Snippets
-
-- With snippets **off**: no launcher entries, no keyword expansion, and no permission prompt at launch
-- Enabling shows the consent dialog **before** the Accessibility prompt
-- Declining leaves the feature off and prompts for nothing
-- After enabling, a keyword expands in a text field; an argument-bearing snippet prompts then delivers
-- A `{selection}` snippet inserted from Search Snippets or its shortcut wraps text selected in an app
-  Accessibility can't read, and the clipboard is restored afterwards
-- Editing a snippet file externally reloads it
 
 ### Calculator and currency
 
@@ -762,13 +753,9 @@ Debug answers `tinycast-dev://`; use that scheme for every link below.
   `?fallbackText=x` both open `?q=x`; with no input it asks for the argument. A custom command with
   one argument and `?arguments=%5B%22x%22%5D` runs with `$1` = `x`
 - `command/create-quicklink?context=%7B%22name%22%3A%22Docs%22%2C%22link%22%3A%22https%3A%2F%2Fexample.com%22%7D`
-  opens the editor filled in; Cancel saves nothing. `command/create-snippet?fallbackText=hello` and
-  `command/create-note?fallbackText=hello` start with `hello`
+  opens the editor filled in; Cancel saves nothing
 - `command/create-quicklink?context=` with a list of two, one already in the library: it asks to add
-  two, showing each name and link, adds one, and the HUD says so. The same for `create-snippet`,
-  whose question shows names
-- Select text in TextEdit, then run Create Snippet from its hotkey and from the launcher: the editor
-  starts with that text, and the clipboard is untouched
+  two, showing each name and link, adds one, and the HUD says so
 - `system-action/set-volume?fallbackText=30` sets 30% with no picker; `?fallbackText=300` reports the
   link before asking and changes nothing. `note/..` reports it too
 - `window-size?arguments=%7B%22width%22%3A%22800%22%2C%22height%22%3A%2260%25%22%7D` sizes the front
@@ -812,7 +799,7 @@ Debug answers `tinycast-dev://`; use that scheme for every link below.
 - An image clip round-trips and still renders; the archive can then be deleted without breaking it
 - A file whose `manifest.json` `format` was hand-edited is refused **with a message naming it**
 - Cancelling the save panel leaves nothing in `~/Library/Caches/com.olegy.tinycast.dev/backup-staging/`
-- **`snippetsEnabled` is not in the exported file**, and importing does not enable snippets
+- **`quickActionsEnabled` is not in the exported file**, and importing does not enable Quick Actions
 - Nothing in the extracted tree names a Keychain item, an extension, or an AI conversation
 
 ### Clean install
@@ -833,7 +820,7 @@ tccutil reset Accessibility com.olegy.tinycast.dev 2>/dev/null || true
   English; a saved language stays unchanged on relaunch
 - Onboarding has no Dock entry; completing it leaves the palette open and ready for typing.
   Settings still adds a Dock entry while open and removes it when the last ordinary window closes
-- Palette opens and lists apps; clipboard, quicklinks, snippets and calculator history are all empty
+- Palette opens and lists apps; clipboard, quicklinks and calculator history are all empty
   and all accept a first entry
 - **Every setting shows its intended default.** Walk the panes: this is what catches a broken
   absence-versus-`false` read

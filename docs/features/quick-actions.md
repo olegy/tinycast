@@ -33,14 +33,13 @@ row in the launcher opens its editor in Settings → Quick Actions (Translate ha
   through `AppIndex.setCommandsVisible`, and the custom ones leave it through
   `AppIndex.setCustomQuickActions`, the way AI Chat drops its own. Carbon bindings stay
   registered, so re-enabling restores every shortcut without touching the hotkey layer. The flag
-  grants keystroke delivery into other apps, so like `snippetsEnabled` it is excluded from settings
-  backups — an import must never arm it.
+  grants keystroke delivery into other apps, so it is excluded from settings backups — an import
+  must never arm it.
 - **One funnel, whichever way an action started.** A shortcut and a launcher row both land on
   `QuickActionCoordinator.run(_:)`, which captures the target **before** hiding the palette.
   Hiding there rather than at each caller keeps the two paths identical.
 - **Enabling is consent, and it is the only place Accessibility is requested.** The toggle confirms
-  through `DialogController` first and then calls `Permissions.ensureAccessibility()`, the pattern
-  `SnippetCoordinator.setSnippetsEnabled` established. Everything else — a shortcut press, a
+  through `DialogController` first and then calls `Permissions.ensureAccessibility()`. Everything else — a shortcut press, a
   delivery — uses `isAccessibilityTrusted()` and degrades to a HUD.
 - **Tinycast is never an event target.** `QuickActionRunner.selection(in:using:)` refuses our own
   bundle identifier, and `TextInjector.targetAcceptsInjection` refuses it again before every event post,
@@ -253,29 +252,71 @@ Copying is the fallback and never the first try: it synthesises a keystroke into
 When both tiers come back empty, only an Accessibility result of `.empty` justifies "nothing is
 selected"; otherwise the app told us nothing either way and says so.
 
-Quicklinks and snippets read `{selection}` through the same two tiers, with one rule of their own:
-the ⌘C is sent only when the expanded template reads the selection. A snippet's keyword expansion
-never sends one, since a typed keyword leaves nothing selected.
+Quicklinks read `{selection}` through the same two tiers, with one rule of their own: the ⌘C is sent
+only when the expanded template reads the selection.
 
 ## Delivery
 
-`TextInjector` — shared with Snippets and Quicklinks, and owned by `AppCore` — does
-the replacement.
-`replaceSelection(with:in:)` takes the interactive path: no keyword to match, no generation to
-cancel, because a shortcut is an explicit gesture rather than an expansion the app decided to
-attempt. Its serial delivery queue is what stops two features fighting over the pasteboard lease.
+`TextInjector` — shared with Quicklinks, and owned by `AppCore` — does the replacement through
+`replaceSelection(with:in:)`. Its serial delivery queue is what stops two features fighting over the
+pasteboard lease.
 
-The Accessibility tier replaces the live selection atomically, under the five-rule delivery contract
-in [snippets.md](snippets.md#text-delivery-and-pasteboard-safety) — Quick Actions simply enter it with
-no keyword, so rule 2 never applies. The event tiers behind it type or paste over the selection, which
-every app treats as replacing it — but that is the target app's behaviour rather than something
+There are two delivery tiers, and the target picks which one runs. `InjectionTarget.ownEditor` is
+one of our own views — AI Chat's `ComposerTextView`, which opts in by adopting
+`InjectableTextView`. It is written in process with `insertText(_:replacementRange:)`: undoable in the
+editor's own `UndoManager`, and needing no Accessibility grant, no pasteboard lease, no app
+activation and no event posting.
+
+`InjectionTarget.external` is another application, and it takes the contract below, in this order.
+
+1. The focused element exposes `AXSelectedTextMarkerRange` → a renderer surface. Skip Accessibility.
+2. Write over Accessibility, read the value back. Matches → done. Unchanged → events. Moved some
+   other way → refuse.
+3. Events: paste (long or multiline) or type in four-unit keystrokes.
+4. Nothing landed → say so.
+
+**Rule 1: a renderer's Accessibility surface is not authoritative.** Chromium and Monaco publish
+selection as opaque text markers, and their `AXValue` either trails the editor by a few milliseconds
+or — in VSCodium — stays empty and caret-zero indefinitely while the real editor holds the text. A
+marker range is the reliable tell, so those targets never take the Accessibility write at all.
+`accessibilityTextState` skips them for the same reason: a value that never moves cannot confirm a
+paste either.
+
+**Rule 2: a `kAXErrorSuccess` from the setter is not evidence.** Chromium answers success and applies
+nothing. `TextReplacementPolicy.confirmsReplacement` rebuilds the exact string the write should have
+produced and compares it to what the element reports. An unchanged value is `.unavailable`, so the
+event tiers still get their turn instead of an "applied" message over untouched text; a value that
+changed into something we did not write is `.rejected`, because events would then edit a document we
+can no longer describe.
+
+**Rule 3** keeps the same permission, Secure Event Input and target-app gates before every post.
+Short single-line text of at most 100 characters uses Unicode keyboard events, and **a Unicode
+keystroke carries at most four UTF-16 units**: Blink stores one key event's text in a fixed
+`WebKeyboardEvent::kTextLengthCap` array, so a Chromium target — Brave, Chrome, Electron, VS Code,
+Slack — silently drops everything past the fourth unit. `UnicodeTypingChunk` splits the text into
+four-unit keystrokes on scalar boundaries, posted through a spaced, re-gated loop, so a target that
+goes away mid-word stops the rest.
+
+Longer or multiline text uses a temporary paste. Tinycast snapshots every item, type and data
+payload, then **lends a board holding nothing but the text** — one item carrying the plain text and
+Tinycast's own marker type — and restores by rewriting the snapshot whole. Keeping the original
+item's shape and swapping only its `.string` would leave `public.html`, `public.rtf` and the rest
+describing the *previous* copy, which a rich-text editor such as ChatGPT's ProseMirror composer
+prefers. An empty or image-only clipboard lends the same single item. The change count is checked
+before restoration, so a newer copy is never overwritten, and the clipboard poller synchronizes to
+Tinycast's ownership changes so lent or restored text is not added as new history.
+
+When Accessibility text state is readable, a paste waits for evidence that the target changed; if the
+editor cannot expose it, a posted paste is accepted after a conservative delay. Cursor movement starts
+after that and after pasteboard restoration. Terminating the app cancels pending delivery and
+completes any restoration still owned by Tinycast. The event tiers type or paste over the selection,
+which every app treats as replacing it — but that is the target app's behaviour rather than something
 Tinycast asserts, so it is the part worth checking by hand.
 
 **A replacement that never lands says so, and keeps the reply.** Every tier can decline, and a shortcut
 that quietly did nothing is indistinguishable from a shortcut that is not bound. `DeliveryCompletion`
 now settles either way, so a delivery that returned early reports failure exactly once; Quick Actions
-put the generated text on the clipboard and raise a HUD rather than dropping it. Snippets pass no
-failure handler, so automatic expansion stays silent as before.
+put the generated text on the clipboard and raise a HUD rather than dropping it.
 
 ### Manual sweep
 

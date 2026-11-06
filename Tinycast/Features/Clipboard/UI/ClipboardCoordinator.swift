@@ -53,6 +53,21 @@ final class ClipboardCoordinator {
         Task { clipboardStore.load() }
     }
 
+    /// What `{clipboard offset=N}` reads, newest first, led by the pasteboard's own text.
+    func textHistoryForTemplates() -> [String] {
+        var history = clipboardStore.items
+            .filter { $0.kind == .text }
+            .sorted { $0.createdAt > $1.createdAt }
+            .prefix(Self.templateHistoryDepth)
+            .compactMap(\.text)
+        if let current = NSPasteboard.general.string(forType: .string), current != history.first {
+            history.insert(current, at: 0)
+        }
+        return history
+    }
+
+    private static let templateHistoryDepth = 20
+
     func followSearchResults(query: String, previous: [ClipboardItem], current: [ClipboardItem]) {
         guard palette.isVisible, palette.mode == .clipboard,
             palette.query.trimmingCharacters(in: .whitespaces) == query,

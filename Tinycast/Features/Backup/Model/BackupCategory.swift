@@ -3,7 +3,6 @@ import Foundation
 enum BackupCategory: String, CaseIterable, Identifiable, Sendable {
     case configuration
     case clipboard
-    case snippets
     case learning
 
     var id: Self { self }
@@ -25,9 +24,6 @@ enum BackupCategory: String, CaseIterable, Identifiable, Sendable {
             return .init(
                 label: String(localized: "Clipboard History"), symbol: "doc.on.clipboard",
                 subpath: "clipboard")
-        case .snippets:
-            return .init(
-                label: String(localized: "Snippets"), symbol: "curlybraces", subpath: "snippets")
         case .learning:
             return .init(
                 label: String(localized: "Launcher Learning"), symbol: "chart.line.uptrend.xyaxis",
@@ -40,7 +36,6 @@ enum BackupCategory: String, CaseIterable, Identifiable, Sendable {
         switch self {
         case .configuration: return nil
         case .clipboard: return String(localized: "\(count) clips")
-        case .snippets: return String(localized: "\(count) snippets")
         case .learning: return String(localized: "\(count) records")
         }
     }

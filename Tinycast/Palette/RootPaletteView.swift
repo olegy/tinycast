@@ -21,7 +21,6 @@ struct RootPaletteView: View {
     @Environment(MeetingClock.self) private var meetingClock
     @Environment(UninstallSession.self) private var uninstall
     @Environment(QuicklinkStore.self) private var quicklinks
-    @Environment(SnippetsStore.self) private var snippets
     @Environment(ExtensionManager.self) private var extensions
     @Environment(AppSettings.self) private var settings
     @Environment(\.metrics) private var metrics
@@ -69,12 +68,6 @@ struct RootPaletteView: View {
             return QuicklinkEditorScreen(
                 coordinator: core.quicklinkCoordinator, openMenuCorner: menuCorner,
                 openInputMenu: openInputOptions)
-        case .snippets:
-            return SnippetsScreen(
-                store: snippets, core: core, vm: vm, openActions: openActions)
-        case .snippetEditor:
-            return SnippetEditorScreen(
-                coordinator: core.snippetCoordinator, openInputMenu: openInputOptions)
         case .emoji:
             return EmojiScreen(
                 index: emojiIndex, frequent: frequentEmoji, pinned: core.pinnedEmoji, core: core, vm: vm,
@@ -1493,7 +1486,7 @@ struct RootPaletteView: View {
         switch app.kind {
         case .quicklink:
             wantsArguments = core.quicklinks.quicklink(entryID: app.id).map {
-                !SnippetTemplateEngine.declaredArguments(in: $0.link).isEmpty
+                !TemplateEngine.declaredArguments(in: $0.link).isEmpty
             } ?? false
         case .customCommand:
             wantsArguments = !(core.customCommands.command(entryID: app.id)?.arguments ?? []).isEmpty
@@ -1605,10 +1598,6 @@ struct RootPaletteView: View {
         }
         if vm.mode == .quicklinkEditor {
             core.quicklinkCoordinator.cancelQuicklinkEditing()
-            return
-        }
-        if vm.mode == .snippetEditor {
-            core.snippetCoordinator.cancelSnippetEditing()
             return
         }
         if vm.mode == .extensionCommand {

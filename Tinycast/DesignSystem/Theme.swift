@@ -227,7 +227,7 @@ enum Theme {
         static let aiVariableName: CGFloat = 170
         /// A Codex usage window's meter, beside its "72% left" readout.
         static let aiUsageBar: CGFloat = 110
-        /// Settings editor modals (Custom Commands, Snippets): fixed width, intrinsic height.
+        /// Settings editor modals (Custom Commands): fixed width, intrinsic height.
         static let editorSheetWidth: CGFloat = 480
         /// The multi-line box inside those modals; it scrolls rather than grows the panel.
         static let editorTextHeight: CGFloat = 120

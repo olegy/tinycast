@@ -41,8 +41,7 @@ launchers. We accept that to keep the app simple.
 - **Input methods (IME) such as Chinese, Japanese or Wubi.** Basic typing works. But each
   input-method fix broke something for other people, so **we no longer fix input-method bugs.**
   That covers arrow keys or Escape while you compose, text that goes to a bar at the bottom of the
-  screen, lag right after opening, and snippets leaving part
-  of the keyword behind. New input-method reports are closed as not planned.
+  screen and lag right after opening. New input-method reports are closed as not planned.
   **Instead:** the community fork [tinycast-cn](https://github.com/conversun/tinycast-cn).
   ([#990](https://github.com/abue-ammar/tinycast/issues/990), [#851](https://github.com/abue-ammar/tinycast/issues/851), [#1203](https://github.com/abue-ammar/tinycast/issues/1203), [#1580](https://github.com/abue-ammar/tinycast/issues/1580), [#1555](https://github.com/abue-ammar/tinycast/issues/1555))
 - **More cases for Chinese app names.** Tinycast finds an app by its Chinese name, and matches
@@ -53,7 +52,7 @@ launchers. We accept that to keep the app simple.
   **⚠️ If these cases keep breaking, we may remove translated app names and show English names
   only.** **Instead:** add the Chinese name as an alias in Settings → Applications.
   ([#1640](https://github.com/abue-ammar/tinycast/issues/1640), [#1649](https://github.com/abue-ammar/tinycast/issues/1649))
-- **Keyboard layouts other than US QWERTY.** Paste, snippets and emoji press keys by their position
+- **Keyboard layouts other than US QWERTY.** Paste and emoji press keys by their position
   on a US keyboard. On Colemak, Dvorak and similar layouts this can trigger the wrong shortcut.
   Shortcuts also don't match by layout. ([#65](https://github.com/abue-ammar/tinycast/issues/65), [#1214](https://github.com/abue-ammar/tinycast/issues/1214), [#1404](https://github.com/abue-ammar/tinycast/issues/1404))
 - **App names in another language.** App names follow your Mac's language. **Instead:** set your
@@ -102,16 +101,9 @@ launchers. We accept that to keep the app simple.
 - **Fuzzy search.** ([#953](https://github.com/abue-ammar/tinycast/issues/953))
 - **Type "img" to filter.** **Instead:** press ⌘P to filter by type. ([#403](https://github.com/abue-ammar/tinycast/issues/403), [#1248](https://github.com/abue-ammar/tinycast/issues/1248))
 - **Merge duplicate entries.** ([#632](https://github.com/abue-ammar/tinycast/issues/632))
-- **Turn an entry into a snippet with ⌘S.** ([#1333](https://github.com/abue-ammar/tinycast/issues/1333))
 - **Block chosen extensions.** ([#1522](https://github.com/abue-ammar/tinycast/issues/1522))
 - **A separate screenshot browser.** **Instead:** filter history by images and search the text in
   them. It may come later as a plugin. ([#1211](https://github.com/abue-ammar/tinycast/issues/1211), [#1619](https://github.com/abue-ammar/tinycast/issues/1619))
-
-## Snippets
-
-- **Put a snippet on the clipboard instead of typing it.** ([#1595](https://github.com/abue-ammar/tinycast/issues/1595))
-- **Pin snippets.** ([#1027](https://github.com/abue-ammar/tinycast/issues/1027))
-- **Sort snippets by last used.** ([#1015](https://github.com/abue-ammar/tinycast/issues/1015))
 
 ## Calculator
 

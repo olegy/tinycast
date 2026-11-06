@@ -2,7 +2,7 @@ import Foundation
 
 /// What the app is in the middle of. Every flag is injected, so the decision stays pure.
 struct UpdateActivity: Sendable {
-    var isExpandingSnippet = false
+    var isPastingText = false
     var isRunningExtension = false
     var isUninstalling = false
     var isRecordingHotKey = false
@@ -13,7 +13,7 @@ struct UpdateActivity: Sendable {
 /// Whether it is safe to interrupt the user and swap the app out from under them.
 enum UpdateReadiness {
     enum Blocker: Equatable, Sendable {
-        case expandingSnippet
+        case pastingText
         case runningExtension
         case uninstalling
         case recordingHotKey
@@ -22,8 +22,8 @@ enum UpdateReadiness {
 
         var message: String {
             switch self {
-            case .expandingSnippet:
-                return String(localized: "Waiting for a snippet to finish expanding.")
+            case .pastingText:
+                return String(localized: "Waiting for text to finish pasting.")
             case .runningExtension:
                 return String(localized: "Waiting for a running extension command to finish.")
             case .uninstalling: return String(localized: "Waiting for the uninstaller to finish.")
@@ -36,7 +36,7 @@ enum UpdateReadiness {
 
     /// Ordered by consequence: an interrupted install loses work, an open panel does not.
     static func evaluate(_ activity: UpdateActivity) -> Blocker? {
-        if activity.isExpandingSnippet { return .expandingSnippet }
+        if activity.isPastingText { return .pastingText }
         if activity.isRunningExtension { return .runningExtension }
         if activity.isUninstalling { return .uninstalling }
         if activity.isRecordingHotKey { return .recordingHotKey }

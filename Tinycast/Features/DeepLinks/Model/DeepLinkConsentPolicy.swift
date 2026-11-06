@@ -9,7 +9,7 @@ enum DeepLinkConsentPolicy {
 
     /// The row alone, or the row with the exact input, so a grant never covers other input.
     static func key(entryID: String, input: DeepLinkInput) -> String {
-        // A snippet's ID is a path and may hold a `?`; encoded, the first `?` is always the split.
+        // Encoded, so an ID holding a `?` still splits at the first one.
         let row = entryID.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? entryID
         let query = input.percentEncodedQueryItems.map { "\($0.name)=\($0.value ?? "")" }
         return query.isEmpty ? row : row + "?" + query.joined(separator: "&")
@@ -35,7 +35,7 @@ enum DeepLinkConsentPolicy {
         case .togglePalette, .settingsPane:
             false
         case .app, .customCommand, .systemAction, .windowCommand, .windowLayout,
-            .windowRoom, .customWindowSize, .quicklink, .quickAction, .appleShortcut, .snippet,
+            .windowRoom, .customWindowSize, .quicklink, .quickAction, .appleShortcut,
             .extensionCommand:
             true
         }
@@ -52,7 +52,7 @@ enum DeepLinkConsentPolicy {
             .searchMenuItems, .switchWindows, .switchWindowsBackwards, .createCustomCommand,
             .searchCustomCommands, .define, .mySchedule, .createEvent, .createWindowLayout,
             .switchRoom, .createRoom, .createQuicklink, .searchQuicklinks, .importQuicklinks,
-            .exportQuicklinks, .searchSnippets, .createSnippet, .exportSettings, .importSettings,
+            .exportQuicklinks, .exportSettings, .importSettings,
             .checkForUpdates, .about:
             false
         }

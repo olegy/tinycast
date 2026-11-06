@@ -49,10 +49,8 @@ struct SettingsBackup: Codable {
         var fileSearchIgnorePatterns: [String]?
         var fileSearchRemovedDefaultPatterns: [String]?
         var fileSearchShowInLauncher: Bool?
-        // `snippetsEnabled` is absent: an import must not enable keystroke listening.
         var customCommandsEnabled: Bool?
         var customCommandsShowInLauncher: Bool?
-        var snippetsShowInLauncher: Bool?
         // Safe to carry: it grants no permission class paste doesn't already prompt for.
         var navigationEnabled: Bool?
         var menuSearchDisabledApps: [String]?
@@ -65,7 +63,7 @@ struct SettingsBackup: Codable {
         var windowKeepsProportions: Bool?
         var windowLayoutsShowInLauncher: Bool?
         var windowRoomsShowInLauncher: Bool?
-        // Carried, unlike `snippetsEnabled`: opening a link grants no permission class of its own.
+        // Carried: opening a link grants no permission class of its own.
         var quicklinksEnabled: Bool?
         var quicklinksShowInLauncher: Bool?
         var extensionsShowInLauncher: Bool?
@@ -158,7 +156,6 @@ extension SettingsBackup {
             fileSearchShowInLauncher: s.fileSearchShowInLauncher,
             customCommandsEnabled: s.customCommandsEnabled,
             customCommandsShowInLauncher: s.customCommandsShowInLauncher,
-            snippetsShowInLauncher: s.snippetsShowInLauncher,
             navigationEnabled: s.navigationEnabled,
             menuSearchDisabledApps: s.menuSearchDisabledApps,
             menuSearchShowsAppleMenu: s.menuSearchShowsAppleMenu,
@@ -417,10 +414,6 @@ extension SettingsBackup {
         }
         if let flag = s.customCommandsShowInLauncher {
             settings.customCommandsShowInLauncher = flag
-            count += 1
-        }
-        if let flag = s.snippetsShowInLauncher {
-            settings.snippetsShowInLauncher = flag
             count += 1
         }
         if let flag = s.navigationEnabled {

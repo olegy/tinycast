@@ -22,8 +22,6 @@ enum PaletteMode: String, CaseIterable, Identifiable {
     case uninstall
     case quicklinks
     case quicklinkEditor
-    case snippets
-    case snippetEditor
     case dictionary
     case extensionCommand
     case quickAction  // mod: quick-action-screen
@@ -31,7 +29,7 @@ enum PaletteMode: String, CaseIterable, Identifiable {
     var id: String { rawValue }
 
     var isNativeEditor: Bool {
-        self == .snippetEditor || self == .quicklinkEditor || self == .eventEditor
+        self == .quicklinkEditor || self == .eventEditor
             || self == .customCommandEditor
     }
 
@@ -54,7 +52,6 @@ enum PaletteMode: String, CaseIterable, Identifiable {
         case .meetingDetails: return "calendar"
         case .uninstall: return "trash"
         case .quicklinks, .quicklinkEditor: return Quicklink.sfSymbol
-        case .snippets, .snippetEditor: return "curlybraces"
         case .dictionary: return "book.closed"
         case .extensionCommand: return "puzzlepiece.extension"
         case .quickAction: return "wand.and.sparkles"  // mod: quick-action-screen
@@ -82,8 +79,6 @@ enum PaletteMode: String, CaseIterable, Identifiable {
         case .uninstall: return String(localized: "Filter files and folders by name…")
         case .quicklinks: return String(localized: "Search quicklinks…")
         case .quicklinkEditor: return String(localized: "Quicklink editor")
-        case .snippets: return String(localized: "Search snippets…")
-        case .snippetEditor: return String(localized: "Snippet editor")
         case .dictionary: return String(localized: "Look up a word…")
         // Replaced by the command's own `searchBarPlaceholder` whenever it declares one.
         case .extensionCommand: return String(localized: "Search…")

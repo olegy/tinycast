@@ -383,8 +383,6 @@ extension View {
             .environment(core.fallbacks)
             .environment(core.customCommands)
             .environment(core.customCommandCoordinator)
-            .environment(core.snippetsStore)
-            .environment(core.snippetCoordinator)
             .environment(core.quicklinks)
             .environment(core.quicklinkCoordinator)
             .environment(core.windowLayouts)

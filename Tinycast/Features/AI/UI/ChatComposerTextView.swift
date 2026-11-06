@@ -122,7 +122,7 @@ struct ChatComposerTextView: NSViewRepresentable {
     }
 }
 
-/// Tinycast's own editor, so snippets and Quick Actions write into it in process.
+/// Tinycast's own editor, so Quick Actions write into it in process.
 final class ComposerTextView: NSTextView, InjectableTextView {
     var onDropFiles: (([URL]) -> Void)?
     var onFileDragTargeted: ((Bool) -> Void)?

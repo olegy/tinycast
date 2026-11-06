@@ -269,8 +269,6 @@ final class DeepLinkCoordinator {
         switch id {
         case .createQuicklink:
             return createQuicklinks(from: input)
-        case .createSnippet:
-            return createSnippets(from: input)
         case .aiChat:
             guard let text = input.fallbackText else { return false }
             hidePalette()
@@ -293,7 +291,6 @@ final class DeepLinkCoordinator {
         case .searchFiles: core.fileSearchCoordinator.show(query: text)
         case .define: core.dictionaryCoordinator.show(term: text)
         case .quickAI: core.quickAICoordinator.show(draft: text)
-        case .searchSnippets: core.snippetCoordinator.showSnippets(query: text)
         case .searchCustomCommands: core.customCommandCoordinator.showCustomCommands(query: text)
         case .searchMenuItems: core.menuSearchCoordinator.show(query: text)
         case .switchWindows: core.windowSwitchCoordinator.show(query: text)
@@ -320,25 +317,6 @@ final class DeepLinkCoordinator {
         return true
     }
 
-    /// As for quicklinks, with `fallbackText` as the snippet's text.
-    private func createSnippets(from input: DeepLinkInput) -> Bool {
-        if case .list(let list) = input.context {
-            let offered = list.compactMap { fields -> Snippet? in
-                guard let name = fields["name"], let text = fields["text"], !name.isEmpty, !text.isEmpty
-                else { return nil }
-                return Snippet(
-                    name: name, text: text, keyword: fields["keyword"].flatMap { $0.isEmpty ? nil : $0 })
-            }
-            Task { await core.snippetCoordinator.importSnippets(offered: offered) }
-            return true
-        }
-        let fields = input.contextFields ?? [:]
-        guard let text = fields["text"] ?? input.fallbackText else { return false }
-        core.snippetCoordinator.createSnippet(
-            name: fields["name"] ?? "", text: text, keyword: fields["keyword"] ?? "")
-        return true
-    }
-
     /// Only an app that is installed, so a link can't leave a quicklink pointing at nothing.
     private func installedBundleID(_ bundleID: String?) -> String? {
         bundleID.flatMap {
@@ -353,7 +331,7 @@ final class DeepLinkCoordinator {
             core.quicklinkCoordinator.openQuicklink(id: id, filling: text)
             return true
         }
-        let names = SnippetTemplateEngine.declaredArguments(in: quicklink.link).map(\.name)
+        let names = TemplateEngine.declaredArguments(in: quicklink.link).map(\.name)
         let values = input.fieldValues(names: names, fieldID: { names[$0] })
         core.quicklinkCoordinator.openQuicklink(id: id, values: values)
         return true

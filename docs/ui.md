@@ -111,7 +111,7 @@ groups. See "Section headers" below.
 
 `panel 26` · `row 10` · `formField 12` · `card 10` · `codeBlock 14` · `dialog 20` · `dialogSymbol 16` · `menuPanel 16` · `menu 6` · `menuRow 10` · `barControl 8` · `thumbnail 6` · `keyCap 6` · `recorderKeyCap 4`
 
-`formField` dresses the native Snippet, Quicklink, Event and Custom Command editor fields; it does not change settings controls
+`formField` dresses the native Quicklink, Event and Custom Command editor fields; it does not change settings controls
 or extension forms.
 
 Native editor fields keep the same border ink at focus, thickened to 2pt. Single-line text is centred
@@ -479,7 +479,7 @@ sole owner rule) and is the only presenter, so every confirmation in the app loo
   `HUDPresenter.extend()`, so the bar slides to its new value in place instead of replaying the
   entrance.
 - **`MessageHUDController`'s pill** is every _other_ transient
-  confirmation: Custom Commands and Snippets confirming a run, and every system action whose effect
+  confirmation: Custom Commands confirming a run, and every system action whose effect
   is invisible (`Trash Emptied`, `Hidden Files Shown`, `Bluetooth Off`). One capsule shape, sized to
   its message (`hudMaxWidth 420` ceiling), clipped to a `Capsule()`, with a plain glyph leading the
   message: `checkmark` green for `.success`, `exclamationmark` red for `.danger`,
@@ -569,11 +569,9 @@ it would couple two unrelated surfaces.
 ## Dialog accessories
 
 A dialog carries at most one control beyond its buttons, and `DialogAccessory` makes that structural
-rather than a convention — `.volume` for the Set Volume prompt, `.snippetArguments` for a snippet's
-`{argument}` values and `.clipboardText` for Edit Entry. Text fields take `dialogTextField()`;
-inline enumerated arguments are `DialogChip`s. `DialogPanel.handlesArrowKeys` is set from
-`DialogAccessory.claimsArrowKeys`, so the slider steps on ←/→ while snippet argument text fields
-keep their caret, and `acceptsLineBreaks` from the accessory of the same name, so only Edit Entry's
+rather than a convention — `.volume` for the Set Volume prompt and `.clipboardText` for Edit Entry.
+`DialogPanel.handlesArrowKeys` is set from `DialogAccessory.claimsArrowKeys`, so the slider steps on
+←/→ while a text field keeps its caret, and `acceptsLineBreaks` from the accessory of the same name, so only Edit Entry's
 `dialogTextHeight` text area takes ↵. Create Event uses the launcher form instead.
 
 The first text field or text view takes focus from `DialogController.windowDidBecomeKey`, never from

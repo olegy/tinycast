@@ -18,7 +18,6 @@ struct SettingsDetailView: View {
             case .ai: AISettingsView()
             case .quickActions: QuickActionsSettingsView()
             case .fileSearch: FileSearchSettingsView()
-            case .snippets: SnippetsSettingsView()
             case .navigation: NavigationSettingsView()
             case .windowManagement: WindowManagementSettingsView()
             case .clipboard: ClipboardSettingsView()

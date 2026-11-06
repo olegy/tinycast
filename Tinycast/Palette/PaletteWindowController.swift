@@ -407,10 +407,6 @@ final class PaletteWindowController: NSObject, NSWindowDelegate {
                 core.quicklinkCoordinator.cancelQuicklinkEditing()
                 return true
             }
-            if core.palette.mode == .snippetEditor, !core.palette.isComposing {
-                core.snippetCoordinator.cancelSnippetEditing()
-                return true
-            }
             // mod: quick-action-screen — its text view would read Escape as completion.
             if core.palette.mode == .quickAction { return core.quickActionScreen.escape() }
             return false
@@ -426,8 +422,6 @@ final class PaletteWindowController: NSObject, NSWindowDelegate {
                 switch core.palette.mode {
                 case .quicklinkEditor:
                     core.quicklinkCoordinator.saveQuicklink()
-                case .snippetEditor:
-                    core.snippetCoordinator.requestSnippetSave()
                 case .eventEditor:
                     core.calendarCoordinator.saveEvent()
                 case .customCommandEditor:

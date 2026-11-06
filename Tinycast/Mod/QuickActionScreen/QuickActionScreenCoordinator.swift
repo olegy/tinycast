@@ -264,8 +264,7 @@ final class QuickActionScreenCoordinator {
         let title = session.action.title
         finish(restoreFocus: target?.ownEditor != nil)
         core.textInjector.deliver(
-            InjectedText(text), target: target, expectedKeyword: nil, keywordLength: 0,
-            automaticGeneration: nil,
+            InjectedText(text), target: target,
             onFailed: { [weak self] in
                 _ = Paster.copyPlainText(text)
                 self?.core.showMessage(

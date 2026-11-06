@@ -33,7 +33,7 @@ reports notification-dependent checks as skipped when the session cannot deliver
 - **One command, one pane, one switch.** `SettingsTab.ownedCommands` is the whole table of which pane
   lists a command's shortcut, alias and launcher checkbox. A feature that names its commands there
   already decides whether they exist, so `Enable Commands` neither lists nor gates them — two switches
-  over one row is how somebody ends up with Snippets on and its shortcut dead. Everything the table does
+  over one row is how somebody ends up with File Search on and its shortcut dead. Everything the table does
   not name belongs to Settings › Commands and answers to that switch.
 - **The ranking lives in pure files.** `Model/LauncherMatch.swift` (the scorer),
   `Model/LauncherOrder.swift` (the comparator) and `Model/LauncherSuggestions.swift` are
@@ -44,10 +44,10 @@ reports notification-dependent checks as skipped when the session cannot deliver
   lowers it to the `SearchProfile` the comparator reads. A new naming criterion picks one of those four
   fields; needing a fifth means the criterion was modelled wrong.
 - **`EntryNaming.profile` runs over every kind, once per index change**, so a naming rule can never
-  apply to applications and quietly skip snippets — and nothing is built per keystroke. `AppIndex.scan`
+  apply to applications and quietly skip quicklinks — and nothing is built per keystroke. `AppIndex.scan`
   names the app slice on its own, off-main: transliterating a CJK index is ICU work, and
   `publishEntries` runs on the main actor whenever any unrelated slice changes.
-- **Tinycast never translates a name it did not write.** Apps, panes, quicklinks, snippets and
+- **Tinycast never translates a name it did not write.** Apps, panes, quicklinks and
   extensions read the way their source names them. A built-in command shows its translated name and
   keeps its English source as an alternate title, so `clipboard` finds it in every language.
 - **The fields stay separate.** Which field matched is half of what the comparator reads — an exact
@@ -100,7 +100,7 @@ refreshes collapse into a single trailing scan.
 | Field | What lands in it | Compared against | Ranks |
 | --- | --- | --- | --- |
 | title | the display name | the query read into Latin | yes |
-| alternate titles | the bundle's names in the user's other languages and English, a renamed bundle's file name, `CFBundleAlternateNames`, a snippet's keyword | the query as typed | yes |
+| alternate titles | the bundle's names in the user's other languages and English, a renamed bundle's file name, `CFBundleAlternateNames` | the query as typed | yes |
 | subtitle | an extension's title, or a row's own subtitle in its place | the query read into Latin | yes |
 | keywords | the declared Info.plist name, an extension command's `keywords`, a meeting's calendar, and the title and subtitle joined both ways | the query read into Latin | no — they only make an entry appear |
 
@@ -271,7 +271,7 @@ by the title's own score, then by name. The subtitle does not name the entry, so
 
 A query that *equals* a category's name lists that whole category under its section header, in the
 order the section shows when the field is empty. The section title and singular label,
-`Snippets`/`Snippet` or `Window Management`/`Window Command`, come straight from `KindDescriptor`.
+`Quicklinks`/`Quicklink` or `Window Management`/`Window Command`, come straight from `KindDescriptor`.
 An entry whose display name equals the query joins the listing: `System Settings` still shows the
 installed application above its panes.
 
@@ -361,8 +361,8 @@ never stored — same streaming window, same Stop button — so `CustomCommandCo
 shell config (`ll` should mean the reader's own alias) and takes the runner's default home directory.
 
 **The order and the checkboxes are not in a settings backup.** The fallback list is where an import
-could arm shell execution from the launcher, which is the line `snippetsEnabled` already draws:
-a flag that grants a capability is never carried by a backup.
+could arm shell execution from the launcher, and a flag that grants a capability is never carried by
+a backup.
 
 `FallbackStore` is a thin persistence shell over `Fallback.ordered(_:by:)`, which is pure and covered
 by `fallback-test`: stored ids first, then anything the order has never seen, and a stored id with
@@ -381,7 +381,7 @@ revealed: `activate` routes to `FallbackCoordinator.run` instead of `LauncherCoo
 ### User aliases
 
 `AliasStore` (`Launcher/Service/`) keeps one user-chosen alias per entry, keyed by `preferenceKey`
-like favorites and learned ranking, so every entry kind — apps, commands, quicklinks, snippets —
+like favorites and learned ranking, so every entry kind — apps, commands, quicklinks, extensions —
 can carry one. An alias is deliberate in a way no vendor field is, so an exact hit is rule 1 and a
 prefix hit rule 6. Only a hit **from its start** earns those rules; anywhere else the alias ranks as
 an alternate title by score, so `dark` finds an alias `toggle light / dark`, while `term` inside
@@ -487,7 +487,7 @@ never suggested, however often they are opened:
    faster way in;
 3. while fewer than five, built-in commands with no alias or shortcut, by
    `CommandID.suggestionPriority`: Clipboard History, Search Files, My Schedule, Search Emoji &
-   Symbols, then Create Quicklink and Create Snippet. A command whose feature is off is absent from the
+   Symbols, then Create Quicklink. A command whose feature is off is absent from the
    index, so it is never offered.
 
 A suggested entry leaves its kind section below, so no row appears twice. `AppIndex.Results` carries
@@ -507,7 +507,7 @@ permission-aware failures. With the palette closed it targets the frontmost app,
 Quit All act on the same window a palette launch would have.
 
 System actions occupy their own launcher section and their own Settings pane. The empty-query publication
-order is applications, System Settings, quicklinks, snippets, system actions, window commands, custom
+order is applications, System Settings, quicklinks, system actions, window commands, custom
 commands, then built-in commands; the sectioned view filters in that same order so the visible rows remain
 identical to the flat selection index.
 Search, favorites, visibility and learned ranking work through the normal `AppEntry` path, and every
@@ -542,7 +542,7 @@ line matters for devices that store a level slightly off the one set (45.1% for 
 the read-back level alone would aim at the same line again and never move.
 
 An action whose effect is invisible reports back through a pill (`MessageHUDController`, the same one
-Custom Commands and Snippets confirm through) rather than finishing silently:
+Custom Commands confirm through) rather than finishing silently:
 `SystemActionRunner.run` returns a `SystemActionFeedback` naming the state it landed in
 (`Trash Emptied`, `Hidden Files Shown`, `Dark Appearance`, `Bluetooth Off`, `3 Disks Ejected`), and
 `AppCore` shows it with a `DialogTone` derived from the feedback's `isNoOp` flag: `.success` when
@@ -581,8 +581,7 @@ dismissal matches Accessibility subroles rather than English labels.
 `AppIndex.setWindowCommandsVisible(_:)` and shown under a "Window Management" section. Like system
 actions they carry dedicated global hotkeys (`AppEntry.hotKeyAction` returns `.windowCommand(id:)`),
 so launcher rows render keycaps for them. Their per-command shortcut and visibility controls live in
-Settings › Window Management rather than a launcher-category pane of their own — the same call already
-made for snippets. The feature ships off. User-defined custom sizes join the same section as their
+Settings › Window Management rather than a launcher-category pane of their own. The feature ships off. User-defined custom sizes join the same section as their
 own slice, `AppIndex.setCustomWindowSizes(_:)`, published right after the catalog. See
 [window-management.md](window-management.md#custom-sizes).
 
@@ -658,7 +657,7 @@ and three places read it: `FeatureCommandsSection` draws the pane's rows from it
 category gate for it in both `isVisible` and `allowsHotKey`. Stamping the entry rather than sniffing its
 id is what keeps "which pane owns this" out of the entry-ID namespace.
 
-Ten panes own commands today — AI, Quick Actions, File Search, Snippets, Navigation,
+Nine panes own commands today — AI, Quick Actions, File Search, Navigation,
 Window Management, Clipboard, Emoji, Calendar and Quicklinks. What is left in Settings › Commands is
 the set no feature switch governs: Calculator History, Open Camera, the two backup commands, Check
 for Updates, About and Quit.
@@ -765,9 +764,8 @@ favorite, alias and learned ranking survive the round trip, and its shortcut kee
 The row is offered only where Settings can undo it, and `KindDescriptor.canHideFromSearch` is that
 rule — per kind, and a new `Kind` case has to answer it to compile. Applications, System Settings,
 Commands, Quick Actions, System Actions, Window Commands, Window Layouts, Rooms and extension commands each
-draw a per-row checkbox in their pane, so they carry it. Snippets do not: their pane lists a record
-with its own switches, not a launcher checkbox — a hide nothing in Settings can visibly undo is a
-trap, not a shortcut. Quicklinks and custom commands differ: each editor has its own **Show in root
+draw a per-row checkbox in their pane, so they carry it — a hide nothing in Settings can visibly
+undo is a trap, not a shortcut. Quicklinks and custom commands differ: each editor has its own **Show in root
 search** switch, so the row offers **Hide from Root Search** and `hideFromSearch(at:)` clears that
 `showsInRootSearch` flag instead of writing `VisibilityStore`.
 `AppActionsMenu` adds the query-driven guard the favorites row already uses: a typed URL lives only

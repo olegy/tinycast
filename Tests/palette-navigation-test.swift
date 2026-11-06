@@ -92,22 +92,22 @@ struct PaletteNavigationTests {
             "so one back step still lands on the launcher")
 
         let editing = searchingLauncher()
-        editing.push(mode: .snippets)
+        editing.push(mode: .quicklinks)
         editing.query = "sign-off"
         editing.selection = 2
-        editing.push(mode: .snippetEditor)
-        expect(editing.query.isEmpty, "the snippet editor does not inherit the browser query")
+        editing.push(mode: .quicklinkEditor)
+        expect(editing.query.isEmpty, "the quicklink editor does not inherit the browser query")
         editing.noteEditingField(true)
         expect(
-            editing.pop(preservingSelection: true) && editing.mode == .snippets && editing.query == "sign-off"
+            editing.pop(preservingSelection: true) && editing.mode == .quicklinks && editing.query == "sign-off"
                 && editing.selection == 2 && editing.restoredSelection == 2 && !editing.isEditingField,
-            "leaving a snippet editor restores its browser and releases the form keyboard")
+            "leaving a quicklink editor restores its browser and releases the form keyboard")
         editing.query = "new search"
         expect(editing.restoredSelection == nil, "typing a new query releases the restored selection")
         expect(
             editing.pop() && editing.mode == .launcher && editing.query == "clipboard",
-            "the snippet browser still returns to the launcher search")
-        editing.prepare(mode: .snippets)
+            "the quicklink browser still returns to the launcher search")
+        editing.prepare(mode: .quicklinks)
         expect(editing.restoredSelection == nil, "a fresh summon releases the restored selection")
         expect(vm.restoredSelection == nil, "other screens keep their existing navigation behaviour")
 
@@ -190,7 +190,7 @@ struct PaletteNavigationTests {
             "closing a command editor restores its browser query and selection")
         expect(commands.pop() && commands.mode == .launcher, "the command browser returns to root search")
 
-        for mode: PaletteMode in [.snippetEditor, .quicklinkEditor, .eventEditor, .customCommandEditor] {
+        for mode: PaletteMode in [.quicklinkEditor, .eventEditor, .customCommandEditor] {
             let switched = searchingLauncher()
             switched.push(mode: mode)
             switched.push(mode: .clipboard)

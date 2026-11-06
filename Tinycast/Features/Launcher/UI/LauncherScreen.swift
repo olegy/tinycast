@@ -389,11 +389,6 @@ struct LauncherScreen: PaletteScreen {
         case .quicklink:
             guard let quicklink = quicklink(for: entry) else { return false }
             core.quicklinkCoordinator.editQuicklink(quicklink)
-        case .snippet:
-            guard let id = StoredSnippet.id(fromEntryID: entry.id),
-                let record = core.snippetsStore.record(id: id)
-            else { return false }
-            core.snippetCoordinator.editSnippet(record)
         case .customCommand:
             guard let command = core.customCommands.command(entryID: entry.id) else { return false }
             core.customCommandCoordinator.editCustomCommand(command)

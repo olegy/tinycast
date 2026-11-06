@@ -81,10 +81,6 @@ struct DeepLinkTests {
         for (entryID, action) in storedRows(id: id, uuid: uuid) {
             expect(roundTrip(entryID) == action, "\(entryID) round-trips")
         }
-        let snippet = "/Users/me/Snippets/Sign off ✍️.md"
-        expect(
-            roundTrip(StoredSnippet.entryIDPrefix + snippet) == .snippet(id: snippet),
-            "a snippet's file path survives percent-encoding")
 
         expect(
             DeepLink.url(forEntryID: "command:clipboard-history", scheme: scheme)?.absoluteString
@@ -122,7 +118,6 @@ struct DeepLinkTests {
         var actions = CommandID.allCases.compactMap(\.hotKeyAction)
         actions += SystemAction.ID.allCases.map { .systemAction(id: $0) }
         actions += WindowCommand.ID.allCases.map { .windowCommand(id: $0) }
-        actions.append(.snippet(id: "/Users/me/Snippets/a.md"))
         for action in actions {
             expect(
                 action.entryID.flatMap(HotKeyAction.init(entryID:)) == action,
@@ -334,7 +329,7 @@ struct DeepLinkTests {
         expect(
             DeepLinkConsentPolicy.requiresConsent(.command(.searchFiles), input: text),
             "any input asks, since a page chose it")
-        let entryID = "snippet:/Users/me/What?.md"
+        let entryID = "extension:what?/run"
         let keyed = DeepLinkConsentPolicy.key(entryID: entryID, input: text)
         expect(
             keyed != DeepLinkConsentPolicy.key(entryID: entryID, input: plain),
@@ -345,7 +340,7 @@ struct DeepLinkTests {
                     entryID: entryID, input: DeepLinkInput(fallbackText: "~/")),
             "a grant covers only its exact input")
         let parts = DeepLinkConsentPolicy.parts(ofKey: keyed)
-        expect(parts?.entryID == entryID && parts?.input == text, "a key reads back, even with ? in a path")
+        expect(parts?.entryID == entryID && parts?.input == text, "a key reads back, even with ? in an ID")
         expect(
             DeepLinkConsentPolicy.parts(ofKey: "system-action:lock-screen")?.input == plain,
             "a plain key is the row alone")

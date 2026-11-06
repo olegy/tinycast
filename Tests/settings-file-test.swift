@@ -16,7 +16,6 @@ struct SettingsFileTest {
         try testReplace()
         try testUnreadable()
         try testSymlink()
-        try testContentFolders()
         testPaths()
 
         print(failures == 0 ? "\nALL PASSED" : "\n\(failures) FAILED")
@@ -46,13 +45,13 @@ struct SettingsFileTest {
             SettingsFileKey.sections == [
                 "general", "appearance", "calculator", "search", "applications",
                 "systemSettings", "systemActions", "commands", "quicklinks", "appleShortcuts", "ai",
-                "quickActions", "fileSearch", "snippets", "navigation",
+                "quickActions", "fileSearch", "navigation",
                 "windowManagement", "clipboard", "emoji", "calendar", "extensions"
             ])
 
         // A file that could switch one of these on would grant what only the app may ask for.
         let grantPaths = [
-            "snippets.enabled", "extensions.enabled", "calendar.enabled",
+            "extensions.enabled", "calendar.enabled",
             "calendar.autoJoinMeetings", "calendar.cameraPreview", "quickActions.enabled",
             "ai.mcpEnabled", "mcp.enabled", "clipboard.textSearchEnabled"
         ]
@@ -171,13 +170,13 @@ struct SettingsFileTest {
             check("a file that is not an object throws", error == .notAnObject(nil))
         }
 
-        let text = #"{"bogus": {}, "general": {"nope": 1, "showInMenuBar": false}, "snippets": 3}"#
+        let text = #"{"bogus": {}, "general": {"nope": 1, "showInMenuBar": false}, "quicklinks": 3}"#
         let parsed = try? SettingsFileFormat.parse(Data(text.utf8))
         check("a known key reads", parsed?.values[.showInMenuBar] == false)
         check(
             "unknown sections and keys, and a section that is no object, are each reported",
             parsed?.issues == [
-                .unknownSetting("bogus"), .unknownSetting("general.nope"), .notAnObject("snippets")
+                .unknownSetting("bogus"), .unknownSetting("general.nope"), .notAnObject("quicklinks")
             ])
         check(
             "the HUD line names the first issue and counts the rest",
@@ -333,46 +332,6 @@ struct SettingsFileTest {
     }
 
     // MARK: - Paths
-
-    private static func testContentFolders() throws {
-        let bundleID = "com.tinycast.settings-file-test.\(UUID().uuidString)"
-        let standard = AppPaths.applicationSupport(bundleID: bundleID)
-        defer { try? FileManager.default.removeItem(at: standard) }
-        let home = FileManager.default.homeDirectoryForCurrentUser.standardizedFileURL.path
-        check(
-            "no folder keeps snippets in Application Support",
-            AppPaths.contentFolder(nil, named: "Snippets", bundleID: bundleID).lastPathComponent
-                == "Snippets")
-        check(
-            "a folder under ~ reads from the home folder",
-            AppPaths.contentFolder("~/Dotfiles/snippets", named: "Snippets", bundleID: bundleID).path
-                == home + "/Dotfiles/snippets")
-        check(
-            "a relative folder is not a folder",
-            !AppPaths.isFolderPath("notes") && !AppPaths.isFolderPath("~notes"))
-
-        let folder = scratchFolder()
-        defer { try? FileManager.default.removeItem(at: folder) }
-        let target = folder.appending(path: "dotfiles/snippets")
-        let link = folder.appending(path: "Snippets")
-        try FileManager.default.createDirectory(at: target, withIntermediateDirectories: true)
-        try FileManager.default.createSymbolicLink(at: link, withDestinationURL: target)
-        check(
-            "a symlinked folder resolves to its target",
-            AppPaths.contentFolder(link.path, named: "Snippets", bundleID: bundleID).path
-                == target.resolvingSymlinksInPath().path)
-
-        let defaultFolder = AppPaths.contentFolder(nil, named: "Snippets", bundleID: bundleID)
-        check(
-            "choosing the default folder stores nothing",
-            AppPaths.contentFolderSetting(for: defaultFolder, named: "Snippets", bundleID: bundleID)
-                == nil)
-        check(
-            "choosing one in the home folder stores it under ~",
-            AppPaths.contentFolderSetting(
-                for: URL(filePath: home + "/Dotfiles/snippets"), named: "Snippets", bundleID: bundleID)
-                == "~/Dotfiles/snippets")
-    }
 
     private static func testPaths() {
         let expected = [

@@ -108,7 +108,6 @@ struct LanguageTests {
             ("system-actions-empty", "Nothing here yet.", ["fr": "Aucune action système à afficher."]),
             ("commands-empty", "Nothing here yet.", ["fr": "Aucune commande à afficher."]),
             ("apple-shortcuts-empty", "Nothing here yet.", ["fr": "Aucun raccourci à afficher."]),
-            ("snippets-use-default-folder", "Use Default", ["fr": "Utiliser le dossier par défaut"]),
             ("ai-installed-tools", "Installed", ["fr": "Outils installés"]),
             ("extensions-installed-section", "Installed", ["fr": "Extensions installées"]),
             ("extensions-install-section", "Install", ["fr": "Installation"]),

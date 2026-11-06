@@ -161,7 +161,7 @@ window's app quit between the sweep and the ↵.
   Clipboard still wraps in a `DisabledApplicationsSection` of its own.
 - Both settings ride in backups. Neither grants a permission class of its own — Accessibility is
   already required for paste — which is the call `windowManagementEnabled` made, and the opposite of
-  `snippetsEnabled`.
+  `quickActionsEnabled`.
 - **There is deliberately no "Show in launcher" switch.** The per-command checkboxes in
   `FeatureCommandsSection` already are one, and a second would be a switch over rows the pane lists.
 

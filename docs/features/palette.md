@@ -105,8 +105,6 @@ every screen but two: the clipboard lands past its pins
 | `.uninstall`           | `UninstallScreen`           | `UninstallList` (see [uninstall.md](uninstall.md))                                                       |
 | `.quicklinks`          | `QuicklinkListScreen`       | `QuicklinkList` + preview (see [quicklinks.md](quicklinks.md#search-quicklinks))                         |
 | `.quicklinkEditor`     | `QuicklinkEditorScreen`     | `QuicklinkEditorView` (see [quicklinks.md](quicklinks.md#launcher-editor))                               |
-| `.snippets`            | `SnippetsScreen`            | `SnippetsList` + preview (see [snippets.md](snippets.md#search-snippets))                                |
-| `.snippetEditor`       | `SnippetEditorScreen`       | `SnippetEditorView` (see [snippets.md](snippets.md#launcher-editor))                                     |
 | `.dictionary`          | `DictionaryScreen`          | `DictionaryEntryView` (see [dictionary.md](dictionary.md))                                               |
 | `.extensionCommand`    | `ExtensionCommandScreen`    | `ExtensionCommandView` (see [extensions.md](extensions.md))                                              |
 
@@ -250,8 +248,8 @@ button per configured `AppSettings.compactBarCommands` entry whose feature
 `AppIndex.isCommandEnabled` reports on. General settings shows **Compact Shortcuts** only
 when Compact is selected: an ordered list of zero to four unique commands, with add, replace,
 remove and move controls. The default is Clipboard History and Emoji & Symbols, both on for a new
-install, then Search Files and Search Quicklinks; Search Snippets, My Schedule and Quick AI
-are also available. Disabled features retain their configured positions but disappear from the
+install, then Search Files and Search Quicklinks; My Schedule and Quick AI are also
+available. Disabled features retain their configured positions but disappear from the
 bar until re-enabled; Settings still offers them, under **Off** in both menus and marked Off in the
 list, so a slot can be ready before its feature is.
 The ordered command identifiers persist in preferences, backups and `appearance.compactBarCommands`

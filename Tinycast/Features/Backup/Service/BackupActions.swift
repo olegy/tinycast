@@ -129,14 +129,12 @@ enum BackupActions {
         }
         var imported: [String] = []
         if summary.clipboard > 0 { imported.append(String(localized: "\(summary.clipboard) clips")) }
-        if summary.snippets > 0 { imported.append(String(localized: "\(summary.snippets) snippets")) }
         if summary.learning > 0 {
             imported.append(String(localized: "\(summary.learning) learning records"))
         }
         if !imported.isEmpty {
             parts.append(String(localized: "Imported \(imported.formatted(.list(type: .and)))."))
         }
-        if summary.snippetsNeedEnabling { parts.append(snippetsNeedEnablingText) }
         parts.append(contentsOf: summary.problems)
         return parts.isEmpty ? nothingImportedText : parts.joined(separator: " ")
     }
@@ -154,10 +152,6 @@ enum BackupActions {
     }
 
     static let nothingImportedText = String(localized: "Nothing to import from this file.")
-
-    /// No import may grant keystroke listening, so say the switch an imported keyword needs is off.
-    private static let snippetsNeedEnablingText =
-        String(localized: "Turn on Snippets in Settings to use their keywords.")
 
     /// nil when no settings applied, so a caller can compose one combined sentence.
     static func appliedText(_ s: SettingsBackup.ApplySummary) -> String? {

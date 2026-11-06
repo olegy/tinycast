@@ -44,7 +44,7 @@ final class QuicklinkStore {
         if !isAvailable { closeDatabase() }
     }
 
-    /// Under Application Support, the same per-channel root snippets use.
+    /// Under Application Support, in the per-channel root.
     private static var defaultDirectory: URL {
         let bundleID = Bundle.main.bundleIdentifier ?? "com.olegy.tinycast"
         return FileManager.default

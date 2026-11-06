@@ -18,7 +18,7 @@ every shortcut without re-registering.
 - **`Model/` stays Foundation-only (plus SQLite3) and pure** for `quicklink-test` — the home directory is
   injected, never read. `Service/QuicklinkLauncher` owns every `NSWorkspace` call.
 - **Drawing an argument field reads nothing.** The header's chips come from
-  `SnippetTemplateEngine.declaredArguments(in:)`, a parse of the template alone, so moving the
+  `TemplateEngine.declaredArguments(in:)`, a parse of the template alone, so moving the
   selection never touches the clipboard or the frontmost app's selection. Only opening does.
 - **`Quicklink.precedes` is the one display order**, sorted through by both the store and the `AppIndex`
   slice.
@@ -27,7 +27,7 @@ every shortcut without re-registering.
   attached — name, link, alias, shortcut, favorite slot, ranking — stays exactly as it was. The
   **Settings → Quicklinks** row is the one place that turns it back on, through the checkbox launcher
   items and custom commands carry: last in the row, dimming the alias field and shortcut recorder.
-- **There is one template engine.** Quicklinks expand through `SnippetTemplateEngine` rather than a
+- **There is one template engine.** Quicklinks expand through `TemplateEngine` rather than a
   second parser, which is what makes `| raw` mean something — it opts a value out of the automatic
   percent-encoding a URL destination asks for. `{selectedText}` is accepted as an alias for
   `{selection}`, but nothing ever *writes* it.
@@ -65,10 +65,47 @@ before the placeholders are resolved.
 
 ## Placeholders
 
-Quicklinks reuse Tinycast's one template engine — the same
-[`SnippetTemplateEngine`](snippets.md#template-tokens) snippets use, so every token and every modifier
-is available and there is no second parser to keep in sync. `{cursor}` and `{snippet:…}` are text
-concerns with nothing to resolve against in a destination, so they are left literal.
+Quicklinks expand through Tinycast's one template engine, `Templates/Model/TemplateEngine.swift`.
+It is Foundation-only and receives one captured expansion context — clipboard history, selected text,
+clock, calendar, locale, time zone and a UUID source — so the whole placeholder surface is covered by
+`template-test`. `{cursor}` is a text concern with nothing to mark in a destination.
+
+The token set follows [Raycast's dynamic placeholders](https://manual.raycast.com/dynamic-placeholders)
+so a template copied from Raycast keeps working.
+
+| Token                                      | Result                                                                                                                                                                                                             |
+| ------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `{clipboard}`                              | Captured plain-text clipboard value                                                                                                                                                                                |
+| `{clipboard offset=1}`                     | Nth most recent clipboard text; `offset=1` is the one before the current                                                                                                                                           |
+| `{selection}` · `{selectedText}`           | Captured selected text from the target app, when Accessibility can read it. `{selectedText}` is Raycast's spelling, accepted on the way in; `{selection}` is the canonical one and the only one **Insert…** writes |
+| `{date}` · `{time}` · `{datetime}`         | Captured date / time / both, in the context locale                                                                                                                                                                 |
+| `{day}`                                    | Weekday name                                                                                                                                                                                                       |
+| `{uuid}`                                   | A fresh UUID per token                                                                                                                                                                                             |
+| `{date format="yyyy-MM-dd"}`               | Any `DateFormatter` format                                                                                                                                                                                         |
+| `{date locale="fr-FR"}`                    | Renders in another locale; cannot be combined with `format`                                                                                                                                                        |
+| `{time offset="+3h +30m"}`                 | Signed offsets, space-separated: `m` minutes, `h` hours, `d` days, `M` months, `y` years                                                                                                                           |
+| `{argument}` · `{query}`                   | An argument named `Argument`. `{query}` is Raycast's spelling, accepted on the way in; `{argument}` is the canonical one and the only one **Insert…** writes                                                         |
+| `{argument name="Recipient"}`              | A named argument requested before expansion                                                                                                                                                                        |
+| `{argument default="Hi"}`                  | Optional argument — the default expands without prompting                                                                                                                                                          |
+| `{argument options="a, b, c"}`             | The prompt offers a picker instead of a text field                                                                                                                                                                 |
+| `{cursor}`                                 | Final insertion point                                                                                                                                                                                              |
+
+The editor's **Insert…** menu lists every token above; parameters and modifiers are typed by hand. A
+parameter value needs quotes only to carry a `|`: an unquoted one runs to the next `key=`, so
+`{date format=MMMM d, yyyy}` keeps its spaces the way Raycast writes it.
+
+Any value-producing token accepts a modifier pipeline, applied left to right:
+`{clipboard | trim | uppercase}`. The modifiers are `uppercase`, `lowercase`, `trim`,
+`percent-encode` (escapes everything outside RFC 3986's unreserved set), `json-stringify` (escapes for
+use _inside_ a JSON string, without adding the quotes), and `raw`, which opts a value out of any
+automatic formatting the _result_ asks for. A quicklink expanding into a URL percent-encodes every
+value, and `raw` is how a template opts one out. `{cursor}` is structural, so it takes no modifiers.
+
+A token Tinycast cannot parse — an unknown name, an unknown modifier, a duplicated or unsupported
+parameter, an unterminated quote — is left in the text exactly as written rather than silently
+dropped. `{browser-tab}`, `{calculator}` and `{snippet:…}` are not supported, and stay literal.
+
+
 
 ```text
 https://google.com/search?q={argument}
@@ -105,7 +142,7 @@ to the palette and are described in
 answer means.
 
 The fields are exactly the `{argument}`s the link declares, read straight off the template by
-`SnippetTemplateEngine.declaredArguments(in:)` — a pure parse, so nothing is expanded and no clipboard
+`TemplateEngine.declaredArguments(in:)` — a pure parse, so nothing is expanded and no clipboard
 is read to draw a chip. An argument with a `default=` is still offered, as an optional chip: left
 empty, the default fills it, so a default is a starting value rather than a fixed one. It stays owed
 if any occurrence of that name lacks a `default=`, because expansion falls back per occurrence.
@@ -171,7 +208,7 @@ Tinycast's own dialog and leaves no partial state.
 ## Search and pinning
 
 Quicklinks are their own `AppEntry.Kind`, their own `AppIndex` slice and their own launcher section,
-between System Settings and Snippets. Only the **name** is indexed; the destination is not searchable
+between System Settings and System Actions. Only the **name** is indexed; the destination is not searchable
 (a URL is a subsequence of almost any query) — beside the name, a quicklink answers to whatever
 [user alias](launcher.md#user-aliases) its Settings row carries, which is why a hidden one dims the
 field. Per-quicklink "Show in root search" filters the slice;
@@ -195,7 +232,7 @@ A root-search row's ⌘K menu adds **Copy Link** (`⌃⌘C`), copying the saved 
 ## Search Quicklinks
 
 `PaletteMode.quicklinks` is a sub-screen reached from the `Search Quicklinks` command. It is shaped
-like Search Snippets and the clipboard: the list on the left, a **detail pane** on the right showing
+like the clipboard: the list on the left, a **detail pane** on the right showing
 the selected quicklink's glyph over an Information block (name, link, the app it opens with, its
 shortcut, when it was created). Like Calculator History it stays out of the Tab cycle and exits via the
 back chevron or a bare backspace.
@@ -282,8 +319,8 @@ takes a fresh identity for every entry, so it can never collide with a shortcut 
 owns.
 
 Quicklinks and their bindings also ride in native settings backups, and the settings flags with them.
-Unlike `snippetsEnabled`, `quicklinksEnabled` grants no permission class and enables no listening, so
-excluding it would be cargo-culting.
+`quicklinksEnabled` grants no permission class and enables no listening, so excluding it would be
+cargo-culting.
 
 ## Standalone harness
 

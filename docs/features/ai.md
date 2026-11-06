@@ -590,7 +590,7 @@ and the Actions menu's own chords, and dies with the window.
   the refusals a paste does. The text field takes a file drop itself and hands it to the same
   attach, since an `NSTextView` would otherwise type the file's path. The unsent text lives on `AIChatState.draft`, so it survives closing
   the window.
-- **The field is a `ComposerTextView`, an `InjectableTextView`,** so snippets and Quick Actions
+- **The field is a `ComposerTextView`, an `InjectableTextView`,** so Quick Actions and quicklinks
   write into it in process.
 
 `AIChatState` turns provider-neutral stream events into one live assistant message. Thinking state is

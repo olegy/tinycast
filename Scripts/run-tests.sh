@@ -176,7 +176,6 @@ run launcher-settings-file-test \
                            Tinycast/Features/Quicklinks/Model/QuicklinkDestination.swift \
                            Tinycast/Features/SystemActions/Model/SystemAction.swift \
                            Tinycast/Features/WindowManagement/Model/WindowCommand.swift \
-                           Tinycast/Features/Snippets/Model/Snippet.swift \
                            Tinycast/Platform/LocalizedResource.swift
 run apple-shortcut-test    Tinycast/Features/AppleShortcuts/Model/*.swift
 run calc-test              Tinycast/Features/Calculator/Model/*.swift
@@ -350,7 +349,6 @@ run compact-bar-test       Tinycast/Features/Launcher/Model/CompactBarSelection.
                            Tinycast/Features/Quicklinks/Model/QuicklinkDestination.swift \
                            Tinycast/Features/SystemActions/Model/SystemAction.swift \
                            Tinycast/Features/WindowManagement/Model/WindowCommand.swift \
-                           Tinycast/Features/Snippets/Model/Snippet.swift \
                            Tinycast/Platform/LocalizedResource.swift
 run fallback-test          Tinycast/Features/Launcher/Model/Fallback.swift \
                            Tinycast/Features/Launcher/Model/CommandID.swift \
@@ -362,7 +360,6 @@ run fallback-test          Tinycast/Features/Launcher/Model/Fallback.swift \
                            Tinycast/Features/Quicklinks/Model/QuicklinkDestination.swift \
                            Tinycast/Features/SystemActions/Model/SystemAction.swift \
                            Tinycast/Features/WindowManagement/Model/WindowCommand.swift \
-                           Tinycast/Features/Snippets/Model/Snippet.swift \
                            Tinycast/Platform/LocalizedResource.swift
 run dictionary-test        Tinycast/Features/Dictionary/Model/DictionaryEntry.swift \
                            Tinycast/Features/Dictionary/Model/DictionaryMarkup.swift
@@ -383,7 +380,6 @@ run hotkey-test            Tinycast/Features/HotKeys/Model/DoubleTapModifier.swi
                            Tinycast/Features/Quicklinks/Model/QuicklinkDestination.swift \
                            Tinycast/Features/SystemActions/Model/SystemAction.swift \
                            Tinycast/Features/WindowManagement/Model/WindowCommand.swift \
-                           Tinycast/Features/Snippets/Model/Snippet.swift \
                            Tinycast/Platform/LocalizedResource.swift
 run callout-test          Tinycast/Platform/Appearance.swift \
                            Tinycast/DesignSystem/Theme.swift Tinycast/Features/Settings/RaycastThemeCore.swift \
@@ -466,7 +462,6 @@ run deeplink-test          Tinycast/Features/DeepLinks/Model/DeepLink.swift \
                            Tinycast/Features/SystemActions/Model/SystemAction.swift \
                            Tinycast/Features/CustomCommands/Model/CustomCommand.swift \
                            Tinycast/Features/AppleShortcuts/Model/AppleShortcut.swift \
-                           Tinycast/Features/Snippets/Model/Snippet.swift \
                            Tinycast/Features/WindowManagement/Model/WindowCommand.swift \
                            Tinycast/Features/WindowManagement/Model/WindowCycle.swift \
                            Tinycast/Features/WindowManagement/Model/WindowPlacementEngine.swift \
@@ -546,14 +541,10 @@ run quicklink-coordinator-test Tinycast/Features/Quicklinks/Model/Quicklink.swif
                            Tinycast/Features/Quicklinks/UI/QuicklinkCoordinator.swift \
                            Tinycast/Features/Quicklinks/UI/QuicklinkEditorSession.swift \
                            Tinycast/Features/Quicklinks/UI/QuicklinkArgumentsAccessory.swift \
-                           Tinycast/Features/Snippets/Model/Snippet.swift \
-                           Tinycast/Features/Snippets/Model/SnippetTemplateEngine.swift
-run slow snippets-test     Tinycast/Platform/NotificationToken.swift \
-                           Tinycast/Platform/HealthTicker.swift \
-                           Tinycast/Platform/AccessibilityText.swift \
-                           Tinycast/Features/Snippets/Model/*.swift \
-                           Tinycast/Features/Snippets/Service/*.swift \
-                           Tinycast/Features/Snippets/UI/SnippetEditorSession.swift \
+                           Tinycast/Features/Templates/Model/TemplateEngine.swift
+run template-test          Tinycast/Features/Templates/Model/TemplateEngine.swift
+run text-injection-test    Tinycast/Platform/AccessibilityText.swift \
+                           Tinycast/Features/Templates/Model/TemplateEngine.swift \
                            Tinycast/Features/TextInjection/Service/*.swift
 run settings-backup-test   Tinycast/Features/Settings/AppSettingsKey.swift \
                            Tinycast/Features/Backup/Model/SettingsBackupCoverage.swift
@@ -562,6 +553,9 @@ run settings-file-test     Tinycast/Features/Settings/Model/*.swift \
                            Tinycast/Features/Settings/Service/SettingsFileRepository.swift \
                            Tinycast/Platform/AppPaths.swift
 run compact-favorites-migration-test Tinycast/Migrations/CompactFavoritesMigration.swift \
+                           Tinycast/Features/Settings/Model/*.swift \
+                           Tinycast/Platform/AppPaths.swift
+run snippets-removal-migration-test Tinycast/Migrations/SnippetsRemovalMigration.swift \
                            Tinycast/Features/Settings/Model/*.swift \
                            Tinycast/Platform/AppPaths.swift
 run backup-archive-test   Tinycast/Platform/AppPaths.swift \

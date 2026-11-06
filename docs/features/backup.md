@@ -3,8 +3,9 @@
 Export and import of Tinycast's own data as a single `.tinycast` file. The feature lives in
 `Features/Backup/`.
 
-A backup carries four independently selectable categories, ticked on export and again on import:
-**Settings & Shortcuts**, **Clipboard History**, **Snippets** and **Launcher Learning**.
+A backup carries three independently selectable categories, ticked on export and again on import:
+**Settings & Shortcuts**, **Clipboard History** and **Launcher Learning**. A category an older
+backup carries that this build no longer knows, such as `snippets`, is ignored.
 
 ## Invariants
 
@@ -13,19 +14,18 @@ A backup carries four independently selectable categories, ticked on export and 
   which are sourced from somewhere other than `UserDefaults`, and which are excluded **with a reason**.
   `settings-backup-test` fails when a key is none of those. Adding a setting means editing
   `SettingsBackupCoverage` in the same commit.
-- **`snippetsEnabled` is excluded, and that is a security control.** It doubles as consent to keystroke
-  listening, so an imported file must not be able to grant it. A `Mirror` or a macro is the wrong
-  answer: neither can be read to check what is covered.
+- **`quickActionsEnabled` is excluded, and that is a security control.** It doubles as consent to
+  reading and replacing text in other apps, so an imported file must not be able to grant it. A
+  `Mirror` or a macro is the wrong answer: neither can be read to check what is covered.
 - **A flag that grants a capability is never carried by a backup**, whether it is excluded from
-  `SettingsBackupCoverage` like `snippetsEnabled` or kept out of `AppSettings` entirely. Importing a
+  `SettingsBackupCoverage` like `quickActionsEnabled` or kept out of `AppSettings` entirely. Importing a
   config must not be able to grant something the user never granted. `FallbackStore` is the second
   case: its order and checkboxes live on their own `UserDefaults` keys precisely so an import cannot
   arm **Run Shell Command** in someone's launcher. This change adds *content*, never a capability.
 - **No absolute path may enter a `.tinycast`.** A clip's `imagePath` names a file on the Mac that wrote
   it, so `BackupClipboardItem` carries a bundle-relative `imageName` instead. `backup-archive-test`
   asserts the produced file contains neither `/Users` nor `/Library` — the analogue of
-  `settings-backup-test`'s `snippetsEnabled` check, and for the same reason: this file gets sent to
-  people.
+  `settings-backup-test`'s capability checks, and for the same reason: this file gets sent to people.
 - **The file carries a format version and a reader accepts only its own.** That is a guard, not a
   migration: the comparison is `==`, so an older and a newer file fail identically and by the same
   statement. Writing it any other way is the first line of a backup-format migration, and there is none.
@@ -61,7 +61,6 @@ manifest.json              format, app version, createdAt, per-category counts
 settings.json              SettingsBackup, exactly as it encoded before
 clipboard/items.jsonl      one clip per line
 clipboard/images/<uuid>.png
-snippets/<name>.md         copied verbatim
 learning/{ranking,emoji,calculator}.json
 ```
 
@@ -83,8 +82,7 @@ payload and are already compressed.
 **Extraction is filtered, not trusted.** `BackupArchive.open` passes an `ArchiveHeader.EntryFilter`
 that returns `.skip` for any entry whose path is absolute or contains `..`, and then refuses an extract
 holding a symbolic link — a link entry names no `..` at all, so the path filter passes it, and reading
-through one would leave the tree the caller chose. Composing resolves a link for the same reason, so a
-symlinked snippet travels as a file. `backup-archive-test` builds both hostile archives header-by-header
+through one would leave the tree the caller chose. `backup-archive-test` builds both hostile archives header-by-header
 and asserts nothing escapes.
 
 **Staging lives in `Caches`, not `temporaryDirectory`.** It has to sit on the same volume as
@@ -103,7 +101,7 @@ anything a day old on the next run, since a run killed mid-flight leaves its tre
 
 `settings-backup-test` asserts that every `AppSettingsKey` appears in exactly one table, that no field
 claims a key twice, that every exclusion names a real key and carries a non-empty reason, and that each
-capability-granting key — `snippetsEnabled`, `extensionsEnabled`, `calendarEnabled`,
+capability-granting key — `extensionsEnabled`, `calendarEnabled`,
 `autoJoinMeetings`, `cameraPreview`, `quickActionsEnabled` — is named individually as excluded. The
 duplication between `AppSettings` and this file is the point: it forces a decision about every new
 setting rather than defaulting it into a backup.
@@ -123,8 +121,6 @@ Per category:
   UI. A row is deduped on its text, or on the path its image takes; the blob keeps the name the bundle
   gave it, so importing one file twice lands on the same path and adds nothing. Only a file inside
   `imagesDir` is one retention can ever reclaim, which is why the blob moves there before the row lands.
-- **Snippets** merge through `importSnippets`, deduped on name and body so importing the same file
-  twice doesn't leave a second copy of everything. Importing snippets does not enable snippets.
 - **Learning** replaces. Merging two Macs' frecency tables produces a table describing neither.
 
 An `id` never travels with a clip: `items.id` is `UNIQUE`, so a re-import minting fresh identities is

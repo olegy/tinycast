@@ -163,7 +163,7 @@ struct OnboardingView: View {
                 OnboardingRow(
                     title: String(localized: "Accessibility"),
                     subtitle: String(
-                        localized: "Allows pasting clipboard items and expanded snippets into active apps."),
+                        localized: "Allows pasting clipboard items and quicklinks into active apps."),
                     systemImage: "accessibility", tint: .blue
                 ) {
                     statusBadge
