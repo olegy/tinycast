@@ -43,7 +43,7 @@ enum CommandID: String, CaseIterable, Sendable {
     case about = "command:about"
     case quit = "command:quit"
 
-    var name: String { String(localized: nameResource) }
+    var name: String { nameResource.resolved() }
 
     var englishName: String { nameResource.key }
 
