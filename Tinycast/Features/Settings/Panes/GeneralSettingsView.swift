@@ -83,11 +83,11 @@ struct GeneralSettingsView: View {
                 }
                 InterfaceSizeRow()
                 WindowModeRow()
-                Toggle(isOn: $settings.showFavoritesInCompactMode) {
-                    SettingsRowTitle(.generalAppearance, "Show favorites in compact mode")
-                    Text("Launch them with ⌘1–⌘5.")
-                }
-                .settingsEnabled(settings.compactMode)
+                    .background {
+                        if !settings.compactMode {
+                            Color.clear.settingsAnchor(.generalCompactShortcuts)
+                        }
+                    }
                 Toggle(isOn: $settings.openOnCursorScreen) {
                     SettingsRowTitle(.generalAppearance, "Follow the cursor across displays")
                 }
@@ -98,6 +98,8 @@ struct GeneralSettingsView: View {
             } header: {
                 SettingsSectionHeader(.generalAppearance)
             }
+
+            if settings.compactMode { CompactShortcutsSection() }
 
             Section {
                 Picker(selection: $settings.calcNumberStyle) {

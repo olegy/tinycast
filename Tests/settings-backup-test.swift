@@ -56,6 +56,9 @@ struct SettingsBackupTest {
             "removed default ignore patterns ride the settings backup",
             mirrored["fileSearchRemovedDefaultPatterns"] == .fileSearchRemovedDefaultPatterns)
         check(
+            "compact shortcuts ride the settings backup",
+            mirrored["compactBarCommands"] == .compactBarCommands)
+        check(
             "clipboard enablement rides the settings backup",
             mirrored["clipboardEnabled"] == .clipboardEnabled)
         check(

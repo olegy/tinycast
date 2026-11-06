@@ -18,6 +18,7 @@ extension SettingsAnchor {
     static let generalGlobalShortcuts = Self(tab: .general, title: "Global Shortcuts")
     static let generalSearch = Self(tab: .general, title: "Search")
     static let generalAppearance = Self(tab: .general, title: "Appearance")
+    static let generalCompactShortcuts = Self(tab: .general, title: "Compact Shortcuts")
     static let generalCalculator = Self(tab: .general, title: "Calculator")
     static let generalGeneral = Self(tab: .general, title: "General")
 
