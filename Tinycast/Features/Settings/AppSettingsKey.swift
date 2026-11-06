@@ -97,4 +97,5 @@ enum AppSettingsKey: String, CaseIterable {
     case quickActionInstructions = "quickActionInstructions"
     case quickActionLanguage = "quickActionLanguage"
     case settingsFileEnabled = "settingsFileEnabled"
+    case allowedDeepLinks = "allowedDeepLinks"
 }

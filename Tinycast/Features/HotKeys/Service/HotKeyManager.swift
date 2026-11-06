@@ -239,7 +239,7 @@ final class HotKeyManager {
         return actions
     }
 
-    private func displayName(of action: HotKeyAction) -> String {
+    func displayName(of action: HotKeyAction) -> String {
         switch action {
         case .togglePalette:
             return String(localized: "App Launcher")
@@ -290,7 +290,7 @@ final class HotKeyManager {
         modifierTapMonitor.update(bound: Set(modifierTaps.keys))
     }
 
-    private func perform(_ action: HotKeyAction) {
+    func perform(_ action: HotKeyAction) {
         // The category switch, the way each feature switch already guards its own funnel.
         guard allowsAction?(action) ?? true else { return }
         switch action {
