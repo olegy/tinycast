@@ -11,6 +11,7 @@ offers.
   microphone permission.
 - **Hyper Key** is gone.
 - **Raycast import** is gone.
+- **Notes** are gone completely.
 - Commands cleanup.
 
 ### Settings
@@ -21,38 +22,6 @@ offers.
 
 - **Form fields keep their focus.** A text field in a launcher form no longer reports losing focus
   each time the form redraws while you type in it.
-
-### Notes
-
-- **Text Size.** A slider in Settings > Notes makes a note's text larger, in four steps from today's
-  size up to 23 points. Headings grow with it; the window's title and footer stay as they are.
-- **Show Character Count** can now be turned off in Settings > Notes.
-- **Lighter headings and roomier lines.** Headings are semibold and closer to the body's size, so a
-  second-level heading no longer reads like a first, and lines have more space between them.
-- **Inline code** in a note sits on a rounded chip with room on both sides, in slightly smaller type.
-- **Selected text in a note** is highlighted in the system's highlight colour instead of grey.
-- **Fit Window to Text** in Settings > Notes can be turned off, so the note window keeps the
-  width and height you set instead of growing and shrinking with the text.
-- **⌘D selects the word** under the caret, including when the caret sits right after it.
-- **⌘Z works on any keyboard layout.** Undo, redo and the formatting shortcuts in a note, AI
-  Chat's composer and the other text areas no longer stop working while non-Latin layout is active.
-- **Pasting a list item into an empty one** no longer doubles its bullet.
-- **The caret stays after a list bullet.** Moving to the start of a list line with the keyboard
-  stops where a click would, so Backspace removes the bullet instead of joining the line to the one
-  above.
-- **Standard window.** Settings > Notes > Window can make the note an ordinary window that other
-  apps cover and that stays on its own Space, instead of floating above everything.
-- **Paper.** The note can be written on Glass, as before, Frosted, Solid, Cream or White, and the
-  first three take an optional tint.
-- **Show Title Bar Buttons** can be turned off, leaving a slimmer title bar with just the window
-  buttons and the note's title.
-- **⌃⌘↑ and ⌃⌘↓ move a list item** up or down among its siblings, nested items with it.
-- **⌘] and ⌘[ indent and outdent** a list item, like Tab and Shift-Tab.
-- **⌘T opens the note switcher**, instead of ⌘P.
-- **Notes are listed by name** rather than by when they were last changed.
-- **F1 and F2 switch to the previous and next note**, wrapping around at either end, and the title
-  shows the note's place in the folder, such as `• 3/7`, when there is more than one.
-- **⌃X moves the open note to the Trash**, after the same confirmation as the switcher's Trash button.
 
 ## 0.12.1-lite.1
 

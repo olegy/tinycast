@@ -62,29 +62,6 @@ enum Theme {
     enum Size {
         static let panelWidth: CGFloat = 750
         static let panelHeight: CGFloat = 475
-        /// Opening size on a first run and the floor: below it the title bar's own parts collide.
-        static let noteWindow = CGSize(width: 440, height: 180)
-        static let noteWindowMaxHeight: CGFloat = 860
-        static let noteEditorInset: CGFloat = 16
-        /// Shorter than the horizontal inset, so the first line sits close under the title bar.
-        static let noteEditorTopInset: CGFloat = 6
-        static let noteSearchHeight: CGFloat = 34
-        /// The switcher popover, sized independently of a note window that can be 180pt tall.
-        static let noteSwitcher = CGSize(width: 300, height: 240)
-        static let noteSwitcherEmptyHeight: CGFloat = 96
-        static let noteSwitcherDrop: CGFloat = 56
-        /// Fixed like every menu's width; the height is exactly four heading rows.
-        static let noteHeadingMenu = CGSize(
-            width: 220, height: menuRowHeight * 4 + menuRowSpacing * 3 + Spacing.sm * 2)
-        static let noteFooterHeight: CGFloat = 28
-        /// Holds the launcher's 36-point action capsule with the same margin its own bar gives it.
-        static let noteTitlebar: CGFloat = 52
-        /// Without its buttons, the band only has to hold the traffic lights and the title.
-        static let noteCompactTitlebar: CGFloat = 32
-        /// Symmetric, so the title stays centred on the window while clearing lights and capsule.
-        static let noteTitleInset: CGFloat = 120
-        /// Nine points crowds the palette's 26-point corner, so Notes seats its lights further in.
-        static let noteTrafficLightInset: CGFloat = 20
         /// Fraction of visible height above the palette's top edge; it grows downward.
         static let paletteTopMarginFraction: CGFloat = 0.18
         static let headerHeight: CGFloat = 44
@@ -128,8 +105,6 @@ enum Theme {
         static let compactKeyCap: CGFloat = 15
         static let heroKeyCap: CGFloat = 22
         static let menuButton: CGFloat = 36
-        static let noteGlyph: CGFloat = 16
-        static let noteEmptyGlyph: CGFloat = 28
         /// Hit target for a chat message footer glyph; its caption symbol floats inside it.
         static let chatMessageAction: CGFloat = 16
         static let hairline: CGFloat = 1
@@ -368,7 +343,6 @@ enum Theme {
         static let menuIcon = Font.body
         static let menuSymbolSize: CGFloat = 14
         static let menuSymbolWeight = Font.Weight.medium
-        static let noteTitle = Font.headline
         static let composerSymbol = Font.system(size: 13, weight: .medium)
         static let composerSend = Font.system(size: 13, weight: .bold)
         static let composerStop = Font.system(size: 10, weight: .bold)
@@ -437,7 +411,6 @@ enum Theme {
         static var textSecondary: Color { ramp(dark: 0.60, light: 0.60) }
         static var textTertiary: Color { ramp(dark: 0.40, light: 0.42) }
         static var menuSymbol: Color { ramp(dark: 0.70, light: 0.70) }
-        static var noteText: Color { ramp(dark: 0.90, light: 0.85) }
         static var iconPlaceholder: Color { ramp(dark: 0.06, light: 0.06) }
         static var sheen: Color { ramp(dark: 0.04, light: 0.04) }
         /// The Settings card: a faint surface whose border doubles as the row divider.
@@ -487,30 +460,6 @@ enum Theme {
         /// The command output window's page: a flat surface the log sits directly on.
         static let terminalSurface = adaptive(
             dark: .srgbInk(0.07, alpha: 1), light: .srgbInk(0.99, alpha: 1))
-
-        /// Notes' papers: the opaque ones are light in either appearance, so they are literals.
-        enum NotePaper {
-            static let solid = Color(nsColor: .windowBackgroundColor)
-            static let cream = Color(red: 0.969, green: 0.941, blue: 0.882)
-            static let white = Color.white
-            /// The header and footer strips: a neighbouring tone, since a strip of the page's own
-            /// colour would vanish into it.
-            static let systemChrome = Color(nsColor: .windowBackgroundColor)
-            static let creamChrome = Color(red: 0.922, green: 0.882, blue: 0.808)
-            static let whiteChrome = Color(red: 0.945, green: 0.945, blue: 0.961)
-            static let headerOpacity = 0.8
-            static let footerOpacity = 0.6
-        }
-
-        /// Washes, not papers: at this opacity the ink keeps its contrast in either appearance.
-        enum NoteTint {
-            static let opacity = 0.12
-            static let graphite = Color(red: 0.180, green: 0.190, blue: 0.220)
-            static let amber = Color(red: 0.870, green: 0.640, blue: 0.310)
-            static let rose = Color(red: 0.850, green: 0.420, blue: 0.480)
-            static let moss = Color(red: 0.470, green: 0.640, blue: 0.450)
-            static let indigo = Color(red: 0.430, green: 0.480, blue: 0.780)
-        }
 
         enum Syntax {
             static let keyword = pair(dark: 0xFC5FA3, light: 0xAD3DA4)

@@ -320,51 +320,6 @@ final class AppSettings {
         }
     }
 
-    var notesEnabled: Bool {
-        didSet { defaults.set(notesEnabled, forKey: Key.notesEnabled.rawValue) }
-    }
-
-    var notesRendersMarkdown: Bool {
-        didSet { defaults.set(notesRendersMarkdown, forKey: Key.notesRendersMarkdown.rawValue) }
-    }
-
-    var notesFitsWindowToText: Bool {
-        didSet { defaults.set(notesFitsWindowToText, forKey: Key.notesFitsWindowToText.rawValue) }
-    }
-
-    var notesShowsFormattingBar: Bool {
-        didSet { defaults.set(notesShowsFormattingBar, forKey: Key.notesShowsFormattingBar.rawValue) }
-    }
-
-    var notesShowsCharacterCount: Bool {
-        didSet { defaults.set(notesShowsCharacterCount, forKey: Key.notesShowsCharacterCount.rawValue) }
-    }
-
-    var notesTextSize: NoteTextSize {
-        didSet { defaults.set(notesTextSize.rawValue, forKey: Key.notesTextSize.rawValue) }
-    }
-
-    var notesWindowMode: NoteWindowMode {
-        didSet { defaults.set(notesWindowMode.rawValue, forKey: Key.notesWindowMode.rawValue) }
-    }
-
-    var notesPaper: NotePaper {
-        didSet { defaults.set(notesPaper.rawValue, forKey: Key.notesPaper.rawValue) }
-    }
-
-    var notesTint: NoteTint {
-        didSet { defaults.set(notesTint.rawValue, forKey: Key.notesTint.rawValue) }
-    }
-
-    var notesShowsTitleBarButtons: Bool {
-        didSet { defaults.set(notesShowsTitleBarButtons, forKey: Key.notesShowsTitleBarButtons.rawValue) }
-    }
-
-    /// The notes folder as the user wrote it, `~` allowed; nil keeps it in Application Support.
-    var notesFolder: String? {
-        didSet { defaults.set(notesFolder, forKey: Key.notesFolder.rawValue) }
-    }
-
     /// Off by default: connecting a server is consent to run code Tinycast did not write.
     var mcpEnabled: Bool {
         didSet { defaults.set(mcpEnabled, forKey: Key.mcpEnabled.rawValue) }
@@ -705,30 +660,6 @@ final class AppSettings {
         fileSearchRemovedDefaultPatterns =
             defaults.stringArray(forKey: Key.fileSearchRemovedDefaultPatterns.rawValue) ?? []
         fileSearchShowInLauncher = defaults.bool(forKey: Key.fileSearchShowInLauncher.rawValue)
-        notesEnabled = defaults.bool(forKey: Key.notesEnabled.rawValue)
-        notesRendersMarkdown =
-            defaults.object(forKey: Key.notesRendersMarkdown.rawValue) == nil
-            || defaults.bool(forKey: Key.notesRendersMarkdown.rawValue)
-        notesFitsWindowToText =
-            defaults.object(forKey: Key.notesFitsWindowToText.rawValue) == nil
-            || defaults.bool(forKey: Key.notesFitsWindowToText.rawValue)
-        notesShowsFormattingBar =
-            defaults.object(forKey: Key.notesShowsFormattingBar.rawValue) == nil
-            || defaults.bool(forKey: Key.notesShowsFormattingBar.rawValue)
-        notesShowsCharacterCount =
-            defaults.object(forKey: Key.notesShowsCharacterCount.rawValue) == nil
-            || defaults.bool(forKey: Key.notesShowsCharacterCount.rawValue)
-        notesTextSize =
-            defaults.string(forKey: Key.notesTextSize.rawValue).flatMap(NoteTextSize.init) ?? .standard
-        notesWindowMode =
-            defaults.string(forKey: Key.notesWindowMode.rawValue).flatMap(NoteWindowMode.init)
-            ?? .floating
-        notesPaper = defaults.string(forKey: Key.notesPaper.rawValue).flatMap(NotePaper.init) ?? .glass
-        notesTint = defaults.string(forKey: Key.notesTint.rawValue).flatMap(NoteTint.init) ?? .none
-        notesShowsTitleBarButtons =
-            defaults.object(forKey: Key.notesShowsTitleBarButtons.rawValue) == nil
-            || defaults.bool(forKey: Key.notesShowsTitleBarButtons.rawValue)
-        notesFolder = defaults.string(forKey: Key.notesFolder.rawValue)
         aiEnabled = defaults.bool(forKey: Key.aiEnabled.rawValue)
         mcpEnabled = defaults.bool(forKey: Key.mcpEnabled.rawValue)
         customCommandsEnabled = defaults.bool(forKey: Key.customCommandsEnabled.rawValue)

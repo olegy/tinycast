@@ -421,7 +421,7 @@ Both clip to their own bounds so AppKit's visible-rect tracking area stays insid
 Without this, the unclipped form scroll view makes each text view track the entire window, and their
 cursor claims overlap even in the gaps between fields. The page itself keeps its edge dissolve.
 Each editor session mounts fresh controls; textarea undo stays local and includes placeholder inserts.
-The textarea routes undo/redo to its own manager, as the Notes editor does in a non-activating panel.
+The textarea routes undo/redo to its own manager.
 
 ## One menu at a time
 
@@ -630,13 +630,7 @@ app:
 
 Both require the Accessibility permission (`Permissions.ensureAccessibility()`).
 
-Ordering the palette out makes AppKit pass key to the next of our panels that accepts it, and a
-non-activating panel holds the keyboard even while another app is active. So `hide` sets
-`NotesPanel.refusesInheritedKey` around the order-out unless `previousOwnWindow` is still visible:
-over another app the keyboard returns to that app, and a paste or the next keystroke cannot land in an
-open note. Summoned from a note, the note takes key back, so a paste lands there.
-
 The same show also mirrors that app into `PaletteState.pasteTarget` (a `PasteTarget`: localized
-name + bundle path), so Clipboard and Emoji can name it — the footer pill reads "Paste to Notes" and
+name + bundle path), so Clipboard and Emoji can name it — the footer pill reads "Paste to TextEdit" and
 the ⌘K paste rows carry the app's icon. Resolved once per summon, never per render, and deliberately
 not cleared by `prepare` (pop-to-root resets the screen, not the target).

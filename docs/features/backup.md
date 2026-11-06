@@ -3,8 +3,8 @@
 Export and import of Tinycast's own data as a single `.tinycast` file. The feature lives in
 `Features/Backup/`.
 
-A backup carries five independently selectable categories, ticked on export and again on import:
-**Settings & Shortcuts**, **Clipboard History**, **Snippets**, **Notes** and **Launcher Learning**.
+A backup carries four independently selectable categories, ticked on export and again on import:
+**Settings & Shortcuts**, **Clipboard History**, **Snippets** and **Launcher Learning**.
 
 ## Invariants
 
@@ -62,7 +62,6 @@ settings.json              SettingsBackup, exactly as it encoded before
 clipboard/items.jsonl      one clip per line
 clipboard/images/<uuid>.png
 snippets/<name>.md         copied verbatim
-notes/<name>.md            copied verbatim
 learning/{ranking,emoji,calculator}.json
 ```
 
@@ -77,15 +76,15 @@ because a newline inside a clip is escaped as `\n` by the encoder and can never 
 
 **AppleArchive, LZFSE, and a deliberately narrow keyset.** `"TYP,PAT,DAT,MOD,MTM"` rather than
 `.defaultForArchive`: no `UID`/`GID`, which would restore another Mac's numeric owner, and no `IDX`,
-whose hardlink dedup would record a link to a blob outside the staged tree. `MTM` stays because the
-note list sorts on modification date. LZFSE rather than LZMA because clipboard PNGs dominate the
+whose hardlink dedup would record a link to a blob outside the staged tree. `MTM` stays so a restored
+file keeps its modification date. LZFSE rather than LZMA because clipboard PNGs dominate the
 payload and are already compressed.
 
 **Extraction is filtered, not trusted.** `BackupArchive.open` passes an `ArchiveHeader.EntryFilter`
 that returns `.skip` for any entry whose path is absolute or contains `..`, and then refuses an extract
 holding a symbolic link — a link entry names no `..` at all, so the path filter passes it, and reading
 through one would leave the tree the caller chose. Composing resolves a link for the same reason, so a
-symlinked note travels as a file. `backup-archive-test` builds both hostile archives header-by-header
+symlinked snippet travels as a file. `backup-archive-test` builds both hostile archives header-by-header
 and asserts nothing escapes.
 
 **Staging lives in `Caches`, not `temporaryDirectory`.** It has to sit on the same volume as
@@ -126,8 +125,6 @@ Per category:
   `imagesDir` is one retention can ever reclaim, which is why the blob moves there before the row lands.
 - **Snippets** merge through `importSnippets`, deduped on name and body so importing the same file
   twice doesn't leave a second copy of everything. Importing snippets does not enable snippets.
-- **Notes** land as new files through `NotesRepository.importNotes`, which suffixes a title that is
-  already taken rather than overwriting it.
 - **Learning** replaces. Merging two Macs' frecency tables produces a table describing neither.
 
 An `id` never travels with a clip: `items.id` is `UNIQUE`, so a re-import minting fresh identities is

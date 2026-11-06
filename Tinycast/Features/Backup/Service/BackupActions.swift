@@ -130,7 +130,6 @@ enum BackupActions {
         var imported: [String] = []
         if summary.clipboard > 0 { imported.append(String(localized: "\(summary.clipboard) clips")) }
         if summary.snippets > 0 { imported.append(String(localized: "\(summary.snippets) snippets")) }
-        if summary.notes > 0 { imported.append(String(localized: "\(summary.notes) notes")) }
         if summary.learning > 0 {
             imported.append(String(localized: "\(summary.learning) learning records"))
         }

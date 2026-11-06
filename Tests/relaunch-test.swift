@@ -66,7 +66,7 @@ struct RelaunchTests {
         process.standardError = FileHandle.nullDevice
         try process.run()
         let exited = await waitUntil { !process.isRunning }
-        check("the original process terminates after async cleanup", exited)
+        check("the original process terminates", exited)
         guard exited else { return }
         check("the original process exits successfully", process.terminationStatus == 0)
         func events() -> [String] {
@@ -75,11 +75,8 @@ struct RelaunchTests {
         }
         let first = events().filter { $0.hasPrefix("first.") }
         check(
-            "repeated termination runs cleanup and teardown once",
-            first == [
-                "first.start", "first.request-returned", "first.flush-start", "first.repeat-deferred",
-                "first.heartbeat", "first.flush-end", "first.teardown"
-            ])
+            "termination runs teardown once",
+            first == ["first.start", "first.request-returned", "first.teardown"])
         guard relaunch else { return }
         let responsive = await waitUntil { events().contains("second.heartbeat") }
         check("the relaunched process responds on the main actor", responsive)
@@ -152,19 +149,6 @@ final class AppCore {
         } else {
             Task { @MainActor in record("heartbeat") }
         }
-    }
-
-    func flushNotesForTermination() async {
-        record("flush-start")
-        if stage == "first" {
-            Task { @MainActor in
-                let reply = NSApp.delegate?.applicationShouldTerminate?(NSApp)
-                record(reply == .terminateLater ? "repeat-deferred" : "repeat-rejected")
-                record("heartbeat")
-            }
-        }
-        try? await Task.sleep(for: .milliseconds(150))
-        record("flush-end")
     }
 
     func prepareForTermination() {

@@ -59,7 +59,6 @@ final class AppCore {
     let windowSwitch = WindowSwitchSession()
     let activationPolicy = ActivationPolicy()
     let uninstall = UninstallSession()
-    let notesStore: NotesStore
     let extensions: ExtensionManager
     let chatHistory: ChatHistoryStore
     let aiChats: AIChatSurfacesState
@@ -140,17 +139,6 @@ final class AppCore {
         settings: settings, appIndex: appIndex, hotKeys: hotKeys, favorites: favorites,
         visibility: visibility, ranking: launcherRanking, aliases: aliases,
         paletteCoordinator: paletteCoordinator, core: self)
-    /// Window state, not a preference: it rides `UserDefaults` like the active note's filename.
-    private nonisolated static let noteFormattingBarKey = "notesFormattingBarExpanded"
-    @ObservationIgnored private(set) lazy var notesCoordinator = NotesCoordinator(
-        store: notesStore,
-        settings: settings,
-        appIndex: appIndex,
-        core: self,
-        isFormattingBarExpanded: UserDefaults.standard.bool(forKey: Self.noteFormattingBarKey),
-        saveFormattingBarExpanded: {
-            UserDefaults.standard.set($0, forKey: Self.noteFormattingBarKey)
-        })
 
     @ObservationIgnored private(set) lazy var launcherCoordinator = LauncherCoordinator(
         ranking: launcherRanking, windowController: windowController,
@@ -164,7 +152,7 @@ final class AppCore {
         snippetCoordinator: snippetCoordinator, fileSearchCoordinator: fileSearchCoordinator,
         menuSearchCoordinator: menuSearchCoordinator,
         windowSwitchCoordinator: windowSwitchCoordinator,
-        notesCoordinator: notesCoordinator, extensionCoordinator: extensionCoordinator,
+        extensionCoordinator: extensionCoordinator,
         calendarCoordinator: calendarCoordinator,
         core: self)
     @ObservationIgnored private(set) lazy var fallbackCoordinator = FallbackCoordinator(
@@ -246,13 +234,6 @@ final class AppCore {
         textInjector = TextInjector(
             clipboardManager: clipboardManager,
             settings: settings)
-        let noteSelectionKey = "notesActiveFileName"
-        notesStore = NotesStore(
-            repository: Self.notesRepository(for: settings),
-            loadSelection: {
-                UserDefaults.standard.string(forKey: noteSelectionKey).map(NoteID.init(rawValue:))
-            },
-            saveSelection: { UserDefaults.standard.set($0?.rawValue, forKey: noteSelectionKey) })
     }
 
     func start() {
@@ -275,7 +256,6 @@ final class AppCore {
             windowSwitchCoordinator.applyEnabled()
             menuSearchCoordinator.applyEnabled()
             fileSearchCoordinator.applyPolicy()
-            notesCoordinator.applyEnabled()
             installedAI.launchSettings = { [aiSettings] in aiSettings.launch(for: $0) }
             chatGPTSubscription.launchSettings = { [aiSettings] in aiSettings.launch(for: .codex) }
             aiChatCoordinator.applyEnabled()
@@ -482,10 +462,6 @@ final class AppCore {
         }
     }
 
-    func flushNotesForTermination() async {
-        await notesCoordinator.prepareForTermination()
-    }
-
     /// Idempotent: both switches are tracked, and either one flipping re-runs the whole decision.
     func applyClipboardTextSearch() {
         guard settings.clipboardEnabled, settings.clipboardTextSearchEnabled else {
@@ -644,7 +620,6 @@ final class AppCore {
                 $0.windowSwitchCoordinator.applyEnabled()
                 $0.menuSearchCoordinator.applyEnabled()
             })
-        track({ _ = $0.notesEnabled }, reproject: { $0.notesCoordinator.applyEnabled() })
         track({ _ = $0.aiEnabled }, reproject: { $0.aiChatCoordinator.applyEnabled() })
         track(
             {
@@ -694,7 +669,6 @@ final class AppCore {
             { _ = $0.extensionsShowInLauncher },
             reproject: { $0.extensionCoordinator.applyExtensionsLauncherPresence() })
         track({ _ = $0.snippetsFolder }, reproject: { $0.applySnippetsFolder() })
-        track({ _ = $0.notesFolder }, reproject: { $0.applyNotesFolder() })
         trackChatRoute()
     }
 
@@ -770,18 +744,9 @@ final class AppCore {
         Task { await snippetsStore.relocate(to: repository) }
     }
 
-    private func applyNotesFolder() {
-        let repository = Self.notesRepository(for: settings)
-        Task { await notesStore.relocate(to: repository) }
-    }
-
     private static func snippetsRepository(for settings: AppSettings) -> SnippetRepository {
         SnippetRepository(
             snippetsDirectory: AppPaths.contentFolder(settings.snippetsFolder, named: "Snippets"))
-    }
-
-    private static func notesRepository(for settings: AppSettings) -> NotesRepository {
-        NotesRepository(notesDirectory: AppPaths.contentFolder(settings.notesFolder, named: "Notes"))
     }
 
     private func applyWindowCommandsPresence() {

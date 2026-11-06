@@ -30,7 +30,6 @@ struct BackupBundle: Sendable {
         directory(for: .clipboard).appendingPathComponent("images", isDirectory: true)
     }
     var snippetsDirectory: URL { directory(for: .snippets) }
-    var notesDirectory: URL { directory(for: .notes) }
 
     func learningURL(_ part: LearningPart) -> URL {
         directory(for: .learning).appendingPathComponent("\(part.rawValue).json")
@@ -43,7 +42,6 @@ struct BackupBundle: Sendable {
         try create(root)
         if categories.contains(.clipboard) { try create(clipboardImagesDirectory) }
         if categories.contains(.snippets) { try create(snippetsDirectory) }
-        if categories.contains(.notes) { try create(notesDirectory) }
         if categories.contains(.learning) { try create(directory(for: .learning)) }
     }
 
@@ -161,7 +159,7 @@ struct BackupBundle: Sendable {
 
     // MARK: - Names
 
-    /// A note or snippet title becomes a filename here, so path separators cannot survive it.
+    /// A snippet title becomes a filename here, so path separators cannot survive it.
     static func sanitized(_ title: String) -> String {
         let cleaned = title.components(separatedBy: Self.forbidden).joined(separator: "-")
             .trimmingCharacters(in: .whitespacesAndNewlines)

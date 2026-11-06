@@ -46,7 +46,7 @@ struct SettingsFileTest {
             SettingsFileKey.sections == [
                 "general", "appearance", "calculator", "search", "applications",
                 "systemSettings", "systemActions", "commands", "quicklinks", "appleShortcuts", "ai",
-                "quickActions", "fileSearch", "notes", "snippets", "navigation",
+                "quickActions", "fileSearch", "snippets", "navigation",
                 "windowManagement", "clipboard", "emoji", "calendar", "extensions"
             ])
 
@@ -171,13 +171,13 @@ struct SettingsFileTest {
             check("a file that is not an object throws", error == .notAnObject(nil))
         }
 
-        let text = #"{"bogus": {}, "general": {"nope": 1, "showInMenuBar": false}, "notes": 3}"#
+        let text = #"{"bogus": {}, "general": {"nope": 1, "showInMenuBar": false}, "snippets": 3}"#
         let parsed = try? SettingsFileFormat.parse(Data(text.utf8))
         check("a known key reads", parsed?.values[.showInMenuBar] == false)
         check(
             "unknown sections and keys, and a section that is no object, are each reported",
             parsed?.issues == [
-                .unknownSetting("bogus"), .unknownSetting("general.nope"), .notAnObject("notes")
+                .unknownSetting("bogus"), .unknownSetting("general.nope"), .notAnObject("snippets")
             ])
         check(
             "the HUD line names the first issue and counts the rest",
@@ -340,12 +340,13 @@ struct SettingsFileTest {
         defer { try? FileManager.default.removeItem(at: standard) }
         let home = FileManager.default.homeDirectoryForCurrentUser.standardizedFileURL.path
         check(
-            "no folder keeps notes in Application Support",
-            AppPaths.contentFolder(nil, named: "Notes", bundleID: bundleID).lastPathComponent == "Notes")
+            "no folder keeps snippets in Application Support",
+            AppPaths.contentFolder(nil, named: "Snippets", bundleID: bundleID).lastPathComponent
+                == "Snippets")
         check(
             "a folder under ~ reads from the home folder",
-            AppPaths.contentFolder("~/Dotfiles/notes", named: "Notes", bundleID: bundleID).path
-                == home + "/Dotfiles/notes")
+            AppPaths.contentFolder("~/Dotfiles/snippets", named: "Snippets", bundleID: bundleID).path
+                == home + "/Dotfiles/snippets")
         check(
             "a relative folder is not a folder",
             !AppPaths.isFolderPath("notes") && !AppPaths.isFolderPath("~notes"))

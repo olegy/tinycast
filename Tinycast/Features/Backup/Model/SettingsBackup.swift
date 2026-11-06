@@ -48,16 +48,6 @@ struct SettingsBackup: Codable {
         var fileSearchIgnorePatterns: [String]?
         var fileSearchRemovedDefaultPatterns: [String]?
         var fileSearchShowInLauncher: Bool?
-        var notesEnabled: Bool?
-        var notesRendersMarkdown: Bool?
-        var notesFitsWindowToText: Bool?
-        var notesShowsFormattingBar: Bool?
-        var notesShowsCharacterCount: Bool?
-        var notesTextSize: String?
-        var notesWindowMode: String?
-        var notesPaper: String?
-        var notesTint: String?
-        var notesShowsTitleBarButtons: Bool?
         // `snippetsEnabled` is absent: an import must not enable keystroke listening.
         var customCommandsEnabled: Bool?
         var customCommandsShowInLauncher: Bool?
@@ -162,16 +152,6 @@ extension SettingsBackup {
             fileSearchIgnorePatterns: s.fileSearchIgnorePatterns,
             fileSearchRemovedDefaultPatterns: s.fileSearchRemovedDefaultPatterns,
             fileSearchShowInLauncher: s.fileSearchShowInLauncher,
-            notesEnabled: s.notesEnabled,
-            notesRendersMarkdown: s.notesRendersMarkdown,
-            notesFitsWindowToText: s.notesFitsWindowToText,
-            notesShowsFormattingBar: s.notesShowsFormattingBar,
-            notesShowsCharacterCount: s.notesShowsCharacterCount,
-            notesTextSize: s.notesTextSize.rawValue,
-            notesWindowMode: s.notesWindowMode.rawValue,
-            notesPaper: s.notesPaper.rawValue,
-            notesTint: s.notesTint.rawValue,
-            notesShowsTitleBarButtons: s.notesShowsTitleBarButtons,
             customCommandsEnabled: s.customCommandsEnabled,
             customCommandsShowInLauncher: s.customCommandsShowInLauncher,
             snippetsShowInLauncher: s.snippetsShowInLauncher,
@@ -417,46 +397,6 @@ extension SettingsBackup {
         }
         if let flag = s.fileSearchShowInLauncher {
             settings.fileSearchShowInLauncher = flag
-            count += 1
-        }
-        if let flag = s.notesEnabled {
-            settings.notesEnabled = flag
-            count += 1
-        }
-        if let flag = s.notesRendersMarkdown {
-            settings.notesRendersMarkdown = flag
-            count += 1
-        }
-        if let flag = s.notesFitsWindowToText {
-            settings.notesFitsWindowToText = flag
-            count += 1
-        }
-        if let flag = s.notesShowsFormattingBar {
-            settings.notesShowsFormattingBar = flag
-            count += 1
-        }
-        if let flag = s.notesShowsCharacterCount {
-            settings.notesShowsCharacterCount = flag
-            count += 1
-        }
-        if let raw = s.notesTextSize, let size = NoteTextSize(rawValue: raw) {
-            settings.notesTextSize = size
-            count += 1
-        }
-        if let raw = s.notesWindowMode, let mode = NoteWindowMode(rawValue: raw) {
-            settings.notesWindowMode = mode
-            count += 1
-        }
-        if let raw = s.notesPaper, let paper = NotePaper(rawValue: raw) {
-            settings.notesPaper = paper
-            count += 1
-        }
-        if let raw = s.notesTint, let tint = NoteTint(rawValue: raw) {
-            settings.notesTint = tint
-            count += 1
-        }
-        if let flag = s.notesShowsTitleBarButtons {
-            settings.notesShowsTitleBarButtons = flag
             count += 1
         }
         if let flag = s.customCommandsEnabled {

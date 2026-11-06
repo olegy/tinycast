@@ -551,7 +551,7 @@ and the Actions menu's own chords, and dies with the window.
   attach, since an `NSTextView` would otherwise type the file's path. The unsent text lives on `AIChatState.draft`, so it survives closing
   the window.
 - **The field is a `ComposerTextView`, an `InjectableTextView`,** so snippets and Quick Actions
-  write into it in process, as they do into a note.
+  write into it in process.
 
 `AIChatState` turns provider-neutral stream events into one live assistant message. Thinking state is
 shown without entering the transcript, partial text is preserved on failure, cancellation invalidates

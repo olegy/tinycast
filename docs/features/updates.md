@@ -28,11 +28,11 @@ no Sparkle and no appcast: the releases feed is the feed. Releases are published
   Upstream's releases are never offered: their tags have no `-lite.N`, so `AppVersion` rejects them.
 - **Nothing is installed unless every check passes.** Bundle id, version and signature are all checked
   on the expanded copy before `replaceItemAt` runs, and the running app survives any failure untouched.
-- **Relaunching goes through `NSApp.terminate`, never `exit`.** That is what flushes a pending note
-  draft.
+- **Relaunching goes through `NSApp.terminate`, never `exit`.** That is what runs
+  `AppCore.prepareForTermination`, which flushes the settings file and stops every long-lived service.
   Relaunch schedules termination through the main run loop, outside any Swift task or dispatch
-  callback, so AppKit's nested termination loop can run the main-actor cleanup. The delegate returns
-  `terminateLater` and replies when cleanup finishes, preserving system logout and shutdown requests.
+  callback, so AppKit's termination loop starts cleanly. The delegate returns `terminateNow`, so
+  termination is synchronous, and system logout and shutdown requests are honoured as they arrive.
   A reopen is scheduled once, only when termination is committed, and waits for the old process to exit.
 - **An automatic prompt defers to whatever the user is doing, and is never spent unshown.**
   `UpdateReadiness` withholds it while a snippet is expanding, an extension command is running, an
@@ -112,7 +112,7 @@ One route, whatever the install came from:
    `open` on a bundle id that is still running would only re-activate the instance on its way out.
 
 Nothing here touches `~/Library/Preferences`, `~/Library/Caches` or `Application Support`, so no
-setting, clipboard entry, note or snippet is affected by an update.
+setting, clipboard entry or snippet is affected by an update.
 
 ## Releasing into it
 

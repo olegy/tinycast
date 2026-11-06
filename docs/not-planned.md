@@ -41,7 +41,7 @@ launchers. We accept that to keep the app simple.
 - **Input methods (IME) such as Chinese, Japanese or Wubi.** Basic typing works. But each
   input-method fix broke something for other people, so **we no longer fix input-method bugs.**
   That covers arrow keys or Escape while you compose, text that goes to a bar at the bottom of the
-  screen, lag right after opening, the Notes placeholder over your text, and snippets leaving part
+  screen, lag right after opening, and snippets leaving part
   of the keyword behind. New input-method reports are closed as not planned.
   **Instead:** the community fork [tinycast-cn](https://github.com/conversun/tinycast-cn).
   ([#990](https://github.com/abue-ammar/tinycast/issues/990), [#851](https://github.com/abue-ammar/tinycast/issues/851), [#1203](https://github.com/abue-ammar/tinycast/issues/1203), [#1580](https://github.com/abue-ammar/tinycast/issues/1580), [#1555](https://github.com/abue-ammar/tinycast/issues/1555))
@@ -137,12 +137,6 @@ Tinycast is an all-in-one launcher, not a full window manager. Its window tools 
 - **Follow Stage Manager.** **Instead:** try Window Rooms. ([#1249](https://github.com/abue-ammar/tinycast/issues/1249))
 - **Safari's width after Mission Control.** Safari may reset its width afterwards. ([#1556](https://github.com/abue-ammar/tinycast/issues/1556))
 
-## Notes
-
-- **More than one Notes window.** One window, many notes. ([#863](https://github.com/abue-ammar/tinycast/issues/863))
-- **Turn off "always on top".** Most people want Notes to float. ([#670](https://github.com/abue-ammar/tinycast/issues/670))
-- **Collect everything you copy into a note (AutoPaste).** ([#307](https://github.com/abue-ammar/tinycast/issues/307))
-
 ## AI
 
 - **Send your selected text or file to AI on its own.** macOS often won't share the selection.
@@ -211,8 +205,6 @@ Tinycast is an all-in-one launcher, not a full window manager. Its window tools 
 - **Read selected text in every app.** Many apps and websites don't share it. ([#1492](https://github.com/abue-ammar/tinycast/issues/1492), [#1420](https://github.com/abue-ammar/tinycast/issues/1420))
 - **Another app's Quick Look plugin takes your keys** (like Obsidian's). ([#1607](https://github.com/abue-ammar/tinycast/issues/1607))
 - **Duplicate images with Clop running.** ([#1582](https://github.com/abue-ammar/tinycast/issues/1582))
-- **Notes opening again after you close it** with text selected. Apple's Writing Tools cause this.
-  ([#1164](https://github.com/abue-ammar/tinycast/issues/1164))
 - **One-time-password extensions that paste for you.** ([#829](https://github.com/abue-ammar/tinycast/issues/829))
 
 ## Not now, but maybe later
