@@ -422,7 +422,7 @@ caches, TCC grants and login item, so this cannot disturb an installed copy.
   capsule fills the rest, the whole width with none on. Each summon and each cleared query buds them out
   of the capsule's end, the last one never clipped at the window's edge; with Show animations off they
   appear in place. Mouse and keyboard activation open the command immediately, without a fuse,
-  delayed reveal or shortcut shapes beneath the expanded panel. Show Notes opens its window
+  delayed reveal or shortcut shapes beneath the expanded panel.
 - Compact mode: arrow navigation tints the selected glass circle and uses a white monochrome glyph;
   inspect its native contour at actual size in both appearances, without a second fill or stroke;
   the left capsule and rightmost button must remain whole through opening, hovering, and selection,

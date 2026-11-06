@@ -52,7 +52,7 @@ These are the things that quietly break the look if changed. Preserve them unles
   `body`. A `.documentWindow` panel is an `AnimatedPanel` and sets its behaviour with `followMotion()`,
   and an `NSAnimationContext` group takes its duration from `Motion.duration(_:)`. So no animation
   site checks the setting itself, and Reduce Motion keeps trimming movement where it did while
-  animations are on. Activity indicators — spinners, `symbolEffect` loaders, the dictation pulse —
+  animations are on. Activity indicators — spinners, `symbolEffect` loaders —
   keep running, because they report work rather than move between states.
 - **A dialog has three independent axes; never let one infer another.** The **icon** (`DialogRequest.symbol`, required) is always the _subject's_ own glyph — a command being confirmed uses its `SystemAction.sfSymbol`, so the Restart dialog shows the same icon as the Restart row. Tone never picks an icon. The **tone** (`DialogTone`: `.neutral` / `.success` / `.danger`) tints only that glyph. The **button** takes its color from `DialogAction.Role` (`.standard` white / `.destructive` red / `.cancel` secondary), so a red-glyph security warning can still carry a plain white button — as "Import executable commands?" does.
 - **Resolve every glyph through `SymbolImage`, not `Image(systemName:)`.** Some catalog symbols are bundled assets in `Assets.xcassets` (`toggleBluetooth`), and `Image(systemName:)` silently renders nothing for those.

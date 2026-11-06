@@ -2734,13 +2734,6 @@
 			path = Updates;
 			sourceTree = "<group>";
 		};
-		8CE2C21B4FD7CE64254DC392 /* Dictation */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Dictation;
-			sourceTree = "<group>";
-		};
 		8DA48D9E1E6D368AAFF3E0AF /* UI */ = {
 			isa = PBXGroup;
 			children = (
@@ -2808,7 +2801,6 @@
 				005F026A8F7D5E209B1CE917 /* Clipboard */,
 				486F4CE5090E1ABA5AC16451 /* CustomCommands */,
 				2593A061D4579D609492171A /* DeepLinks */,
-				8CE2C21B4FD7CE64254DC392 /* Dictation */,
 				DDAC14B5D5139B06818C614B /* Dictionary */,
 				15CFCD6B1429C5F0944CBCC4 /* Emoji */,
 				8A16DA3DB6733A27E0DF4059 /* Extensions */,
@@ -2817,7 +2809,6 @@
 				7DE06EE636C14E50EE172D9E /* Launcher */,
 				2B65B3B92DE2BF61841F46DD /* MCP */,
 				7FBB9936A38A366FCAA3F2A8 /* MenuSearch */,
-				E094AB1B105801085EE1946F /* Notes */,
 				0ED457107377ECF8147C6B9D /* Onboarding */,
 				159D0342A9846C10226BF6F7 /* QuickActions */,
 				60DCE6A46E636364E5C3B5B4 /* Quicklinks */,
@@ -3319,13 +3310,6 @@
 				17EA0B9FFCBAB10941EC7702 /* VisibilityStore.swift */,
 			);
 			path = Service;
-			sourceTree = "<group>";
-		};
-		E094AB1B105801085EE1946F /* Notes */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Notes;
 			sourceTree = "<group>";
 		};
 		E3202F504002B7792FC50B2F /* Settings */ = {

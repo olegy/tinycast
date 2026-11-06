@@ -23,6 +23,34 @@ offers.
 - **Form fields keep their focus.** A text field in a launcher form no longer reports losing focus
   each time the form redraws while you type in it.
 
+### From upstream Tinycast 0.12.8
+
+Everything from upstream up to 0.12.8 that applies to Lite. Its update signing, update pill,
+Notes, Dictation and Hyper Key changes are left out.
+
+- **Compact mode is the default**: a glass search capsule with up to four shortcut buttons, chosen
+  in Settings → General → Compact Shortcuts and reachable with the arrow keys. *Show favorites in
+  compact mode* is gone.
+- **Deeplinks for built-in commands.** Every row that takes a hotkey also runs by
+  `tinycast://<kind>/<id>`; ⇧⌘C copies a row's link. Links can carry input, open Settings tabs and
+  saved chats, and ask once before acting outside Tinycast.
+- **Files and folders as favorites** in the launcher.
+- **Show animations** in General settings turns the interface's motion off.
+- Opening Tinycast from Finder or Spotlight shows the launcher, and a finished update says so.
+- **Window management:** move-to-edge commands, fullscreen windows move between displays, and new
+  display-move options.
+- **Calculator:** natural-language dates, times in other zones, compound rates and split bills.
+- **AI:** custom request headers for API connections, an *Expand thinking* setting, OpenAI MCP tool
+  calls fixed, OpenCode uses Tinycast's MCP servers, and Apple Intelligence chats send no instructions.
+- **Clipboard history** records HTML-only and RTF-only copies.
+- **Extensions:** web OAuth keeps its state through the redirect page, sign-in finishes when
+  cancelled, missing preferences can be set directly, and more Node APIs work (`os.networkInterfaces`,
+  AES-GCM, `SharedArrayBuffer`, process and file owners).
+- Fixes: Volume Up/Down on devices with an off-grid level, the running dot after an app quits,
+  calendar events open in the default calendar app, translation language pairs, onboarding language,
+  a waiting shell command's prompt, the Toggle System Appearance message, a text area crash, and a
+  batch of lifecycle and data-safety bugs.
+
 ## 0.12.1-lite.1
 
 First Tinycast Lite release, based on [Tinycast 0.12.1](https://github.com/abue-ammar/tinycast/releases/tag/v0.12.1).
