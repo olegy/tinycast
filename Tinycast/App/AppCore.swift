@@ -236,7 +236,7 @@ final class AppCore {
             settings: settings)
     }
 
-    func start() {
+    func start(launchedByUser: Bool) {
         Signposts.interval("AppCore.start") {
             SpaceTheme.start()  // tinycast-space: before the extension scan, which must see the Theme command
             // Shorten AppKit's ~2–3s tooltip delay; registration domain, so a user default wins.
@@ -398,6 +398,11 @@ final class AppCore {
             if !OnboardingState.hasOnboarded {
                 OnboardingState.markShown()
                 onboardingCoordinator.showOnboarding()
+            } else if launchedByUser {
+                paletteCoordinator.showPalette(mode: .launcher)
+            }
+            if let version = updateChecker.takeInstalledVersion() {
+                showMessage(String(localized: "Updated to Tinycast \(version.description)"))
             }
         }
     }
