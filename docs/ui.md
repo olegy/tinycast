@@ -556,7 +556,7 @@ leaves, and `fadeIn`/`fadeOut` for the panels; Reduce Motion, or **Show animatio
 
 ## The camera preview panel
 
-`CameraPreviewPanel` is the second borderless surface, beside the dialog. It takes
+`CameraPanel` is the second borderless surface, beside the dialog. It takes
 the same recipe — `GlassEffectView`, then the clip — and the same optical lift a
 dialog takes, but sits at `.floating` rather than `.dialog` so a failure report still lands on
 top of it.
