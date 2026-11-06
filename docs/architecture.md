@@ -138,7 +138,8 @@ driven imperatively from AppKit. Extension menu extras are dynamic `NSStatusItem
 - **Settings and Onboarding** — titled `NSWindow`s, one `Windows/AppWindowController.swift` each, owned
   by `SettingsCoordinator` and `OnboardingCoordinator`. SwiftUI `Settings` and `Window` scenes are
   unreliable for accessory apps, so this is deliberate. Their lifecycles are independent of the
-  palette's in both directions.
+  palette's in both directions. Onboarding stays accessory rather than registering Dock ownership,
+  so completing it can open the palette without an activation-policy change stealing focus.
 - **AI Chat** — a titled `AppWindowController` window owned by `AIChatCoordinator`: an
   `NSSplitViewController` with a collapsible sidebar of saved chats beside the open conversation, as
   Settings is built. The conversation lives on `AppCore.aiChats`, not the window, so closing it cancels
