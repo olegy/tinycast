@@ -11,6 +11,7 @@ enum SettingsFileKey: String, CaseIterable, Sendable {
     case autoSwitchInputSource = "general.autoSwitchInputSource"
     case language = "general.language"
     case appearance = "appearance.theme"
+    case animationsEnabled = "appearance.animations"
     case interfaceSize = "appearance.interfaceSize"
     case compactMode = "appearance.compactMode"
     case showFavoritesInCompactMode = "appearance.showFavoritesInCompactMode"

@@ -78,6 +78,9 @@ struct GeneralSettingsView: View {
                     SettingsRowTitle(.generalAppearance, "Appearance")
                 }
                 RaycastThemeRows()  // tinycast-space
+                Toggle(isOn: $settings.animationsEnabled) {
+                    SettingsRowTitle(.generalAppearance, "Show animations")
+                }
                 InterfaceSizeRow()
                 WindowModeRow()
                 Toggle(isOn: $settings.showFavoritesInCompactMode) {

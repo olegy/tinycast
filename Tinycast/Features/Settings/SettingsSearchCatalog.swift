@@ -150,6 +150,9 @@ enum SettingsSearchCatalog {
             .generalAppearance, "Theme background",
             keywords: ["opacity", "transparency", "raycast theme"]),
         .init(
+            .generalAppearance, "Show animations",
+            keywords: ["motion", "transitions", "reduce motion", "effects", "instant"]),
+        .init(
             .generalAppearance, "Interface size",
             keywords: ["text size", "font size", "scale", "zoom", "bigger", "larger", "legible"]),
         .init(
