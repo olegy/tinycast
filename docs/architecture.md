@@ -29,8 +29,7 @@ Independently of the folder tree, every mature subsystem has converged on the sa
 │ AppSettingsKey · SettingsBackupCoverage                                    │
 │ SettingsFile{JSON,Key,Value,Format,Binding,Issue,Identity} ·               │
 │ HotKeySpelling · WindowManagementFileFormat ·                              │
-│ MeetingLink · MeetingEvent · UpcomingWindow · MeetingDay · MenuBarSummary  │
-│ AutoJoinPolicy · EventDraft · SupportReminderSchedule ·                    │
+│ SupportReminderSchedule ·                                                  │
 │ MenuSearch{Item,Shortcut,Query,TreeNode,SnapshotPolicy,Target} ·           │
 │ WindowSwitch{Entry,Order,Query}                                            │
 └──────────────────────────────────┬─────────────────────────────────────────┘
@@ -44,7 +43,7 @@ Independently of the folder tree, every mature subsystem has converged on the sa
 │ SystemActionRunner · QuicklinkLauncher · TextInjector ·             │
 │ CurrencyRateStore · Paster ·                                               │
 │ HotKeyCenter · ModifierTapMonitor · RunningAppsMonitor ·                   │
-│ CalendarStore · MeetingLauncher · MeetingClock · CameraSession ·           │
+│ CameraSession ·                                                            │
 │ AXMenuAccess · WindowZOrder · WindowSwitchSweep ·                          │
 │ AppleShortcutRunner · SettingsFileRepository · SettingsFileMonitor ·       │
 │ WindowManagementSettingsFile                                               │
@@ -90,11 +89,11 @@ the shared primitives and system shims every feature draws on. Neither may depen
 `AppCore.shared` (`App/AppCore.swift`) is a `@MainActor` singleton owning every long-lived thing in the
 app: the stores (`AppIndex`, `ClipboardStore`, `QuicklinkStore`, `CustomCommandStore`,
 `FavoritesStore`, `VisibilityStore`, `AliasStore`, `LauncherRankingStore`, `CalculatorHistoryStore`,
-`CurrencyRateStore`, `FrequentEmojiStore`, `CalendarStore`), the managers, monitors and clocks
+`CurrencyRateStore`, `FrequentEmojiStore`), the managers and monitors
 (`ClipboardManager`, the opt-in `ClipboardTextIndexer`, the opt-in `SettingsFileRepository`,
 `HotKeyManager`, `RunningAppsMonitor`), the shared state
-(`AppSettings`, `PaletteState`, `FileSearchSession`, `MenuSearchSession`, `UninstallSession`,
-`MeetingClock`), the twenty feature coordinators, and the
+(`AppSettings`, `PaletteState`, `FileSearchSession`, `MenuSearchSession`, `UninstallSession`),
+the twenty feature coordinators, and the
 window controllers.
 
 `AppDelegate.applicationDidFinishLaunching` calls `AppCore.shared.start(launchedByUser:)` and nothing
@@ -122,9 +121,8 @@ clipboard's downscaled image copies, so a full-size decode stays out of the app 
 ## Entry points and windows
 
 `TinycastLaunch` (`@main`) pins the interface language, then runs `TinycastApp`, which declares
-only two `MenuBarExtra` scenes — Tinycast's own item and the
-calendar's, each inserted by one preference and independent of the other; everything else visible is
-driven imperatively from AppKit. Extension menu extras are dynamic `NSStatusItem`s owned entirely by
+only one `MenuBarExtra` scene — Tinycast's own item, inserted by `showInMenuBar`; everything else
+visible is driven imperatively from AppKit. Extension menu extras are dynamic `NSStatusItem`s owned entirely by
 `Features/Extensions/`, through `ExtensionManager`, with no scene or lifecycle wiring in the core.
 
 - **Command palette** — a borderless floating `NSPanel` (`Palette/PalettePanel.swift`) hosting SwiftUI
@@ -151,11 +149,9 @@ driven imperatively from AppKit. Extension menu extras are dynamic `NSStatusItem
   confirmations, failure reports and value prompts. Presentation is `async`, so nothing blocks the main
   actor, and the presenter refuses a second dialog while one is up — that, not a flag, is what stops a
   held hotkey stacking dialogs.
-- **The camera surfaces** — a borderless, non-activating `CameraPanel` at `.floating`, in two
-  shapes over one `CameraSession`: `CameraPreviewController`, owned by `CalendarCoordinator`, gates a
-  join and doubles as auto join's confirmation; `CameraCoordinator`, owned by `AppCore`, is the
-  standalone `Open Camera` command. See [features/camera.md](features/camera.md) and
-  [features/calendar.md](features/calendar.md).
+- **The camera surface** — a borderless, non-activating `CameraPanel` at `.floating` over one
+  `CameraSession`, shown by `CameraCoordinator`, owned by `AppCore`, for the `Open Camera` command.
+  See [features/camera.md](features/camera.md).
 - **HUDs** are separate, because a dialog asks and a HUD reports: `MessageHUDController` (the pill) and
   `VolumeHUDController` (the level box), both over a shared `HUDPresenter` that owns the
   one-at-a-time, auto-dismiss and fade policy. See [ui.md](ui.md#dialogs--hud).
@@ -226,7 +222,7 @@ Tinycast/
   Migrations/       one-shot repairs, each deleted after one stable release (migrations.md)
   Features/
     PaletteRowIndex.swift   the flat selection index — palette-owned, so it sits at the top
-    Launcher/ Clipboard/ Calculator/ Calendar/ Emoji/ FileSearch/ MenuSearch/
+    Launcher/ Clipboard/ Calculator/ Emoji/ FileSearch/ MenuSearch/
     Quicklinks/ Templates/ TextInjection/ Uninstall/ SystemActions/ CustomCommands/ HotKeys/ Backup/
     WindowManagement/ Onboarding/ Updates/ AI/ Settings/
     Extensions/

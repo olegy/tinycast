@@ -163,7 +163,6 @@ Tinycast is an all-in-one launcher, not a full window manager. Its window tools 
 - **Interface Size for the Settings window.** It sizes the palette only. ([#931](https://github.com/abue-ammar/tinycast/issues/931))
 - **A switch to hide every item.** You can already turn almost every feature off. ([#791](https://github.com/abue-ammar/tinycast/issues/791))
 - **Filter apps by shortcut, a "?" jump to settings, or no sidebar headings.** ([#978](https://github.com/abue-ammar/tinycast/issues/978), [#1391](https://github.com/abue-ammar/tinycast/issues/1391), [#1142](https://github.com/abue-ammar/tinycast/issues/1142))
-- **Hide the calendar colour dot, or more meeting filters.** ([#1063](https://github.com/abue-ammar/tinycast/issues/1063), [#1576](https://github.com/abue-ammar/tinycast/issues/1576))
 
 ## Hotkeys
 

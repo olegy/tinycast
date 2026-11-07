@@ -554,17 +554,17 @@ Motion is `Theme.RoomMotion.glide` for a card that changes place, a fade for one
 leaves, and `fadeIn`/`fadeOut` for the panels; Reduce Motion, or **Show animations** off, removes all of it. See
 [features/window-rooms.md](features/window-rooms.md#the-preview).
 
-## The camera preview panel
+## The camera panel
 
 `CameraPanel` is the second borderless surface, beside the dialog. It takes
 the same recipe — `GlassEffectView`, then the clip — and the same optical lift a
 dialog takes, but sits at `.floating` rather than `.dialog` so a failure report still lands on
 top of it.
 
-`AVCaptureVideoPreviewLayer` is hosted in one `NSViewRepresentable` and nothing else; the title,
-countdown and buttons around it are Tinycast's own. Its buttons are a **deliberate copy** of
-`DialogButton` rather than a share: the dialog owns its button, and a preview that had to move with
-it would couple two unrelated surfaces.
+`AVCaptureVideoPreviewLayer` is hosted in one `NSViewRepresentable` and nothing else; the buttons
+around it are Tinycast's own. They are a **deliberate copy** of `DialogButton` rather than a share:
+the dialog owns its button, and a camera that had to move with it would couple two unrelated
+surfaces.
 
 ## Dialog accessories
 
@@ -572,7 +572,7 @@ A dialog carries at most one control beyond its buttons, and `DialogAccessory` m
 rather than a convention — `.volume` for the Set Volume prompt and `.clipboardText` for Edit Entry.
 `DialogPanel.handlesArrowKeys` is set from `DialogAccessory.claimsArrowKeys`, so the slider steps on
 ←/→ while a text field keeps its caret, and `acceptsLineBreaks` from the accessory of the same name, so only Edit Entry's
-`dialogTextHeight` text area takes ↵. Create Event uses the launcher form instead.
+`dialogTextHeight` text area takes ↵.
 
 The first text field or text view takes focus from `DialogController.windowDidBecomeKey`, never from
 the view. When the panel turns key AppKit picks its own first responder — the Cancel button with

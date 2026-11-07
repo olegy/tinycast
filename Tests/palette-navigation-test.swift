@@ -148,20 +148,6 @@ struct PaletteNavigationTests {
             !PaletteMode.extensionCommand.isNativeEditor && !PaletteMode.quicklinks.isNativeEditor,
             "native editor keyboard routing excludes extensions and browsers")
 
-        let event = searchingLauncher()
-        event.query = "Create Event"
-        event.push(mode: .eventEditor)
-        event.noteEditingField(true)
-        expect(
-            event.mode.isNativeEditor && event.query.isEmpty,
-            "the event editor owns its keyboard without inheriting the launcher query")
-        expect(
-            event.pop(preservingSelection: true) && event.mode == .launcher
-                && event.query == "Create Event" && event.restoredSelection == 3 && !event.isEditingField,
-            "leaving an event editor restores the launcher query and selected row")
-        event.prepare(mode: .eventEditor)
-        expect(!event.canGoBack, "an event editor summoned by a hotkey starts without a previous screen")
-
         let command = searchingLauncher()
         command.query = "Create Custom Command"
         command.push(mode: .customCommandEditor)
@@ -190,7 +176,7 @@ struct PaletteNavigationTests {
             "closing a command editor restores its browser query and selection")
         expect(commands.pop() && commands.mode == .launcher, "the command browser returns to root search")
 
-        for mode: PaletteMode in [.quicklinkEditor, .eventEditor, .customCommandEditor] {
+        for mode: PaletteMode in [.quicklinkEditor, .customCommandEditor] {
             let switched = searchingLauncher()
             switched.push(mode: mode)
             switched.push(mode: .clipboard)

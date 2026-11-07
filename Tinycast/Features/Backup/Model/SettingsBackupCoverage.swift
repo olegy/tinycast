@@ -51,18 +51,7 @@ enum SettingsBackupCoverage {
         "appleShortcutsEnabled": .appleShortcutsEnabled,
         "snippetsEnabled": .snippetsEnabled,
         "snippetsShowInLauncher": .snippetsShowInLauncher,
-        "extensionsShowInLauncher": .extensionsShowInLauncher,
-        "calendarShowInLauncher": .calendarShowInLauncher,
-        "calendarLauncherLimit": .calendarLauncherLimit,
-        "calendarSpan": .calendarSpan,
-        "joinWindowMinutes": .joinWindowMinutes,
-        "autoJoinConfirms": .autoJoinConfirms,
-        "autoJoinNamedProvidersOnly": .autoJoinNamedProvidersOnly,
-        "menuBarEvents": .menuBarEvents,
-        "calendarMenuBarDisplay": .calendarMenuBarDisplay,
-        "menuBarLinkedEventsOnly": .menuBarLinkedEventsOnly,
-        "calendarMenuBarHidesWhenEmpty": .calendarMenuBarHidesWhenEmpty,
-        "hideCurrentEvent": .hideCurrentEvent
+        "extensionsShowInLauncher": .extensionsShowInLauncher
     ]
 
     /// The `SettingsData` fields no `AppSettings` key stands behind, and what they read instead.
@@ -89,14 +78,6 @@ enum SettingsBackupCoverage {
             "Machine-local geometry: every entry names a display this Mac has, and no other one.",
         AppSettingsKey.autoSwitchInputSource.rawValue:
             "Names a keyboard input source installed on this Mac; another Mac may not have it.",
-        AppSettingsKey.meetingBrowser.rawValue:
-            "Names a browser installed on this Mac; another Mac may not have it.",
-        AppSettingsKey.calendarEnabled.rawValue:
-            "Doubles as consent to read your calendar; an import must not grant calendar access.",
-        AppSettingsKey.autoJoinMeetings.rawValue:
-            "Arms the app to open meeting links unattended; an import must not switch that on.",
-        AppSettingsKey.cameraPreview.rawValue:
-            "Turns the camera on before a meeting; an import must not grant that.",
         AppSettingsKey.aiEnabled.rawValue:
             "No other AI setting travels in a backup, so an import would arm a feature it cannot "
             + "configure.",

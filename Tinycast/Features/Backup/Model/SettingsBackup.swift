@@ -75,20 +75,6 @@ struct SettingsBackup: Codable {
         // Carried: reading the user's Markdown grants no permission class; the folders stay behind.
         var snippetsEnabled: Bool?
         var snippetsShowInLauncher: Bool?
-        // `calendarEnabled` is absent: an import must not grant calendar access.
-        var calendarShowInLauncher: Bool?
-        var calendarLauncherLimit: Int?
-        // Carried: it narrows what is read rather than widening what may be reached.
-        var calendarSpan: Int?
-        var joinWindowMinutes: Int?
-        // `autoJoinMeetings` and `cameraPreview` are absent: an import must arm neither.
-        var autoJoinConfirms: Bool?
-        var autoJoinNamedProvidersOnly: Bool?
-        var menuBarEvents: Int?
-        var calendarMenuBarDisplay: Int?
-        var menuBarLinkedEventsOnly: Bool?
-        var calendarMenuBarHidesWhenEmpty: Bool?
-        var hideCurrentEvent: Int?
     }
 
     struct HotkeyBackup: Codable {
@@ -178,18 +164,7 @@ extension SettingsBackup {
             quicklinkConfirmsBeforeDelete: s.quicklinkConfirmsBeforeDelete,
             appleShortcutsEnabled: s.appleShortcutsEnabled,
             snippetsEnabled: s.snippetsEnabled,
-            snippetsShowInLauncher: s.snippetsShowInLauncher,
-            calendarShowInLauncher: s.calendarShowInLauncher,
-            calendarLauncherLimit: s.calendarLauncherLimit.rawValue,
-            calendarSpan: s.calendarSpan.rawValue,
-            joinWindowMinutes: s.joinWindowMinutes.rawValue,
-            autoJoinConfirms: s.autoJoinConfirms,
-            autoJoinNamedProvidersOnly: s.autoJoinNamedProvidersOnly,
-            menuBarEvents: s.menuBarEvents.rawValue,
-            calendarMenuBarDisplay: s.calendarMenuBarDisplay.rawValue,
-            menuBarLinkedEventsOnly: s.menuBarLinkedEventsOnly,
-            calendarMenuBarHidesWhenEmpty: s.calendarMenuBarHidesWhenEmpty,
-            hideCurrentEvent: s.hideCurrentEvent.rawValue)
+            snippetsShowInLauncher: s.snippetsShowInLauncher)
 
         let hk = core.hotKeys
         var hotkeys = HotkeyBackup()
@@ -499,52 +474,6 @@ extension SettingsBackup {
         }
         if let flag = s.quicklinkConfirmsBeforeDelete {
             settings.quicklinkConfirmsBeforeDelete = flag
-            count += 1
-        }
-        if let flag = s.calendarShowInLauncher {
-            settings.calendarShowInLauncher = flag
-            count += 1
-        }
-        if let raw = s.calendarLauncherLimit, let limit = CalendarLauncherLimit(rawValue: raw) {
-            settings.calendarLauncherLimit = limit
-            count += 1
-        }
-        if let raw = s.calendarSpan, let span = MeetingSpan(rawValue: raw) {
-            settings.calendarSpan = span
-            count += 1
-        }
-        if let raw = s.joinWindowMinutes, let window = JoinWindow(rawValue: raw) {
-            settings.joinWindowMinutes = window
-            count += 1
-        }
-        if let flag = s.autoJoinConfirms {
-            settings.autoJoinConfirms = flag
-            count += 1
-        }
-        if let flag = s.autoJoinNamedProvidersOnly {
-            settings.autoJoinNamedProvidersOnly = flag
-            count += 1
-        }
-        if let raw = s.menuBarEvents, let lead = MenuBarEvents(rawValue: raw) {
-            settings.menuBarEvents = lead
-            count += 1
-        }
-        if let raw = s.calendarMenuBarDisplay,
-            let display = CalendarMenuBarDisplay(rawValue: raw)
-        {
-            settings.calendarMenuBarDisplay = display
-            count += 1
-        }
-        if let flag = s.menuBarLinkedEventsOnly {
-            settings.menuBarLinkedEventsOnly = flag
-            count += 1
-        }
-        if let flag = s.calendarMenuBarHidesWhenEmpty {
-            settings.calendarMenuBarHidesWhenEmpty = flag
-            count += 1
-        }
-        if let raw = s.hideCurrentEvent, let hide = HideCurrentEvent(rawValue: raw) {
-            settings.hideCurrentEvent = hide
             count += 1
         }
         return count

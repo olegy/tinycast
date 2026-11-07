@@ -119,65 +119,6 @@
         }
       }
     },
-    "NSCalendarsFullAccessUsageDescription" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tinycast greift auf deine Termine zu, damit du deinen Zeitplan ansehen und an Besprechungen teilnehmen kannst."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tinycast accesses your events to show your schedule and let you join meetings."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tinycast accede a tus eventos para mostrar tu agenda y permitirte unirte a reuniones."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tinycast accède à vos calendriers pour afficher votre planning, créer des événements et rejoindre vos réunions."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tinycastはイベントにアクセスして予定を表示し、会議に参加できるようにします。"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tinycast는 일정을 표시하고 회의에 참여할 수 있도록 이벤트에 접근합니다."
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "O Tinycast acessa seus eventos para mostrar sua agenda e permitir que você participe de reuniões."
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tinycast получает доступ к вашим событиям, чтобы показывать расписание и подключать вас к встречам."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tinycast 访问你的日程，以显示安排并让你加入会议。"
-          }
-        }
-      }
-    },
     "NSCameraUsageDescription" : {
       "extractionState" : "manual",
       "localizations" : {

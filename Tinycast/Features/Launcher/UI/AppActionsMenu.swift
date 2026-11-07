@@ -127,9 +127,6 @@ enum AppActionsMenu {
     private static func leadingItems(
         app: AppEntry, searchQuery: String, core: AppCore
     ) -> [PopoverMenuItem] {
-        if app.kind == .meeting, let meeting = core.calendarCoordinator.meeting(entryID: app.id) {
-            return MeetingActionsMenu.content(meeting: meeting, core: core).items
-        }
         if app.kind == .customCommand, let command = core.customCommands.command(entryID: app.id) {
             return CustomCommandActionsMenu.leadingItems(
                 command: command, coordinator: core.customCommandCoordinator

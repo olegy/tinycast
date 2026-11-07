@@ -92,8 +92,6 @@ enum Theme {
         static let rowIcon: CGFloat = 24
         static let resultRowIcon: CGFloat = 26
         static let colorDot: CGFloat = 8
-        static let calendarBarWidth: CGFloat = 3
-        static let calendarBarHeight: CGFloat = 18
         static let keyCap: CGFloat = 18
         static let recorderKeyCap: CGFloat = 16
         /// Fixed so the recorder can't resize as its binding changes.
@@ -243,9 +241,7 @@ enum Theme {
         static let dialogSymbolContainer: CGFloat = 52
         /// Shared measurement for dialog accessories and the volume-HUD glyph.
         static let dialogIcon: CGFloat = 32
-        /// 16:9 at the dialog's own width, so the two surfaces read as siblings.
-        static let cameraPreview = CGSize(width: 420, height: 236)
-        /// 16:9 again, wider: the standalone camera is the surface, not a confirmation on one.
+        /// 16:9, wider than a dialog: the standalone camera is the surface, not a confirmation.
         static let cameraStage = CGSize(width: 560, height: 315)
         /// Wider than a dialog: a Quick Action's result is prose to read, not a sentence to answer.
         static let quickActionPanel: CGFloat = 520

@@ -16,9 +16,6 @@ struct RootPaletteView: View {
     @Environment(DictionarySession.self) private var dictionary
     @Environment(MenuSearchSession.self) private var menuSearch
     @Environment(WindowSwitchSession.self) private var windowSwitch
-    @Environment(CalendarStore.self) private var calendarStore
-    /// Observed so the join card's countdown redraws on the minute boundary.
-    @Environment(MeetingClock.self) private var meetingClock
     @Environment(UninstallSession.self) private var uninstall
     @Environment(QuicklinkStore.self) private var quicklinks
     @Environment(ExtensionManager.self) private var extensions
@@ -53,7 +50,6 @@ struct RootPaletteView: View {
             return LauncherScreen(
                 appIndex: appIndex, favorites: favorites, visibility: visibility,
                 currencyRates: currencyRates, core: core, vm: vm, running: selectionIsRunning,
-                meeting: core.calendarCoordinator.cardedMeeting, now: meetingClock.now,
                 openActions: openActions, openArgumentOptions: openArgumentOptions,
                 scrollToFollow: { scroll = ScrollIntent(kind: .follow) })
         case .uninstall:
@@ -94,14 +90,6 @@ struct RootPaletteView: View {
         case .roomWindows:
             return RoomPickerScreen(
                 coordinator: core.roomCoordinator, session: core.roomSession, vm: vm)
-        case .schedule:
-            return ScheduleScreen(
-                store: calendarStore, clock: meetingClock, core: core, vm: vm,
-                openActions: openActions)
-        case .eventEditor:
-            return EventEditorScreen(
-                coordinator: core.calendarCoordinator, openMenuCorner: menuCorner,
-                openInputMenu: openInputOptions)
         case .customCommandEditor:
             return CustomCommandEditorScreen(
                 coordinator: core.customCommandCoordinator, openMenuCorner: menuCorner,
@@ -110,8 +98,6 @@ struct RootPaletteView: View {
             return CustomCommandListScreen(
                 store: core.customCommands, coordinator: core.customCommandCoordinator,
                 vm: vm, metrics: metrics, openActions: openActions)
-        case .meetingDetails:
-            return MeetingDetailsScreen(store: calendarStore, core: core)
         case .clipboard:
             return ClipboardScreen(
                 store: store, core: core, vm: vm, openActions: openActions,
@@ -425,7 +411,6 @@ struct RootPaletteView: View {
                 }
                 if vm.mode != .menuSearch { menuSearch.reset() }
                 if vm.mode != .switchWindows { windowSwitch.reset() }
-                if vm.mode != .meetingDetails { calendarStore.clearDetails() }
                 if vm.mode != .rooms, vm.mode != .roomWindows { core.roomCoordinator.screensDidClose() }
                 // Leaving the screen any other way than Escape still ends the command's session.
                 if vm.mode != .extensionCommand, extensions.running != nil {
@@ -1550,10 +1535,6 @@ struct RootPaletteView: View {
     private func goBack() {
         if vm.mode == .customCommandEditor {
             core.customCommandCoordinator.cancelCustomCommandEditing()
-            return
-        }
-        if vm.mode == .eventEditor {
-            core.calendarCoordinator.cancelEventEditing()
             return
         }
         if vm.mode == .quicklinkEditor {

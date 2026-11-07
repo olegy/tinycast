@@ -67,8 +67,7 @@ struct SettingsBackupTest {
 
         // Named one by one: a backup now carries content, so it is far likelier to be sent on.
         for key: AppSettingsKey in [
-            .extensionsEnabled, .calendarEnabled, .autoJoinMeetings,
-            .cameraPreview, .quickActionsEnabled, .allowedDeepLinks
+            .extensionsEnabled, .quickActionsEnabled, .allowedDeepLinks
         ] {
             check(
                 "\(key.rawValue) stays out of a backup",

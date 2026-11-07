@@ -22,11 +22,6 @@ enum CommandID: String, CaseIterable, Sendable {
     case createCustomCommand = "command:create-custom-command"
     case searchCustomCommands = "command:search-custom-commands"
     case define = "command:define"
-    case joinNextMeeting = "command:join-next-meeting"
-    case mySchedule = "command:my-schedule"
-    case createEvent = "command:create-event"
-    case copyMeetingLink = "command:copy-meeting-link"
-    case openInCalendar = "command:open-in-calendar"
     case createWindowLayout = "command:create-window-layout"
     case captureWindowLayout = "command:capture-window-layout"
     case switchRoom = "command:switch-room"
@@ -49,7 +44,7 @@ enum CommandID: String, CaseIterable, Sendable {
 
     static let compactBarOptions: [CommandID] =
         defaultCompactBarCommands + [
-            .searchSnippets, .mySchedule, .quickAI
+            .searchSnippets, .quickAI
         ]
 
     static let compactBarLimit = 4
@@ -91,11 +86,6 @@ enum CommandID: String, CaseIterable, Sendable {
         case .createCustomCommand: return "Create Custom Command"
         case .searchCustomCommands: return "Search Custom Commands"
         case .define: return "Define Word"
-        case .joinNextMeeting: return "Join Next Meeting"
-        case .mySchedule: return "My Schedule"
-        case .createEvent: return "Create Event"
-        case .copyMeetingLink: return "Copy Meeting Link"
-        case .openInCalendar: return "Open in Calendar"
         case .createWindowLayout: return "Create Window Layout"
         case .captureWindowLayout: return "Create Layout from Current Windows"
         case .switchRoom: return "Switch Room"
@@ -135,11 +125,6 @@ enum CommandID: String, CaseIterable, Sendable {
         case .createCustomCommand: return "terminal"
         case .searchCustomCommands: return "terminal"
         case .define: return "book.closed"
-        case .joinNextMeeting: return "video.fill"
-        case .mySchedule: return "calendar"
-        case .createEvent: return "calendar.badge.plus"
-        case .copyMeetingLink: return "link"
-        case .openInCalendar: return "calendar.badge.clock"
         case .createWindowLayout: return "plus.rectangle.on.rectangle"
         case .captureWindowLayout: return "macwindow.badge.plus"
         case .switchRoom: return "door.left.hand.open"
@@ -192,7 +177,6 @@ enum CommandID: String, CaseIterable, Sendable {
         switch self {
         case .clipboardHistory: 80
         case .searchFiles: 70
-        case .mySchedule: 60
         case .searchEmoji: 50
         case .createQuicklink: 30
         default: nil

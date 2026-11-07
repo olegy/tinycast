@@ -1,6 +1,6 @@
 enum SettingsTab: CaseIterable, Identifiable {
     case general, applications, systemSettings, systemActions, commands, quicklinks, appleShortcuts,
-        fallbacks, clipboard, snippets, fileSearch, windowManagement, navigation, calendar, emoji,
+        fallbacks, clipboard, snippets, fileSearch, windowManagement, navigation, emoji,
         ai, quickActions, extensions, permissions, backup, about
     /// The case, never an index: a selectable `List` flattens section and row IDs together.
     var id: Self { self }
@@ -26,7 +26,6 @@ enum SettingsTab: CaseIterable, Identifiable {
         case .fileSearch: "file-search"
         case .windowManagement: "window-management"
         case .navigation: "navigation"
-        case .calendar: "calendar"
         case .emoji: "emoji"
         case .ai: "ai"
         case .quickActions: "quick-actions"
@@ -55,7 +54,6 @@ enum SettingsTab: CaseIterable, Identifiable {
         case .clipboard: return String(localized: "Clipboard")
         case .snippets: return String(localized: "Snippets")
         case .emoji: return String(localized: "Emoji & Symbols")
-        case .calendar: return String(localized: "Calendar")
         case .extensions: return String(localized: "Extensions")
         case .permissions: return String(localized: "Permissions")
         case .backup: return String(localized: "Backup")
@@ -81,7 +79,6 @@ enum SettingsTab: CaseIterable, Identifiable {
         case .clipboard: return "doc.on.clipboard"
         case .snippets: return "curlybraces"
         case .emoji: return "face.smiling"
-        case .calendar: return "calendar"
         case .extensions: return "puzzlepiece.extension"
         case .permissions: return "lock.shield"
         case .backup: return "arrow.up.arrow.down.circle"
@@ -117,7 +114,7 @@ enum SettingsSection: CaseIterable, Identifiable {
             // Everyday tools first; AI and extensions are opt-in extras.
             return [
                 .clipboard, .snippets, .fileSearch, .windowManagement, .navigation,
-                .calendar, .emoji, .ai, .quickActions, .extensions
+                .emoji, .ai, .quickActions, .extensions
             ]
         case .advanced: return [.backup, .about]
         }

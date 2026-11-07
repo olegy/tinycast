@@ -85,8 +85,6 @@ final class PaletteWindowController: NSObject, NSWindowDelegate {
             panel.contentView?.layoutSubtreeIfNeeded()
             core.inputSourceSwitcher.beginSession(
                 preferredInputSourceID: core.settings.autoSwitchInputSourceID)
-            // Events go stale while the palette is closed, and the countdown only ticks while up.
-            core.calendarCoordinator.paletteDidShow()
             core.palette.noteVisible(true)
             core.clipboardStore.setTextSearchActive(true)
             // Non-activating, so summoning never raises our own aux windows behind it.
@@ -151,7 +149,6 @@ final class PaletteWindowController: NSObject, NSWindowDelegate {
         panel?.orderOut(nil)
         commandEscapeTap.disable()
         core.inputSourceSwitcher.endSession()
-        core.calendarCoordinator.paletteDidHide()
         core.roomCoordinator.paletteDidHide()
         core.snippetCoordinator.paletteDidHide()
         core.palette.noteVisible(false)
@@ -400,10 +397,6 @@ final class PaletteWindowController: NSObject, NSWindowDelegate {
                 core.customCommandCoordinator.cancelCustomCommandEditing()
                 return true
             }
-            if core.palette.mode == .eventEditor, !core.palette.isComposing {
-                core.calendarCoordinator.cancelEventEditing()
-                return true
-            }
             if core.palette.mode == .quicklinkEditor, !core.palette.isComposing {
                 core.quicklinkCoordinator.cancelQuicklinkEditing()
                 return true
@@ -429,8 +422,6 @@ final class PaletteWindowController: NSObject, NSWindowDelegate {
                     core.quicklinkCoordinator.saveQuicklink()
                 case .snippetEditor:
                     core.snippetCoordinator.saveSnippet()
-                case .eventEditor:
-                    core.calendarCoordinator.saveEvent()
                 case .customCommandEditor:
                     core.customCommandCoordinator.saveCustomCommand()
                 default: break

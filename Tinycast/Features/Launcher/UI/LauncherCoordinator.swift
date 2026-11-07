@@ -16,7 +16,6 @@ final class LauncherCoordinator {
     private let menuSearchCoordinator: MenuSearchCoordinator
     private let windowSwitchCoordinator: WindowSwitchCoordinator
     private let extensionCoordinator: ExtensionCoordinator
-    private let calendarCoordinator: CalendarCoordinator
     /// The backup commands only, which need the live stores to gather from and apply to.
     private unowned let core: AppCore
 
@@ -34,7 +33,6 @@ final class LauncherCoordinator {
         menuSearchCoordinator: MenuSearchCoordinator,
         windowSwitchCoordinator: WindowSwitchCoordinator,
         extensionCoordinator: ExtensionCoordinator,
-        calendarCoordinator: CalendarCoordinator,
         core: AppCore
     ) {
         self.ranking = ranking
@@ -50,7 +48,6 @@ final class LauncherCoordinator {
         self.menuSearchCoordinator = menuSearchCoordinator
         self.windowSwitchCoordinator = windowSwitchCoordinator
         self.extensionCoordinator = extensionCoordinator
-        self.calendarCoordinator = calendarCoordinator
         self.core = core
     }
 
@@ -123,11 +120,6 @@ final class LauncherCoordinator {
             extensionCoordinator.runExtensionCommand(app, arguments: arguments)
             return
         }
-        if app.kind == .meeting {
-            guard let id = MeetingEvent.id(fromEntryID: app.id) else { return }
-            calendarCoordinator.activateMeeting(id: id)
-            return
-        }
         // Before the palette hides: an unfilled quicklink stays up to ask first.
         if app.kind == .quicklink {
             guard let id = Quicklink.id(fromEntryID: app.id) else { return }
@@ -147,7 +139,7 @@ final class LauncherCoordinator {
             guard let bundleID = app.bundleID else { return }
             AppLauncher.openSettingsPane(bundleID: bundleID)
         case .command, .quickAction, .customCommand, .systemAction, .windowCommand, .windowLayout,
-            .windowRoom, .quicklink, .appleShortcut, .extensionCommand, .meeting:
+            .windowRoom, .quicklink, .appleShortcut, .extensionCommand:
             break  // handled above
         }
     }
@@ -191,16 +183,6 @@ final class LauncherCoordinator {
             core.dictionaryCoordinator.show()
         case .openInBrowser, .runShellCommand:
             break  // Query-driven: each runs where the typed text is, never through this funnel.
-        case .joinNextMeeting:
-            calendarCoordinator.joinNextMeeting()
-        case .copyMeetingLink:
-            calendarCoordinator.copyNextMeetingLink()
-        case .mySchedule:
-            calendarCoordinator.showSchedule()
-        case .openInCalendar:
-            calendarCoordinator.openNextMeetingInCalendar()
-        case .createEvent:
-            calendarCoordinator.createEvent()
         case .searchQuicklinks:
             paletteCoordinator.togglePalette(mode: .quicklinks)
         case .searchSnippets:

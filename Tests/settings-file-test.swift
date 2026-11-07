@@ -46,13 +46,12 @@ struct SettingsFileTest {
                 "general", "appearance", "calculator", "search", "applications",
                 "systemSettings", "systemActions", "commands", "quicklinks", "appleShortcuts", "ai",
                 "quickActions", "fileSearch", "navigation",
-                "windowManagement", "clipboard", "snippets", "emoji", "calendar", "extensions"
+                "windowManagement", "clipboard", "snippets", "emoji", "extensions"
             ])
 
         // A file that could switch one of these on would grant what only the app may ask for.
         let grantPaths = [
-            "extensions.enabled", "calendar.enabled",
-            "calendar.autoJoinMeetings", "calendar.cameraPreview", "quickActions.enabled",
+            "extensions.enabled", "quickActions.enabled",
             "ai.mcpEnabled", "mcp.enabled", "clipboard.textSearchEnabled"
         ]
         check(

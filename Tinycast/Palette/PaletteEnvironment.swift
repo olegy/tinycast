@@ -36,8 +36,6 @@ extension View {
             .environment(core.uninstall)
             .environment(core.quicklinks)
             .environment(core.extensions)
-            .environment(core.calendarStore)
-            .environment(core.meetingClock)
             .motionScope()
     }
 }

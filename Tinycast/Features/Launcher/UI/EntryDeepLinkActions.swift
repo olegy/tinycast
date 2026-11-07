@@ -20,9 +20,9 @@ enum EntryDeepLinkActions {
         return true
     }
 
-    /// Query-driven rows answer typed text and meetings are today's events; neither has a stable link.
+    /// Query-driven rows answer typed text, so they have no stable link.
     static func isLinkable(_ entry: AppEntry) -> Bool {
-        entry.kind != .meeting && !CommandCatalog.isQueryDriven(entry)
+        !CommandCatalog.isQueryDriven(entry)
     }
 
     static func link(for entry: AppEntry, core: AppCore) -> URL? {

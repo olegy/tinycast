@@ -13,8 +13,8 @@ in `Features/Settings/` (`Model/`, `Service/`, `SettingsFileSchema.swift`), the 
   deleting it, or updating the app never loses a setting, so there is nothing to migrate.
 - **Off by default, and only the pane turns it on.** `settingsFileEnabled` has no key in the file and is
   excluded from backups: a file or an import must never switch on something that reads a file.
-- **A capability grant never has a key.** Extensions, Calendar access, Auto Join, Camera
-  Preview, Quick Actions, MCP and clipboard text recognition are switched on only in the app, which
+- **A capability grant never has a key.** Extensions, Quick Actions, MCP and clipboard text
+  recognition are switched on only in the app, which
   asks first. `settings-file-test` checks those paths stay absent.
 - **Removing a key ships a migration that strips it.** The import reports a key it no longer knows on
   every launch, until a change made in the app rewrites the file. See [migrations.md](../migrations.md).
@@ -125,11 +125,6 @@ Where a number has a special case, the case is a word:
 | `ai.newChatAfterMinutes` | 2, 5, 10, 30, `"never"` |
 | `ai.toolRounds` | 10, 25, 50, 100, `"unlimited"` |
 | `ai.opensTo` | `"recent"`, `"newConversation"` |
-| `calendar.launcherLimit` | 1, 3, 5, `"all"` |
-| `calendar.span` | `"today"`, `"todayAndTomorrow"`, `"nextSevenDays"` |
-| `calendar.menuBar` | `"disabled"`, `"meetingIcon"`, `"meetingTitle"` |
-| `calendar.menuBarUpcomingEvents` | `"today"`, or 2, 5, 10, 30 minutes before |
-| `calendar.hideCurrentEventAfterMinutes` | `"never"`, 0 (as it starts), 5, 10, 30 |
 | `windowManagement.gap` | 0 to 64 |
 
 On first launch, `general.language` is set to the primary system language if supported, otherwise

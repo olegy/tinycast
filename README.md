@@ -36,8 +36,6 @@ third-party dependencies, macOS 26 or later.
   edge moves, display moves, fullscreen and Spaces.
 - **System actions** — lock, sleep, restart, empty trash, toggle appearance, Bluetooth, mute, hidden
   files, and more.
-- **Calendar and meetings** — your next meeting on the empty palette and in the menu bar, one key to
-  join it, or let it join itself.
 - **Emoji picker** — a searchable emoji grid, one keystroke away.
 - **AI chat** — use your own key or an installed AI account: ask Quick AI from the palette, or keep
   longer conversations in the AI Chat window, with a searchable, pinnable history. Off out of the box,

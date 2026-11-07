@@ -180,8 +180,6 @@ run launcher-settings-file-test \
 run apple-shortcut-test    Tinycast/Features/AppleShortcuts/Model/*.swift
 run calc-test              Tinycast/Features/Calculator/Model/*.swift
 run index calc-performance Tinycast/Features/Calculator/Model/*.swift
-run calendar-test          Tinycast/Features/Calendar/Model/*.swift \
-                           Tinycast/Features/Calendar/UI/EventEditorSession.swift
 run clipboard-test         Tinycast/Features/Clipboard/Model/ClipboardStore.swift \
                            Tinycast/Platform/Images/ImageDerivative.swift \
                            Tinycast/Features/Clipboard/Model/ClipboardFilter.swift \
@@ -555,6 +553,9 @@ run settings-backup-test   Tinycast/Features/Settings/AppSettingsKey.swift \
 run settings-file-test     Tinycast/Features/Settings/Model/*.swift \
                            Tinycast/Features/Settings/Service/SettingsFileMonitor.swift \
                            Tinycast/Features/Settings/Service/SettingsFileRepository.swift \
+                           Tinycast/Platform/AppPaths.swift
+run calendar-removal-migration-test Tinycast/Migrations/CalendarRemovalMigration.swift \
+                           Tinycast/Features/Settings/Model/*.swift \
                            Tinycast/Platform/AppPaths.swift
 run backup-archive-test   Tinycast/Platform/AppPaths.swift \
                            Tinycast/Features/Backup/Model/BackupArchive.swift \

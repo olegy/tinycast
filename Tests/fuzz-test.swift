@@ -482,14 +482,14 @@ struct FuzzTest {
 
         let commands = [
             Candidate(name: "Search Files", priority: 70), Candidate(name: "Clipboard History", priority: 80),
-            Candidate(name: "My Schedule", priority: 60),
+            Candidate(name: "Search Snippets", priority: 60),
             Candidate(name: "Search Emoji & Symbols", priority: 50),
             Candidate(name: "Create Quicklink", priority: 30)
         ]
         check(
             "a new user gets the built-ins, highest priority first",
             select(commands) == [
-                "Clipboard History", "Search Files", "My Schedule", "Search Emoji & Symbols", "Create Quicklink"
+                "Clipboard History", "Search Files", "Search Snippets", "Search Emoji & Symbols", "Create Quicklink"
             ])
         let used = [Candidate(name: "Safari", frecency: 40), Candidate(name: "Slack", frecency: 300)]
         check(

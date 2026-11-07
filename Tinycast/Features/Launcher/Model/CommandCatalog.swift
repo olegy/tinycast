@@ -63,8 +63,6 @@ extension SettingsTab {
         case .clipboard: [.clipboardHistory, .pasteSequentially]
         case .snippets: [.searchSnippets, .createSnippet]
         case .emoji: [.searchEmoji]
-        case .calendar:
-            [.joinNextMeeting, .mySchedule, .createEvent, .copyMeetingLink, .openInCalendar]
         default: []
         }
     }

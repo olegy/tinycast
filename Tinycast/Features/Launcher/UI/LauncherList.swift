@@ -7,7 +7,6 @@ struct LauncherList: View {
     /// The flat row id the screen has selected, not an entry id: a fallback can repeat a result.
     let selectedRowID: String?
     let favorites: [FavoritesStore.Item]
-    let meetingCount: Int
     let suggestionCount: Int
     let matchCount: Int
     /// A query is typed, so ⌘1–⌘9 open the first results instead of favorites.
@@ -45,16 +44,14 @@ struct LauncherList: View {
         let onActions: (Int) -> Void
     }
 
-    /// Calc answers a typed query and the card an empty one, so only one ever leads.
+    /// At most one card leads.
     enum LeadCard: Equatable {
         case calc(CalcResult)
-        case meeting(MeetingEvent, now: Date)
         case color(ColorValue)
 
         var sectionTitle: String {
             switch self {
             case .calc: return String(localized: "Calculator")
-            case .meeting: return String(localized: "Meeting")
             case .color: return String(localized: "Color")
             }
         }
@@ -62,7 +59,6 @@ struct LauncherList: View {
         var rowID: String {
             switch self {
             case .calc: return "calc-card"
-            case .meeting: return "meeting-card"
             case .color: return "color-card"
             }
         }
@@ -112,11 +108,9 @@ struct LauncherList: View {
     private var rows: [Row] {
         var rows: [Row] = []
         if let card { rows = [.header(card.sectionTitle), .card(card)] }
-        let meetings = results.prefix(meetingCount)
-        let suggestions = results.dropFirst(meetingCount).prefix(suggestionCount)
-        let pinnedCount = meetingCount + suggestionCount
-        let matches = results.dropFirst(pinnedCount).prefix(matchCount)
-        let rest = results.dropFirst(pinnedCount + matchCount)
+        let suggestions = results.prefix(suggestionCount)
+        let matches = results.dropFirst(suggestionCount).prefix(matchCount)
+        let rest = results.dropFirst(suggestionCount + matchCount)
         var grouped: [AppEntry.Kind: [AppEntry]] = [:]
         for app in rest { grouped[app.kind, default: []].append(app) }
         if !favorites.isEmpty {
@@ -125,10 +119,6 @@ struct LauncherList: View {
                 contentsOf: favorites.enumerated().map {
                     .favorite($1, index: $0)
                 })
-        }
-        if !meetings.isEmpty {
-            rows.append(.header(AppEntry.Kind.meeting.descriptor.sectionTitle.resolved()))
-            rows.append(contentsOf: meetings.map { .app($0, slot: nil) })
         }
         if !suggestions.isEmpty {
             rows.append(.header(String(localized: "Suggestions")))
@@ -140,7 +130,7 @@ struct LauncherList: View {
         }
         // Publication order, so rows match the flat index.
         let kinds: [AppEntry.Kind] = [
-            .meeting, .application, .systemSettings, .extensionCommand, .quicklink, .appleShortcut,
+            .application, .systemSettings, .extensionCommand, .quicklink, .appleShortcut,
             .systemAction, .windowLayout, .windowRoom, .windowCommand, .customCommand,
             .quickAction, .command
         ]
@@ -285,8 +275,6 @@ private struct LeadCardView: View {
         switch card {
         case .calc(let result):
             CalculatorCard(result: result, selected: selected)
-        case .meeting(let meeting, let now):
-            MeetingCard(meeting: meeting, now: now, selected: selected)
         case .color(let color):
             ColorCard(color: color, selected: selected)
         }
@@ -333,11 +321,6 @@ private struct AppRow: View {
                             .offset(y: 3)
                     }
                 }
-            if app.kind == .meeting {
-                MeetingEntryContent(entryID: app.id) { meeting, _ in
-                    CalendarBar(color: meeting.calendarColor)
-                }
-            }
             Text(app.name)
                 .font(metrics.typography.rowTitle)
                 .lineLimit(1)
@@ -375,8 +358,6 @@ private struct AppRow: View {
                     KeyCapChip(text: "⌘", style: .outline)
                     KeyCapChip(text: String(slot), style: .outline)
                 }
-            } else if app.kind == .meeting {
-                MeetingEntryContent(entryID: app.id) { MeetingTiming(meeting: $0, now: $1) }
             } else {
                 Text(app.kindLabel)
                     .font(metrics.typography.rowTrailing)

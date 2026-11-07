@@ -3,6 +3,12 @@
 What is new in each Tinycast Lite release. The update window shows the section of the version it
 offers.
 
+## Next
+
+### Removed
+
+- **Calendar** is gone completely: the meeting card on the empty palette, Join Next Meeting, My Schedule, Create Event, Copy Meeting Link, Open in Calendar, meeting details, meetings in launcher search, auto join and the camera preview before a meeting, the calendar menu-bar item, the Calendar settings pane and the Calendars row in Permissions. Tinycast no longer asks for calendar access. Its leftover settings, shortcuts and the `calendar` section in `settings.json` are cleaned up on first launch; My Schedule leaves the compact bar.
+
 ## 0.12.8-lite.3
 
 ### New

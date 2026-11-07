@@ -123,7 +123,6 @@ If a change touches anything in the right column, the harness on the left is man
 | `onboarding-test` | Onboarding's handoff to the palette keeps focus; ordinary windows retain their Dock ownership |
 | `relaunch-test` | The shipped app delegate and relaunch helper — asynchronous cleanup, repeated quit requests, and a responsive replacement process |
 | `calc-test` | all of `Calculator/Model/` |
-| `calendar-test` | all of `Calendar/Model/` plus `EventEditorSession` — links, join window, day buckets, draft and form focus |
 | `clipboard-search-test` | Ordinary and OCR result ordering, opt-in lifecycle, cancellation, pins and type filters |
 | `clipboard-text-test` | Apple Vision/PDF extraction, scheduling, retry backoff and recovery |
 | `paste-sequence-test` | `Clipboard/Model/PasteSequence.swift` — the walk's order, its end, and what starts it over |
@@ -177,6 +176,7 @@ If a change touches anything in the right column, the harness on the left is man
 | `settings-file-test` | `Settings/Model/` and `Settings/Service/` — key paths, value tokens, the printer and parser, and the repository's import, replace, save, reload and symlink handling on a scratch folder |
 | `window-file-test` | `WindowManagement/Model/WindowManagementFileFormat.swift` — command shortcuts, custom sizes, layouts and rooms as settings.json spells them, hand edits and bad records |
 | `launcher-settings-file-test` | Launcher settings application — invalid records, partial edits, deferred bundles, shortcut moves and records outside search scopes; isolated preferences and in-memory scan/Carbon effects |
+| `calendar-removal-migration-test` | `Migrations/CalendarRemovalMigration.swift` — retires exactly the Calendar defaults and hotkeys, strips the `calendar` section and My Schedule from the compact bar, and leaves a file with other problems to the import |
 | `backup-archive-test` | all of `Backup/Model/`, plus `Backup/Service/BackupStaging.swift` |
 | `updates-test` | `Updates/Model/` — version precedence, channel filtering, install route, readiness |
 | `update-check-test` | `UpdateCheckStore` — stopping, in-flight cancellation, cached prompt suppression, restart and independent manual checking |
@@ -521,7 +521,7 @@ caches, TCC grants and login item, so this cannot disturb an installed copy.
 - A double-tap binding fires
 - Every binding survives quit and relaunch
 - `Enable Commands` off leaves every pane-owned command listed, searchable and firing —
-  Clipboard, Emoji, File Search, Quicklinks, Calendar, AI and the two layout commands
+  Clipboard, Emoji, File Search, Quicklinks, AI and the two layout commands
 
 ### Uninstall
 
@@ -614,74 +614,14 @@ caches, TCC grants and login item, so this cannot disturb an installed copy.
 - `1000 usd in eur/12` converts and then divides; copying preserves the euro amount and code.
   `100km/h in m/s / 2` retains the compound target, and `1000 usd in eur / 0` stays silent
 
-### Calendar and meetings
-
-- With Calendar **off**: no launcher entries, no card, no permission prompt at launch
-- Enabling shows the consent dialog **before** the macOS prompt; declining prompts for nothing
-- After Calendar permission is reset, Settings ▸ Calendar offers `Allow Calendar Access…` and asks
-  again; after denial it offers System Settings instead
-- With a meeting four minutes out, an empty palette shows the card on top, provider glyph and all
-- The countdown steps on the minute boundary rather than on a keystroke
-- ↵ joins: a Zoom link opens the Zoom app, and the browser where no app claims the scheme
-- Typing a character swaps the card for the calculator's; ↑/↓ never lands on a phantom row
-- Unchecking a calendar drops its events from the launcher and My Schedule, and survives a relaunch
-- `Show in launcher` off drops the meeting entries from the launcher, yet typing `My Schedule`
-  still finds the command, and it still lists the meetings
-- Adding or deleting an event in Calendar.app updates an open palette without a reopen
-- A meeting with no link is listed and searchable, and answers Open in Calendar rather than Join
-- Two upcoming meetings with titles in reverse alphabetical order appear earliest first in the
-  launcher's Meetings section and the `Meetings` category listing, even after opening the later one
-- Import a backup taken with Calendar on: it comes back **off**, and no calendar toggle travels
-- Calendar in Menu Bar on Disabled: the calendar item is gone and Tinycast's own item is unaffected;
-  turning `Show in menu bar` off leaves an enabled calendar item in place, and both off leaves neither
-- On Meeting Title with Show Upcoming Events at 5 minutes, the title and countdown appear at T-5 and
-  step on the minute boundary, not on a keystroke
-- `Only show events with meetings` hides a linkless event and shows it again when unchecked
-- `Hide when there are no upcoming events` removes the item whenever it would show only the glyph or
-  `No upcoming events`: on Today after the last event, on 5 minutes between meetings too. It returns
-  with the next event and never moves the `Calendar in Menu Bar` picker off its choice
-- Hide Current Event on Automatically clears the entry at the start and hands the space to the next
-  event inside its lead time; on 5 minutes it lingers counting up, then clears
-- Clicking the calendar item opens `Join <title>`, `Open in Calendar...`, `My Schedule` and
-  `Calendar Settings...` and nothing else; the second opens that event in Calendar.app, while a bare
-  click never joins
-- Camera Preview on: ↵ on the join card opens the panel **already showing live video** — no black
-  frame, no blank mid-preview; ↵ joins, Esc drops the join; the camera light goes out with the
-  panel, and the first run prompts once, before any panel appears
-- With Open Camera or the join card up, changing a video effect in Control Center leaves the preview
-  live; the next click outside both the panel and system UI then closes it, and Esc does once the
-  panel is clicked
-- A meeting that ends leaves the launcher results and `My Schedule` on the same minute boundary it
-  leaves the menu bar, with the palette open or closed over the end
-- Auto Join on: the meeting opens itself at its start, **once** — dismiss it and it does not return.
-  With confirm on and camera preview off, the dialog asks first
-- Arming Auto Join during a meeting already under way joins nothing
-- `Only join known meeting services` on: an event whose only link is a booking page or document
-  neither asks nor opens at its start, while a Zoom or Meet event beside it still joins; the join
-  card still offers both
-- Sleeping over a meeting's start and waking past it reloads the events; one still inside the window
-  joins, one long past does not
-- Create Event opens the launcher form with only Title, Start and Duration, defaulting to Now and
-  30 min. Blank and whitespace-only titles disable the action, including ⌘↵. Tab/Shift-Tab cycle the
-  fields; Return/Space/Down open a focused choice, and Escape closes that menu before the form.
-- Back or Escape restores the search and selection that opened Create Event; a hotkey-opened form
-  closes instead. Disabling Calendar closes the editor, and revoked permission cannot write an event.
-- Create Event writes to the default calendar and shows up on the card, the schedule and the launcher
-  without a relaunch; start offsets are measured at save, not when the editor opens.
-- Arrow keys move the caret in the event title field, and still step the Set Volume slider.
-- Every command row of Settings ▸ Calendar has Add Alias, Record Hotkey and a checkbox, and none of
-  the five appears in Settings ▸ Commands
-- Export with auto join and camera preview on, import onto a clean profile: both come back **off**,
-  while the menu-bar settings carry over
-
 ### File favorites
 
 - In Search Files, use ⌘K → Add to Favorites on a folder and ⇧⌘F on a file. Open root search with an
   empty query: both appear with app favorites in insertion order, including after relaunch.
 - Move files and apps across each other with ⌥⌘↑/↓ and the matching menu actions; selection follows
   the moved row. Remove a favorite through either path; selection stays within Favorites.
-- Hold ⌘ and check that each displayed ⌘1–⌘0 opens that favorite, including with the meeting card
-  above Favorites and from the compact palette.
+- Hold ⌘ and check that each displayed ⌘1–⌘0 opens that favorite, including from the compact
+  palette.
 - Search for a saved filename, including a short query and accented text: the favorite appears once.
   Turn Show in launcher off: saved files remain available; disable File Search: they disappear.
   Re-enable it: their order returns.
@@ -697,6 +637,7 @@ caches, TCC grants and login item, so this cannot disturb an installed copy.
 - Empty Trash confirms while Finder's "Show warning before emptying the Trash" is on, and runs
   without a dialog once it is off
 - Volume actions show the volume HUD; everything else shows the message pill
+- Arrow keys step the Set Volume slider
 - Toggle Microphone Mute works from the launcher and a global hotkey with the palette closed;
   its pill reports Microphone Muted / Microphone Unmuted, input audio follows that state, and input
   gain and output audio stay unchanged. Switch the default input and repeat; an unavailable or
