@@ -543,6 +543,10 @@ run quicklink-coordinator-test Tinycast/Features/Quicklinks/Model/Quicklink.swif
                            Tinycast/Features/Quicklinks/UI/QuicklinkArgumentsAccessory.swift \
                            Tinycast/Features/Templates/Model/TemplateEngine.swift
 run template-test          Tinycast/Features/Templates/Model/TemplateEngine.swift
+run snippets-test          Tinycast/Features/Snippets/Model/*.swift \
+                           Tinycast/Features/Snippets/Service/SnippetScanner.swift \
+                           Tinycast/Features/Snippets/Service/SnippetFileWriter.swift \
+                           Tinycast/Features/FileSearch/Model/FileSearchIgnoreList.swift
 run text-injection-test    Tinycast/Platform/AccessibilityText.swift \
                            Tinycast/Features/Templates/Model/TemplateEngine.swift \
                            Tinycast/Features/TextInjection/Service/*.swift
@@ -551,12 +555,6 @@ run settings-backup-test   Tinycast/Features/Settings/AppSettingsKey.swift \
 run settings-file-test     Tinycast/Features/Settings/Model/*.swift \
                            Tinycast/Features/Settings/Service/SettingsFileMonitor.swift \
                            Tinycast/Features/Settings/Service/SettingsFileRepository.swift \
-                           Tinycast/Platform/AppPaths.swift
-run compact-favorites-migration-test Tinycast/Migrations/CompactFavoritesMigration.swift \
-                           Tinycast/Features/Settings/Model/*.swift \
-                           Tinycast/Platform/AppPaths.swift
-run snippets-removal-migration-test Tinycast/Migrations/SnippetsRemovalMigration.swift \
-                           Tinycast/Features/Settings/Model/*.swift \
                            Tinycast/Platform/AppPaths.swift
 run backup-archive-test   Tinycast/Platform/AppPaths.swift \
                            Tinycast/Features/Backup/Model/BackupArchive.swift \

@@ -10,6 +10,7 @@ final class AppCore {
     let appIndex: AppIndex
     let customCommands = CustomCommandStore()
     let quicklinks = QuicklinkStore()
+    let snippetStore = SnippetStore()
     let windowLayouts = WindowLayoutStore()
     let customWindowSizes = CustomWindowSizeStore()
     let rooms = RoomStore()
@@ -83,6 +84,10 @@ final class AppCore {
         paletteCoordinator: paletteCoordinator,
         clipboardHistory: { [unowned self] in self.clipboardCoordinator.textHistoryForTemplates() },
         core: self)
+
+    @ObservationIgnored private(set) lazy var snippetCoordinator = SnippetCoordinator(
+        store: snippetStore, settings: settings, appIndex: appIndex,
+        windowController: windowController, paletteCoordinator: paletteCoordinator, core: self)
 
     @ObservationIgnored private(set) lazy var paletteCoordinator = PaletteCoordinator(
         palette: palette, settings: settings, appIndex: appIndex,
@@ -235,8 +240,6 @@ final class AppCore {
             SpaceTheme.start()  // tinycast-space: before the extension scan, which must see the Theme command
             // Shorten AppKit's ~2–3s tooltip delay; registration domain, so a user default wins.
             UserDefaults.standard.register(defaults: ["NSInitialToolTipDelay": 250])
-            CompactFavoritesMigration.run(settingsFileEnabled: settings.settingsFileEnabled)
-            SnippetsRemovalMigration.run(settingsFileEnabled: settings.settingsFileEnabled)
             NSApp.setActivationPolicy(.accessory)
             applyAppearance()
             applyMotion()
@@ -286,6 +289,9 @@ final class AppCore {
             // Before `hotKeys.start` even when off: the prune reads it. docs/features/quicklinks.md
             quicklinks.load()
             quicklinkCoordinator.applyQuicklinksPresence()
+            snippetStore.onFailures = { [weak self] in self?.snippetCoordinator.reportFailures($0) }
+            // Unconditional: a disabled feature has to take its command rows down with it.
+            snippetCoordinator.applyEnabled()
             appleShortcutCoordinator.applyPresence()
             paletteCoordinator.onLauncherShown = { [weak self] in
                 self?.appleShortcutCoordinator.refresh()
@@ -599,6 +605,13 @@ final class AppCore {
                 _ = $0.quicklinksEnabled
                 _ = $0.quicklinksShowInLauncher
             }, reproject: { $0.quicklinkCoordinator.applyQuicklinksPresence() })
+        track(
+            {
+                _ = $0.snippetsEnabled
+                _ = $0.snippetsShowInLauncher
+                _ = $0.snippetFolders
+                _ = $0.snippetExcludePatterns
+            }, reproject: { $0.snippetCoordinator.applyEnabled() })
         track(
             { _ = $0.appleShortcutsEnabled },
             reproject: { $0.appleShortcutCoordinator.applyPresence() })

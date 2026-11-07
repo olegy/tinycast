@@ -3,6 +3,12 @@
 What is new in each Tinycast Lite release. The update window shows the section of the version it
 offers.
 
+## Next
+
+### New
+
+- **Snippets** are back, rebuilt around your own Markdown files. Add one or more folders in Settings → Snippets, then Search Snippets finds a file by its name, `keywords` and subfolder names, and previews it with highlighted code. ↵ copies it; ⌘↵ pastes a one-line snippet straight into the app you were in. Create, edit, move between folders and delete from the palette; editing changes only what you edited, so other frontmatter stays as it was. External changes show up on their own.
+
 ## 0.12.8-lite.2
 
 ### Removed

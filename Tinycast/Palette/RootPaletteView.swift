@@ -60,6 +60,15 @@ struct RootPaletteView: View {
         case .uninstall:
             return UninstallScreen(
                 session: uninstall, core: core, vm: vm, openActions: openActions)
+        case .snippets:
+            return SnippetsScreen(
+                store: core.snippetStore, coordinator: core.snippetCoordinator, vm: vm,
+                metrics: metrics, openActions: openActions,
+                scrollToFollow: { scroll = ScrollIntent(kind: .follow) })
+        case .snippetEditor:
+            return SnippetEditorScreen(
+                coordinator: core.snippetCoordinator, openMenuCorner: menuCorner,
+                openInputMenu: openInputOptions)
         case .quicklinks:
             return QuicklinkListScreen(
                 store: quicklinks, core: core, vm: vm, openActions: openActions,
@@ -1598,6 +1607,10 @@ struct RootPaletteView: View {
         }
         if vm.mode == .quicklinkEditor {
             core.quicklinkCoordinator.cancelQuicklinkEditing()
+            return
+        }
+        if vm.mode == .snippetEditor {
+            core.snippetCoordinator.cancelSnippetEditing()
             return
         }
         if vm.mode == .extensionCommand {

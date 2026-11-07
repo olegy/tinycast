@@ -288,6 +288,7 @@ final class DeepLinkCoordinator {
         case .calculatorHistory:
             paletteCoordinator.togglePalette(mode: .calculatorHistory, seeding: text)
         case .searchQuicklinks: paletteCoordinator.togglePalette(mode: .quicklinks, seeding: text)
+        case .searchSnippets: core.snippetCoordinator.showSnippets(query: text)
         case .searchFiles: core.fileSearchCoordinator.show(query: text)
         case .define: core.dictionaryCoordinator.show(term: text)
         case .quickAI: core.quickAICoordinator.show(draft: text)

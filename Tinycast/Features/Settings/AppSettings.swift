@@ -535,6 +535,30 @@ final class AppSettings {
         }
     }
 
+    /// Off means no scan, no watcher and no commands; the files themselves are never touched.
+    var snippetsEnabled: Bool {
+        didSet { defaults.set(snippetsEnabled, forKey: Key.snippetsEnabled.rawValue) }
+    }
+
+    var snippetsShowInLauncher: Bool {
+        didSet { defaults.set(snippetsShowInLauncher, forKey: Key.snippetsShowInLauncher.rawValue) }
+    }
+
+    /// The snippets folders as the user added them, `~` allowed, all of equal standing.
+    var snippetFolders: [String] {
+        didSet { defaults.set(snippetFolders, forKey: Key.snippetFolders.rawValue) }
+    }
+
+    /// Folder patterns skipped in every snippets folder, in File Search's ignore syntax.
+    var snippetExcludePatterns: [String] {
+        didSet { defaults.set(snippetExcludePatterns, forKey: Key.snippetExcludePatterns.rawValue) }
+    }
+
+    /// The app Open in Editor uses; nil hands the file to whatever macOS opens Markdown with.
+    var snippetEditorBundleID: String? {
+        didSet { defaults.set(snippetEditorBundleID, forKey: Key.snippetEditorBundleID.rawValue) }
+    }
+
     /// Off means the Shortcuts tool is never run, down to a bound shortcut running nothing.
     var appleShortcutsEnabled: Bool {
         didSet { defaults.set(appleShortcutsEnabled, forKey: Key.appleShortcutsEnabled.rawValue) }
@@ -750,6 +774,13 @@ final class AppSettings {
         quicklinksShowInLauncher =
             defaults.object(forKey: Key.quicklinksShowInLauncher.rawValue) == nil
             || defaults.bool(forKey: Key.quicklinksShowInLauncher.rawValue)
+        snippetsEnabled = defaults.bool(forKey: Key.snippetsEnabled.rawValue)
+        snippetsShowInLauncher =
+            defaults.object(forKey: Key.snippetsShowInLauncher.rawValue) == nil
+            || defaults.bool(forKey: Key.snippetsShowInLauncher.rawValue)
+        snippetFolders = defaults.stringArray(forKey: Key.snippetFolders.rawValue) ?? []
+        snippetExcludePatterns = defaults.stringArray(forKey: Key.snippetExcludePatterns.rawValue) ?? []
+        snippetEditorBundleID = defaults.string(forKey: Key.snippetEditorBundleID.rawValue)
         appleShortcutsEnabled = defaults.bool(forKey: Key.appleShortcutsEnabled.rawValue)
         quicklinkOpensNewWindow = defaults.bool(forKey: Key.quicklinkOpensNewWindow.rawValue)
         quicklinkPassesSelectedText = defaults.bool(

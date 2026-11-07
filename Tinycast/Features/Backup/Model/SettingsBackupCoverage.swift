@@ -49,6 +49,8 @@ enum SettingsBackupCoverage {
         "quicklinkPassesSelectedText": .quicklinkPassesSelectedText,
         "quicklinkConfirmsBeforeDelete": .quicklinkConfirmsBeforeDelete,
         "appleShortcutsEnabled": .appleShortcutsEnabled,
+        "snippetsEnabled": .snippetsEnabled,
+        "snippetsShowInLauncher": .snippetsShowInLauncher,
         "extensionsShowInLauncher": .extensionsShowInLauncher,
         "calendarShowInLauncher": .calendarShowInLauncher,
         "calendarLauncherLimit": .calendarLauncherLimit,
@@ -160,6 +162,12 @@ enum SettingsBackupCoverage {
             "Custom model instructions change transformed results and must not move unseen.",
         AppSettingsKey.quickActionLanguage.rawValue:
             "Follows the language the person at this Mac reads, not the one who wrote the backup.",
+        AppSettingsKey.snippetFolders.rawValue:
+            "Names folders on this Mac; the one a backup lands on may not have them.",
+        AppSettingsKey.snippetExcludePatterns.rawValue:
+            "Written against the snippets folders, which a backup does not carry either.",
+        AppSettingsKey.snippetEditorBundleID.rawValue:
+            "Names an app on this Mac; the one a backup lands on may not have it.",
         AppSettingsKey.settingsFileEnabled.rawValue:
             "Lets a file on this Mac change its settings; an import must not hand that to another."
     ]

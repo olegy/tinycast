@@ -203,6 +203,10 @@ final class LauncherCoordinator {
             calendarCoordinator.createEvent()
         case .searchQuicklinks:
             paletteCoordinator.togglePalette(mode: .quicklinks)
+        case .searchSnippets:
+            core.snippetCoordinator.showSnippets()
+        case .createSnippet:
+            core.snippetCoordinator.editSnippet(nil)
         case .createWindowLayout:
             dismissPalette()
             windowLayoutCoordinator.editWindowLayout(nil)

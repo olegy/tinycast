@@ -146,6 +146,8 @@ final class PalettePanel: NSPanel, AnimatedPanel {
 
     func cursor(at point: NSPoint) -> NSCursor {
         if let contentView, isEditableText(in: contentView, at: point) { return .iBeam }
+        // Selectable read-only text claims the I-beam too; overruling it made the pointer flicker.
+        if let text = contentView?.hitTest(point) as? NSTextView, text.isSelectable { return .iBeam }
         guard paletteState?.mode.isNativeEditor != true else { return .arrow }
         // Outset: the field editor AppKit installs is a point taller than the field it serves.
         let text = searchFieldRect.insetBy(dx: -Self.fieldEditorSlack, dy: -Self.fieldEditorSlack)
@@ -189,6 +191,7 @@ final class PalettePanel: NSPanel, AnimatedPanel {
         default: break
         }
         defer { applyCursorPolicy(for: event) }
+        if event.type == .keyDown { returnKeyboardFromReadOnlyText(for: event) }
         // Before every other rule, so the arrows' own policies apply to the chords too.
         if event.type == .keyDown, let arrow = Self.emacsArrow(for: event) {
             sendEvent(arrow)
@@ -230,6 +233,49 @@ final class PalettePanel: NSPanel, AnimatedPanel {
             return
         }
         super.sendEvent(event)
+    }
+
+    /// Read-only text keeps copy and selection keys; any other key returns to the search field.
+    private func returnKeyboardFromReadOnlyText(for event: NSEvent) {
+        if let text = firstResponder as? NSTextView {
+            guard !text.isEditable, !Self.selectsText(event) else { return }
+        } else {
+            // Re-rendering can remove the focused text from the window, leaving the window itself.
+            guard firstResponder === self || firstResponder == nil,
+                paletteState?.mode.isNativeEditor != true
+            else { return }
+        }
+        guard let field = searchField, makeFirstResponder(field) else { return }
+        moveFieldEditorCaretToEnd()
+        // SwiftUI's focus state saw the field lose focus, and would take it back after this key.
+        paletteState?.focusToken = UUID()
+    }
+
+    private static let selectionKeys: Set<Int> = [
+        kVK_UpArrow, kVK_DownArrow, kVK_LeftArrow, kVK_RightArrow,
+        kVK_Home, kVK_End, kVK_PageUp, kVK_PageDown
+    ]
+
+    private static func selectsText(_ event: NSEvent) -> Bool {
+        let modifiers = event.modifierFlags.intersection([.command, .option, .control, .shift])
+        if modifiers == .command { return ["c", "a"].contains(ASCIIKeyboardLayout.chordKey(for: event)) }
+        return modifiers.contains(.shift) && selectionKeys.contains(Int(event.keyCode))
+    }
+
+    /// A search, not a hit test: the placeholder drawn over the field would answer a hit test.
+    private var searchField: NSTextField? {
+        let rect = searchFieldRect
+        guard !rect.isEmpty, let contentView else { return nil }
+        return Self.editableField(in: contentView, at: CGPoint(x: rect.midX, y: rect.midY))
+    }
+
+    private static func editableField(in view: NSView, at point: CGPoint) -> NSTextField? {
+        guard !view.isHidden, view.convert(view.bounds, to: nil).contains(point) else { return nil }
+        if let field = view as? NSTextField, field.isEditable { return field }
+        for subview in view.subviews.reversed() {
+            if let field = editableField(in: subview, at: point) { return field }
+        }
+        return nil
     }
 
     private func consumeMenuDismissal(_ event: NSEvent) -> Bool {

@@ -107,7 +107,7 @@ enum SettingsSearchCatalog {
 
     static let entries: [SettingsSearchEntry] =
         general + applications + systemSettings + systemActions + commands + quicklinks
-        + appleShortcuts + fallbacks + clipboard + fileSearch + windowManagement
+        + appleShortcuts + fallbacks + clipboard + snippets + fileSearch + windowManagement
         + navigation + calendar + emoji + ai + quickActions + extensions + permissions
         + backup + about
 
@@ -336,6 +336,27 @@ enum SettingsSearchCatalog {
         .init(
             .quickActionsTranslate, "Translate to",
             keywords: ["language", "locale"])
+    ]
+
+    private static let snippets: [SettingsSearchEntry] = [
+        .init(
+            pane: .snippets,
+            keywords: ["markdown", "obsidian", "text", "code", "template"]),
+        .init(
+            .snippetsSnippets, "Enable Snippets",
+            keywords: ["markdown", "show in launcher", "root search"]),
+        .init(
+            group: .snippetsCommands, "Snippet commands",
+            keywords: ["shortcut", "hotkey", "launcher"]),
+        .init(
+            group: .snippetsFolders, "Snippets Folders",
+            keywords: ["vault", "obsidian", "location", "path", "add folder"]),
+        .init(
+            group: .snippetsExcludedFolders, "Excluded Folders",
+            keywords: ["exclude", "ignore", "skip", "pattern"]),
+        .init(
+            .snippetsEditor, "Open Snippets With",
+            keywords: ["external editor", "zed", "obsidian", "app"])
     ]
 
     private static let fileSearch: [SettingsSearchEntry] = [

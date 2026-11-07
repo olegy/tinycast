@@ -30,5 +30,3 @@ When the check fails, delete everything the row lists, then the row.
 
 | Migration | Repairs | Delete with it |
 | --- | --- | --- |
-| `CompactFavoritesMigration` | `appearance.showFavoritesInCompactMode` left in `settings.json`, which the import reports as unknown on every launch, and the orphaned `showFavoritesInCompactMode` default | its call in `AppCore.start()`, `Tests/compact-favorites-migration-test.swift`, its `run-tests.sh` entry and its testing.md row |
-| `SnippetsRemovalMigration` | the `snippets` and `notes` sections left in `settings.json` by removed features, which the import reports as unknown on every launch, and the orphaned Snippets defaults and hotkeys | its call in `AppCore.start()`, `Tests/snippets-removal-migration-test.swift`, its `run-tests.sh` entry and its testing.md row |

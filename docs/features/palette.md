@@ -248,7 +248,7 @@ button per configured `AppSettings.compactBarCommands` entry whose feature
 `AppIndex.isCommandEnabled` reports on. General settings shows **Compact Shortcuts** only
 when Compact is selected: an ordered list of zero to four unique commands, with add, replace,
 remove and move controls. The default is Clipboard History and Emoji & Symbols, both on for a new
-install, then Search Files and Search Quicklinks; My Schedule and Quick AI are also
+install, then Search Files and Search Quicklinks; Search Snippets, My Schedule and Quick AI are also
 available. Disabled features retain their configured positions but disappear from the
 bar until re-enabled; Settings still offers them, under **Off** in both menus and marked Off in the
 list, so a slot can be ready before its feature is.
@@ -458,6 +458,18 @@ Two measured details the policy depends on:
 - **The rect is outset by 2pt.** AppKit's field editor is a point taller than the field it serves — the
   same measurement the placeholder section above rests on — so its I-beam overhangs the published
   frame. Without the slack that 1pt band is a disagreement, and it flickers.
+- **Selectable read-only text gets the I-beam too.** A `ChatMarkdownText` in a palette screen (the
+  snippet preview, a quick action's result) sets the I-beam from its own tracking area; an arrow from
+  the policy over it made the pointer flicker. It is found by hit test, so a code block's header,
+  which is a subview, still gets the arrow.
+
+A click on read-only text makes it first responder, which would take the arrow keys from the list.
+`PalettePanel.returnKeyboardFromReadOnlyText` leaves it ⌘C, ⌘A and ⇧-movement keys, and hands every
+other key back to the search field before dispatch. A key that finds the window itself first
+responder goes back too: the snippet preview re-renders on a selection change, which removes the
+focused text from the window. The field is found by walking the views, since the placeholder drawn
+over it would answer a hit test. It also bumps `focusToken`: SwiftUI's focus state
+saw the field lose focus, and without the bump it resigns the field again after the first key.
 
 The policy runs after `super.sendEvent`, so it has the last word, and it writes only when the cursor
 actually differs. It must stay **symmetric**: an earlier version left the field alone and only forced

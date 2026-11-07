@@ -72,6 +72,9 @@ struct SettingsBackup: Codable {
         var quicklinkConfirmsBeforeDelete: Bool?
         // Carried like quicklinks: running a shortcut the user built grants no permission class.
         var appleShortcutsEnabled: Bool?
+        // Carried: reading the user's Markdown grants no permission class; the folders stay behind.
+        var snippetsEnabled: Bool?
+        var snippetsShowInLauncher: Bool?
         // `calendarEnabled` is absent: an import must not grant calendar access.
         var calendarShowInLauncher: Bool?
         var calendarLauncherLimit: Int?
@@ -174,6 +177,8 @@ extension SettingsBackup {
             quicklinkPassesSelectedText: s.quicklinkPassesSelectedText,
             quicklinkConfirmsBeforeDelete: s.quicklinkConfirmsBeforeDelete,
             appleShortcutsEnabled: s.appleShortcutsEnabled,
+            snippetsEnabled: s.snippetsEnabled,
+            snippetsShowInLauncher: s.snippetsShowInLauncher,
             calendarShowInLauncher: s.calendarShowInLauncher,
             calendarLauncherLimit: s.calendarLauncherLimit.rawValue,
             calendarSpan: s.calendarSpan.rawValue,
@@ -474,6 +479,14 @@ extension SettingsBackup {
         }
         if let flag = s.appleShortcutsEnabled {
             settings.appleShortcutsEnabled = flag
+            count += 1
+        }
+        if let flag = s.snippetsEnabled {
+            settings.snippetsEnabled = flag
+            count += 1
+        }
+        if let flag = s.snippetsShowInLauncher {
+            settings.snippetsShowInLauncher = flag
             count += 1
         }
         if let flag = s.quicklinkOpensNewWindow {

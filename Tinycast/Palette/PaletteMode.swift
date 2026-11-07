@@ -20,6 +20,8 @@ enum PaletteMode: String, CaseIterable, Identifiable {
     /// One meeting's read-only page, pushed from that meeting's own actions.
     case meetingDetails
     case uninstall
+    case snippets
+    case snippetEditor
     case quicklinks
     case quicklinkEditor
     case dictionary
@@ -29,7 +31,7 @@ enum PaletteMode: String, CaseIterable, Identifiable {
     var id: String { rawValue }
 
     var isNativeEditor: Bool {
-        self == .quicklinkEditor || self == .eventEditor
+        self == .snippetEditor || self == .quicklinkEditor || self == .eventEditor
             || self == .customCommandEditor
     }
 
@@ -51,6 +53,7 @@ enum PaletteMode: String, CaseIterable, Identifiable {
         case .customCommandEditor, .customCommands: return CustomCommand.sfSymbol
         case .meetingDetails: return "calendar"
         case .uninstall: return "trash"
+        case .snippets, .snippetEditor: return "curlybraces"
         case .quicklinks, .quicklinkEditor: return Quicklink.sfSymbol
         case .dictionary: return "book.closed"
         case .extensionCommand: return "puzzlepiece.extension"
@@ -77,6 +80,8 @@ enum PaletteMode: String, CaseIterable, Identifiable {
         case .customCommands: return String(localized: "Search custom commands…")
         case .meetingDetails: return String(localized: "Meeting details")
         case .uninstall: return String(localized: "Filter files and folders by name…")
+        case .snippets: return String(localized: "Search snippets…")
+        case .snippetEditor: return String(localized: "Snippet editor")
         case .quicklinks: return String(localized: "Search quicklinks…")
         case .quicklinkEditor: return String(localized: "Quicklink editor")
         case .dictionary: return String(localized: "Look up a word…")

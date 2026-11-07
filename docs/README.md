@@ -35,6 +35,7 @@ open with an `## Invariants` section; read it before changing anything in that a
 [file search](features/file-search.md) ·
 [menu search](features/menu-search.md) ·
 [quicklinks](features/quicklinks.md) ·
+[snippets](features/snippets.md) ·
 [Apple Shortcuts](features/apple-shortcuts.md) ·
 [hotkeys](features/hotkeys.md) ·
 [deeplinks](features/deeplinks.md) ·

@@ -159,6 +159,7 @@ If a change touches anything in the right column, the harness on the left is man
 | `quicklink-test` | all of `Quicklinks/Model/`, plus editor drafts and placeholder selection |
 | `quicklink-coordinator-test` | Opening and requested arguments, launcher editing, current enabled-state preservation, deletion during editing and feature gates; no platform effects or on-screen focus checks |
 | `apple-shortcut-test` | all of `AppleShortcuts/Model/` — the `shortcuts list` parser and entry ids |
+| `snippets-test` | `Snippets/Model/*.swift`, `SnippetScanner`, `SnippetFileWriter` — frontmatter recognition, byte-preserving keyword and content edits (CRLF, list values, removal), fences and the copy/paste table, words, tags, search and order, file-name rules, `.vault.json`, writes that ask before replacing, case-only renames, head-only scans past 4 KB, excluded and hidden folders |
 | `template-test` | `Templates/Model/TemplateEngine.swift` — every placeholder, parameter and modifier, argument order, cursor offsets, encoding and the Raycast aliases, against an injected clock, locale and UUIDs |
 | `text-injection-test` | `TextInjection/Service/` — the delivery queue, completion, AX confirmation, Unicode chunking, the pasteboard lease and the borrowed ⌘C, and in-process insertion into our own editor |
 | `symbols-test` | `Extensions/Service/SymbolCatalog.swift`, against this machine's CoreGlyphs |
@@ -174,8 +175,6 @@ If a change touches anything in the right column, the harness on the left is man
 | `text-diff-test` | `QuickActions/Model/TextDiffEngine.swift` — exact chunks, coalescing, Unicode, ties, token-cap boundaries and fast paths |
 | `settings-backup-test` | `Settings/AppSettingsKey.swift`, `Backup/Model/SettingsBackupCoverage.swift` |
 | `settings-file-test` | `Settings/Model/` and `Settings/Service/` — key paths, value tokens, the printer and parser, and the repository's import, replace, save, reload and symlink handling on a scratch folder |
-| `compact-favorites-migration-test` | `Migrations/CompactFavoritesMigration.swift` — strips the retired key and keeps every other value, and leaves a file with other problems to the import |
-| `snippets-removal-migration-test` | `Migrations/SnippetsRemovalMigration.swift` — retires exactly the Snippets defaults, strips the `snippets` section alongside the Notes section and compact favorites key, and leaves a file with other problems to the import |
 | `window-file-test` | `WindowManagement/Model/WindowManagementFileFormat.swift` — command shortcuts, custom sizes, layouts and rooms as settings.json spells them, hand edits and bad records |
 | `launcher-settings-file-test` | Launcher settings application — invalid records, partial edits, deferred bundles, shortcut moves and records outside search scopes; isolated preferences and in-memory scan/Carbon effects |
 | `backup-archive-test` | all of `Backup/Model/`, plus `Backup/Service/BackupStaging.swift` |

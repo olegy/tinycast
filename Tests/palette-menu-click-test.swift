@@ -9,6 +9,7 @@ final class PaletteState {
     var isComposing = false
     var searchFieldFrame = CGRect.zero
     var mode = PaletteMode.launcher
+    var focusToken = UUID()
 
     func notePointerMoved(to: CGPoint) {}
     func disarmHoverHighlight(pointerAt: CGPoint) {}
@@ -173,8 +174,12 @@ struct PaletteMenuClickTests {
             panel.cursor(at: NSPoint(x: 100, y: 116)) === NSCursor.arrow,
             "noneditable text fields retain the arrow")
         check(
+            panel.cursor(at: NSPoint(x: 100, y: 180)) === NSCursor.iBeam,
+            "selectable read-only text views keep the text cursor they set themselves")
+        textArea.isSelectable = false
+        check(
             panel.cursor(at: NSPoint(x: 100, y: 180)) === NSCursor.arrow,
-            "noneditable text views retain the arrow")
+            "unselectable text views retain the arrow")
         state.mode = .launcher
         state.searchFieldFrame = CGRect(x: 350, y: 40, width: 250, height: 23)
         check(

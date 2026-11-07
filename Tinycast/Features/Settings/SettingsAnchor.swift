@@ -59,6 +59,12 @@ extension SettingsAnchor {
     static let quickActionsModel = Self(tab: .quickActions, title: "Model")
     static let quickActionsTranslate = Self(tab: .quickActions, title: "Translate")
 
+    static let snippetsSnippets = Self(tab: .snippets, title: "Snippets")
+    static let snippetsCommands = Self(tab: .snippets, title: "Commands")
+    static let snippetsFolders = Self(tab: .snippets, title: "Folders")
+    static let snippetsExcludedFolders = Self(tab: .snippets, title: "Excluded Folders")
+    static let snippetsEditor = Self(tab: .snippets, title: "Editor")
+
     static let fileSearchFileSearch = Self(tab: .fileSearch, title: "File Search")
     static let fileSearchFullDiskAccess = Self(tab: .fileSearch, title: "Full Disk Access")
     static let fileSearchIndex = Self(tab: .fileSearch, title: "Index")

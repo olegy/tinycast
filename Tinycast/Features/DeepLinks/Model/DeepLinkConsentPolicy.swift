@@ -52,6 +52,7 @@ enum DeepLinkConsentPolicy {
             .searchMenuItems, .switchWindows, .switchWindowsBackwards, .createCustomCommand,
             .searchCustomCommands, .define, .mySchedule, .createEvent, .createWindowLayout,
             .switchRoom, .createRoom, .createQuicklink, .searchQuicklinks, .importQuicklinks,
+            .searchSnippets, .createSnippet,
             .exportQuicklinks, .exportSettings, .importSettings,
             .checkForUpdates, .about:
             false
