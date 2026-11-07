@@ -3,11 +3,17 @@
 What is new in each Tinycast Lite release. The update window shows the section of the version it
 offers.
 
-## Next
+## 0.12.8-lite.3
 
 ### New
 
 - **Snippets** are back, rebuilt around your own Markdown files. Add one or more folders in Settings → Snippets, then Search Snippets finds a file by its name, `keywords` and subfolder names, and previews it with highlighted code. ↵ copies it; ⌘↵ pastes a one-line snippet straight into the app you were in. Create, edit, move between folders and delete from the palette; editing changes only what you edited, so other frontmatter stays as it was. External changes show up on their own.
+
+### Changes
+
+- **The round menu button** at the bottom left of the palette is gone. Settings stays on ⌘, and Quit in the menu-bar icon; **Changelog** moves to Settings → About, next to GitHub, and opens this repository's releases.
+- **The ⌘K Actions menu** has the same corner radius as the palette.
+- **Code blocks** in Snippets, AI Chat and Quick Actions have smaller corners and no longer wrap: a long line scrolls sideways.
 
 ## 0.12.8-lite.2
 
