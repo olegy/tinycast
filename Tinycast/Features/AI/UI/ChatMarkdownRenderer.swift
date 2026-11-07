@@ -367,12 +367,16 @@ struct ChatMarkdownRenderer {
         box.setWidth(
             spacing.md + Self.codeHeaderHeight + spacing.sm, type: .absoluteValueType, for: .padding,
             edge: .minY)
-        box.setWidth(spacing.lg, type: .absoluteValueType, for: .padding, edge: .maxY)
-        box.setWidth(context.indent, type: .absoluteValueType, for: .margin, edge: .minX)
         let font = typography.textNSFont(.callout, monospaced: true)
+        // The last line already carries its line spacing and descent, so the baseline sits `xl` up.
+        let bottom = max(spacing.xl - spacing.chatLine + font.descender, spacing.xs)
+        box.setWidth(bottom, type: .absoluteValueType, for: .padding, edge: .maxY)
+        box.setWidth(context.indent, type: .absoluteValueType, for: .margin, edge: .minX)
         let style = paragraphStyle(in: context, extra: [box])
         style.firstLineHeadIndent = 0
         style.headIndent = 0
+        // The box reserves unwrapped lines; `ChatCodeScroller` draws them and scrolls sideways.
+        style.lineBreakMode = .byClipping
         let body = NSMutableAttributedString(
             string: text, attributes: [.font: font, .foregroundColor: textColor(context)])
         if !context.failed { colorSyntax(of: body, language: language) }

@@ -46,7 +46,7 @@ enum Theme {
         /// A pill holding a square thumbnail; a full capsule fights the thumbnail's own corners.
         static let attachmentChip: CGFloat = 8
         static let card: CGFloat = 10
-        static let codeBlock: CGFloat = 14
+        static let codeBlock: CGFloat = 6
         /// A window-to-be in the room preview, rounded like a real window rather than a row.
         static let roomCard: CGFloat = 16
         static let keyCap: CGFloat = 6
@@ -141,7 +141,6 @@ enum Theme {
         static let menuSectionHeader: CGFloat = 16
         /// Five rows and half of the sixth, so a capped menu reads as scrollable, not clipped.
         static let menuVisibleRows: CGFloat = 5.5
-        static let appMenuVisibleRows: CGFloat = 4.5
         /// Rounded: a half-row of an odd pitch lands the glass edge on a half pixel.
         static var menuRowsMaxHeight: CGFloat {
             (menuVisibleRows * (menuRowHeight + menuRowSpacing)).rounded()

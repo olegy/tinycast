@@ -10,6 +10,7 @@ struct AboutView: View {
     }
 
     private static let repository = URL(string: "https://github.com/olegy/tinycast")!
+    private static let releases = repository.appending(path: "releases")
 
     // Cached, and read from the bundle: the app icon is generic until LaunchServices registers.
     @MainActor private static let appIcon: NSImage = {
@@ -78,6 +79,15 @@ struct AboutView: View {
                     Link(destination: Self.repository) {
                         HStack(spacing: Theme.Spacing.xxs) {
                             Text(verbatim: "GitHub")
+                            Image(systemName: "arrow.up.right")
+                                .imageScale(.small)
+                        }
+                    }
+                    Text(verbatim: "•")
+                        .foregroundStyle(.tertiary)
+                    Link(destination: Self.releases) {
+                        HStack(spacing: Theme.Spacing.xxs) {
+                            Text("Changelog")
                             Image(systemName: "arrow.up.right")
                                 .imageScale(.small)
                         }

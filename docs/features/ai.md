@@ -504,7 +504,9 @@ and the Actions menu's own chords, and dies with the window.
   a continuous rounded rectangle (`Theme.Radius.codeBlock`) over the block's bounds less its margin
   (the list or quote indent), because a text block paints only around the glyphs being redrawn and
   a scroll that redraws just its header strip left that strip bare. The language and Copy sit in
-  that strip, above the code. The text view's tracking area hears the pointer under that strip and
+  that strip, above the code. Code paragraphs are `.byClipping`, so the box reserves unwrapped lines;
+  layout-manager temporary attributes hide their glyphs and a `ChatCodeScroller` over the box draws
+  them and scrolls sideways, keeping vertical swipes for the transcript. The text view's tracking area hears the pointer under that strip and
   under anything floated over the transcript, such as Jump to Latest, and `NSTextView` would claim
   an I-beam there; its `mouseMoved` and `cursorUpdate` set the arrow unless the window's hit test
   lands on the text itself. Thinking folds, search
@@ -714,6 +716,8 @@ window, and every chat action either surface sends — is the nineteenth feature
 - Scroll up until only a code block's top edge shows, then a little more: its rounded top and the
   strip holding its language and Copy draw whole. A code block inside a list starts at the list's
   indent, with its header over the code.
+- A code block with a line wider than the reply does not wrap: a sideways swipe scrolls it, a
+  vertical one scrolls the transcript, and a copy across it keeps the code's colours.
 - Full screen and a narrow window: a reply, its code blocks, the chips and the composer share the
   same left and right edges, the user's bubble ends on the right one, and the column grows to
   `aiChatReadingWidth` before the gutters widen.

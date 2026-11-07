@@ -64,12 +64,7 @@ struct ExtensionActionsPanel: View {
     private var hairline: CGFloat { 1 / displayScale }
 
     var body: some View {
-        let shape = UnevenRoundedRectangle(
-            topLeadingRadius: metrics.radius.menuPanel,
-            bottomLeadingRadius: metrics.radius.menuPanel,
-            bottomTrailingRadius: metrics.size.menuButton / 2,
-            topTrailingRadius: metrics.radius.menuPanel,
-            style: .continuous)
+        let shape = RoundedRectangle(cornerRadius: metrics.radius.panel, style: .continuous)
         return VStack(spacing: 0) {
             listContent
             Rectangle()

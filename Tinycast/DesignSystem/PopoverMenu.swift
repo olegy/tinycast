@@ -74,7 +74,6 @@ struct PopoverMenuContent {
 struct PopoverMenu: View {
     enum Attachment {
         case none
-        case bottomLeading
         case bottomTrailing
     }
 
@@ -88,20 +87,9 @@ struct PopoverMenu: View {
         let placement: Placement
     }
 
-    struct SurfaceShape: Shape {
-        let attachment: Attachment
-        let radius: CGFloat
-        let attachedRadius: CGFloat
-
-        func path(in rect: CGRect) -> Path {
-            UnevenRoundedRectangle(
-                topLeadingRadius: radius,
-                bottomLeadingRadius: attachment == .bottomLeading ? attachedRadius : radius,
-                bottomTrailingRadius: attachment == .bottomTrailing ? attachedRadius : radius,
-                topTrailingRadius: radius,
-                style: .continuous
-            ).path(in: rect)
-        }
+    /// The ⌘K menu stands over the palette's corner, so it takes the palette's radius.
+    static func cornerRadius(_ attachment: Attachment, _ metrics: InterfaceMetrics) -> CGFloat {
+        attachment == .bottomTrailing ? metrics.radius.panel : metrics.radius.menuPanel
     }
 
     var header: String?
@@ -127,9 +115,8 @@ struct PopoverMenu: View {
     /// One device pixel: a point-wide rule reads heavy against the glass.
     private var hairline: CGFloat { 1 / displayScale }
     var body: some View {
-        let shape = SurfaceShape(
-            attachment: attachment, radius: metrics.radius.menuPanel,
-            attachedRadius: metrics.size.menuButton / 2)
+        let shape = RoundedRectangle(
+            cornerRadius: Self.cornerRadius(attachment, metrics), style: .continuous)
         surfaceContent
             .frame(width: width ?? metrics.size.actionMenuWidth)
             .glassEffect(SpaceTheme.tinted(.regular), in: shape)  // tinycast-space

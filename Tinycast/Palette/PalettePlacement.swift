@@ -96,7 +96,6 @@ enum PalettePlacement {
 }
 
 enum MenuPanelCorner: Equatable {
-    case bottomLeading
     case bottomTrailing
     case belowHeaderTrailing
     case belowControl(CGRect, trailing: Bool = true)
@@ -107,8 +106,6 @@ enum MenuPanelCorner: Equatable {
     ) -> CGRect {
         let origin: CGPoint =
             switch self {
-            case .bottomLeading:
-                CGPoint(x: parentFrame.minX + inset, y: parentFrame.minY + inset)
             case .bottomTrailing:
                 CGPoint(
                     x: parentFrame.maxX - inset - contentSize.width,

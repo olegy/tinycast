@@ -63,6 +63,7 @@ final class ChatSelectableTextView: NSTextView {
     private var source: ChatMarkdownSource?
     private var rendered: ChatRenderedText?
     private var headers: [ChatCodeHeader] = []
+    private var scrollers: [ChatCodeScroller] = []
     private var codeBoxes: [CGRect] = []
     private var reportedMatch: CGRect?
     /// A second layout of the same storage, so SwiftUI's size probes never re-wrap the drawn one.
@@ -109,8 +110,23 @@ final class ChatSelectableTextView: NSTextView {
         rendered = output
         measured = nil
         textStorage?.setAttributedString(output.string)
+        hideCodeGlyphs()
         layoutOverlays()
         needsDisplay = true
+    }
+
+    /// Temporary attributes only paint, so a copy across a code block keeps the code's own ink.
+    private func hideCodeGlyphs() {
+        guard let layout = layoutManager, let storage = textStorage else { return }
+        layout.removeTemporaryAttribute(
+            .foregroundColor, forCharacterRange: NSRange(location: 0, length: storage.length))
+        layout.removeTemporaryAttribute(
+            .backgroundColor, forCharacterRange: NSRange(location: 0, length: storage.length))
+        for code in rendered?.codeBlocks ?? [] {
+            layout.addTemporaryAttributes(
+                [.foregroundColor: NSColor.clear, .backgroundColor: NSColor.clear],
+                forCharacterRange: code.range)
+        }
     }
 
     /// `nil` is the ideal width. SwiftUI asks the same width repeatedly, so the last answer is kept.
@@ -262,6 +278,99 @@ final class ChatSelectableTextView: NSTextView {
             header.frame = CGRect(
                 x: box.minX + inset, y: box.minY + metrics.spacing.md,
                 width: max(box.width - inset * 2, 0), height: ChatCodeHeader.height)
+        }
+        placeScrollers(blocks, metrics: metrics)
+    }
+
+    private func placeScrollers(_ blocks: [ChatRenderedText.CodeBlock], metrics: InterfaceMetrics) {
+        while scrollers.count > blocks.count { scrollers.removeLast().removeFromSuperview() }
+        while scrollers.count < blocks.count {
+            let scroller = ChatCodeScroller()
+            addSubview(scroller)
+            scrollers.append(scroller)
+        }
+        guard let storage = textStorage, let layout = layoutManager, let container = textContainer
+        else { return }
+        let line = Theme.Size.hairline
+        for (scroller, (block, box)) in zip(scrollers, zip(blocks, codeBoxes)) {
+            let lines = NSRange(location: block.range.location, length: max(block.range.length - 1, 0))
+            let glyphs = layout.glyphRange(forCharacterRange: lines, actualCharacterRange: nil)
+            let drawn = layout.boundingRect(forGlyphRange: glyphs, in: container)
+            scroller.frame = CGRect(
+                x: box.minX + line, y: drawn.minY, width: max(box.width - line * 2, 0),
+                height: drawn.height)
+            scroller.show(
+                ChatCodeScroller.unwrapped(storage.attributedSubstring(from: lines)),
+                inset: metrics.spacing.xl - line)
+        }
+    }
+}
+
+/// A code block's lines, unwrapped: a long line scrolls sideways rather than wrapping.
+private final class ChatCodeScroller: NSScrollView {
+    private let text = NSTextView(frame: .zero)
+    private var shown: NSAttributedString?
+    /// Fixed for a whole gesture, so a diagonal swipe never hands the transcript half of it.
+    private var sideways = false
+
+    init() {
+        super.init(frame: .zero)
+        drawsBackground = false
+        hasHorizontalScroller = false
+        hasVerticalScroller = false
+        verticalScrollElasticity = .none
+        text.isEditable = false
+        text.isSelectable = true
+        text.isRichText = true
+        text.drawsBackground = false
+        text.isHorizontallyResizable = false
+        text.isVerticallyResizable = false
+        text.textContainer?.widthTracksTextView = false
+        text.textContainer?.heightTracksTextView = false
+        text.textContainer?.lineFragmentPadding = 0
+        text.textContainer?.size = CGSize(
+            width: CGFloat.greatestFiniteMagnitude, height: CGFloat.greatestFiniteMagnitude)
+        documentView = text
+    }
+
+    @available(*, unavailable)
+    required init?(coder: NSCoder) { nil }
+
+    /// The box's own paragraph blocks and indents belong to the transcript's layout, not this one.
+    static func unwrapped(_ code: NSAttributedString) -> NSAttributedString {
+        let result = NSMutableAttributedString(attributedString: code)
+        let whole = NSRange(location: 0, length: result.length)
+        result.enumerateAttribute(.paragraphStyle, in: whole) { value, range, _ in
+            guard let style = (value as? NSParagraphStyle)?.mutableCopy() as? NSMutableParagraphStyle
+            else { return }
+            style.textBlocks = []
+            style.headIndent = 0
+            style.firstLineHeadIndent = 0
+            result.addAttribute(.paragraphStyle, value: style, range: range)
+        }
+        return result
+    }
+
+    func show(_ code: NSAttributedString, inset: CGFloat) {
+        if code != shown {
+            shown = code
+            text.textStorage?.setAttributedString(code)
+        }
+        text.textContainerInset = NSSize(width: inset, height: 0)
+        guard let layout = text.layoutManager, let container = text.textContainer else { return }
+        layout.ensureLayout(for: container)
+        let used = layout.usedRect(for: container)
+        text.frame = CGRect(
+            x: 0, y: 0, width: max(ceil(used.width) + inset * 2, bounds.width), height: bounds.height)
+    }
+
+    override func scrollWheel(with event: NSEvent) {
+        let starts = event.phase == .began || (event.phase.isEmpty && event.momentumPhase.isEmpty)
+        if starts { sideways = abs(event.scrollingDeltaX) > abs(event.scrollingDeltaY) }
+        if sideways {
+            super.scrollWheel(with: event)
+        } else {
+            nextResponder?.scrollWheel(with: event)
         }
     }
 }

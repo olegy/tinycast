@@ -56,9 +56,9 @@ typealias MenuPanelClipPath =
             activate: { popover.items[$0].action() },
             isSelectable: { popover.items[$0].isSelectable },
             clipPath: { bounds, metrics, corner in
-                PopoverMenu.SurfaceShape(
-                    attachment: corner.popoverAttachment, radius: metrics.radius.menuPanel,
-                    attachedRadius: metrics.size.menuButton / 2
+                RoundedRectangle(
+                    cornerRadius: PopoverMenu.cornerRadius(corner.popoverAttachment, metrics),
+                    style: .continuous
                 ).path(in: bounds).cgPath
             })
         keepsOpen = { popover.items[$0].keepsMenuOpen }  // tinycast-space
@@ -68,7 +68,6 @@ typealias MenuPanelClipPath =
 private extension MenuPanelCorner {
     var popoverAttachment: PopoverMenu.Attachment {
         switch self {
-        case .bottomLeading: .bottomLeading
         case .bottomTrailing: .bottomTrailing
         case .belowHeaderTrailing, .belowControl: .none
         }

@@ -490,7 +490,7 @@ The textarea routes undo/redo to its own manager.
 
 `RootPaletteView` holds a single `OpenMenu?` rather than a flag per menu, so "at most one is open" is
 structural instead of a pair of `onChange` handlers pushing each other closed. The ⌘K Actions menu
-hangs `.bottomTrailing`, the app menu `.bottomLeading`, and everything drawn as a header control —
+hangs `.bottomTrailing`, and everything drawn as a header control —
 the clipboard type filter, the AI model and effort menus, an `options=` argument field's choices and
 a running command's `searchBarAccessory` dropdown — hangs `.belowHeaderTrailing`, under its own
 button. Native editor inputs supply their own choices and control frame through `openInputOptions`;
@@ -524,8 +524,6 @@ row sits as far from it as from the search field's hairline. That height joins t
 sizing, but the separator takes no selection index, so navigation still walks only rows. A menu
 taller than its default cap ends its viewport mid-row, so the fold never lands on a separator or section
 title, and both hairlines are one device pixel.
-The app menu keeps its five actions in one group and caps the list at four and a half rows, leaving
-Quit partially visible above the search band until scrolling or keyboard navigation reveals it.
 Built-in action menus mark boundaries between opening or copying, managing the item, settings, and
 deletion. Menus offering one kind of action, such as calculator copies, color formats, or emoji
 transfers, keep their rows in one group.

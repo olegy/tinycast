@@ -24,7 +24,6 @@ struct RootPaletteView: View {
     @Environment(ExtensionManager.self) private var extensions
     @Environment(AppSettings.self) private var settings
     @Environment(\.metrics) private var metrics
-    @Environment(\.openURL) private var openURL
     @FocusState private var searchFocused: Bool
     /// Kept apart from the search field's own focus. See docs/features/palette.md.
     @FocusState private var argumentFocused: String?
@@ -210,39 +209,6 @@ struct RootPaletteView: View {
             })
     }
 
-    private var appMenuContent: PopoverMenuContent {
-        let appName = Bundle.main.appDisplayName
-        let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String
-        let title = version.map { "\(appName) v\($0)" } ?? appName
-        return PopoverMenuContent(
-            header: title,
-            items: [
-                PopoverMenuItem(
-                    title: String(localized: "Changelog"),
-                    systemImage: "clock.arrow.trianglehead.2.counterclockwise.rotate.90"
-                ) {
-                    if let url = URL(string: "https://github.com/sermelipharo/tinycast-space/releases") {
-                        openURL(url)
-                    }
-                },
-                PopoverMenuItem(title: String(localized: "About Tinycast"), systemImage: "info.circle") {
-                    core.settingsCoordinator.showAbout()
-                },
-                PopoverMenuItem(
-                    title: String(localized: "Settings"), systemImage: "gearshape", shortcut: "⌘,"
-                ) {
-                    core.settingsCoordinator.showSettings()
-                },
-                PopoverMenuItem(
-                    title: String(localized: "Quit \(appName)"),
-                    systemImage: "rectangle.portrait.and.arrow.right",
-                    isDestructive: true
-                ) {
-                    NSApp.terminate(nil)
-                }
-            ])
-    }
-
     /// The one source every menu path addresses rows through, so none can disagree.
     private var menuContent: PaletteMenuContent? {
         switch openMenu {
@@ -252,14 +218,6 @@ struct RootPaletteView: View {
                 at: selection(in: screen), searchQuery: ActionMenuSearchQuery(vm.menuQuery),
                 menuSelection: $menuSelection,
                 onActivate: activateMenuItem)
-        case .app:
-            let filtered = appMenuContent.matching(ActionMenuSearchQuery(vm.menuQuery))
-            return PaletteMenuContent(
-                popover: filtered.content, selection: $menuSelection,
-                visibleRows: Theme.Size.appMenuVisibleRows,
-                search: PopoverMenu.Search(
-                    placeholder: String(localized: "Search for actions…"), placement: .bottom),
-                onActivate: activateMenuItem, preferredSelection: filtered.bestMatch)
         case .clipboardFilter:
             return headerMenu(
                 clipboardFilterContent, width: metrics.size.clipboardFilterMenuWidth)
@@ -1016,7 +974,7 @@ struct RootPaletteView: View {
     ) -> some View {
         // Floating controls, no bar; the edge dissolve ghosts the rows passing beneath.
         HStack(spacing: 0) {
-            appMenuButton
+            Color.clear.frame(width: 0, height: 0)
                 .modifier(ExtensionToastSlot(extensions: extensions, showing: vm.mode == .extensionCommand))
             if showActionGroup {
                 actionGroup(
@@ -1030,12 +988,6 @@ struct RootPaletteView: View {
         .padding(.horizontal, metrics.spacing.md)
         .frame(height: metrics.size.bottomBarHeight)
         .frame(maxWidth: .infinity)
-    }
-
-    private var appMenuButton: some View {
-        MenuCircleButton {
-            if openMenu == .app { closeMenus() } else { open(.app, highlighting: 0) }
-        }
     }
 
     private func actionGroup(
@@ -1356,7 +1308,6 @@ struct RootPaletteView: View {
 
     private var menuCorner: MenuPanelCorner? {
         switch openMenu {
-        case .app: .bottomLeading
         case .actions: .bottomTrailing
         case .argumentOptions: .belowHeaderTrailing
         case .inputOptions(let corner): corner
@@ -1643,7 +1594,6 @@ private enum OpenMenu: Equatable {
     case extensionAccessory
     case argumentOptions
     case inputOptions(MenuPanelCorner)
-    case app
     case clipboardFilter
     case fileSearchFilter
     case emojiCategory
@@ -1671,29 +1621,6 @@ private struct SearchFieldHiding: ViewModifier {
 
     func body(content: Content) -> some View {
         content.onChange(of: hidden) { _, hidden in apply(hidden) }
-    }
-}
-
-/// The footer's menu circle; hover lives here, so a sweep never re-renders the body.
-private struct MenuCircleButton: View {
-    let action: () -> Void
-    @State private var hovered = false
-    @Environment(\.metrics) private var metrics
-
-    var body: some View {
-        Button(action: action) {
-            VStack(alignment: .leading, spacing: 3) {
-                Capsule().frame(width: 14, height: 1.5)
-                Capsule().frame(width: 8, height: 1.5)
-            }
-            .foregroundStyle(Theme.Colors.textSecondary)
-            .frame(width: metrics.size.menuButton, height: metrics.size.menuButton)
-            .background(Circle().fill(hovered ? Theme.Colors.rowHover : Color.clear))
-            .contentShape(.circle)
-        }
-        .buttonStyle(.plain)
-        .onHover { hovered = $0 }
-        .frosted(in: Circle())
     }
 }
 

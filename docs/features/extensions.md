@@ -416,7 +416,7 @@ screens hold (see [palette.md](palette.md)).
   field has no dissolve. The 8pt resting inset scrolls with the actions, so rows can reach the panel
   edge without shifting their initial position; hover keeps the shared 10pt menu-row corner. The
   panel opens and closes from its bottom-right attachment with extension-owned opacity and scale
-  timing, briefly reaching 1.003; its attached corner matches the footer button. The first action is
+  timing, briefly reaching 1.003; its corners take the palette's `radius.panel`. The first action is
   the primary ↵ action; an action's own `shortcut` is matched against modified keystrokes, with the
   panel open or closed. `ExtensionCommandScreen.menuContent` hands the whole panel to the palette as a
   `PaletteMenuContent`, so the palette never learns the row type — and a row's handler is taken from
