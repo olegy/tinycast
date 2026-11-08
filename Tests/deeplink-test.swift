@@ -49,7 +49,6 @@ struct DeepLinkTests {
         settingsChecks()
         encodingChecks()
         routeInputChecks()
-        windowSizeChecks()
         consentKeyChecks()
         print("\(passes) passed, \(failures) failed")
         if failures > 0 { exit(1) }
@@ -70,11 +69,6 @@ struct DeepLinkTests {
                 roundTrip(action.entryID) == .systemAction(id: action.id),
                 "\(action.entryID) round-trips")
         }
-        for command in WindowCommandCatalog.all {
-            expect(
-                roundTrip(command.entryID) == .windowCommand(id: command.id),
-                "\(command.entryID) round-trips")
-        }
 
         let id = UUID()
         let uuid = id.uuidString.lowercased()
@@ -87,11 +81,11 @@ struct DeepLinkTests {
                 == "tinycast://command/clipboard-history",
             "a command's link reads as its entry ID")
         expect(
-            DeepLink.url(forEntryID: "window-command:left-half", scheme: "tinycast-dev")?
-                .absoluteString == "tinycast-dev://window-command/left-half",
+            DeepLink.url(forEntryID: "command:clipboard-history", scheme: "tinycast-dev")?
+                .absoluteString == "tinycast-dev://command/clipboard-history",
             "a link is built in the scheme it is given")
         expect(
-            resolve("TINYCAST://Window-Command/left-half") == .windowCommand(id: .leftHalf),
+            resolve("TINYCAST://Command/clipboard-history") == .command(.clipboardHistory),
             "scheme and kind are case-insensitive")
         expect(
             resolve("tinycast://quicklink/\(id.uuidString.uppercased())") == .quicklink(id: id),
@@ -100,9 +94,6 @@ struct DeepLinkTests {
 
     static func storedRows(id: UUID, uuid: String) -> [(String, HotKeyAction)] {
         [
-            (CustomWindowSize.entryIDPrefix + uuid, .customWindowSize(id: id)),
-            (WindowLayout.entryIDPrefix + uuid, .windowLayout(id: id)),
-            (Room.entryIDPrefix + uuid, .windowRoom(id: id)),
             (CustomQuickAction.entryIDPrefix + uuid, .quickAction(id: id)),
             (CustomCommand.entryIDPrefix + uuid, .customCommand(id: id)),
             (Quicklink.entryIDPrefix + uuid, .quicklink(id: id)),
@@ -117,7 +108,6 @@ struct DeepLinkTests {
         }
         var actions = CommandID.allCases.compactMap(\.hotKeyAction)
         actions += SystemAction.ID.allCases.map { .systemAction(id: $0) }
-        actions += WindowCommand.ID.allCases.map { .windowCommand(id: $0) }
         for action in actions {
             expect(
                 action.entryID.flatMap(HotKeyAction.init(entryID:)) == action,
@@ -296,30 +286,6 @@ struct DeepLinkTests {
             "a quicklink may open anything else")
     }
 
-    static func windowSizeChecks() {
-        let base = "tinycast://window-size?arguments="
-        let json = #"{"width":"1200","height":"60%","anchor":"top-left","x":"10","y":"-20"}"#
-        let encoded = json.addingPercentEncoding(withAllowedCharacters: .alphanumerics) ?? ""
-        guard case .windowSize(let size)? = parse(base + encoded) else {
-            return expect(false, "a window-size link with a size parses")
-        }
-        expect(size.width == .init(1200, .points), "a bare width is points")
-        expect(size.height == .init(60, .percent), "a % height is a share of the screen")
-        expect(size.anchor == .topLeft && size.offset == .init(x: 10, y: -20), "anchor and offset apply")
-        let fields: [String: String] = ["width": "800", "height": "600"]
-        let plain = CustomWindowSize(linkFields: fields)
-        expect(plain?.anchor == .center && plain?.offset == .zero, "anchor and offset default")
-        for (field, value) in [
-            ("width", "0"), ("width", "101%"), ("height", "big"), ("anchor", "middle"), ("x", "5000")
-        ] {
-            var bad = fields
-            bad[field] = value
-            expect(CustomWindowSize(linkFields: bad) == nil, "\(field)=\(value) is refused, not clamped")
-        }
-        expect(CustomWindowSize(linkFields: ["width": "800"]) == nil, "a size needs both sides")
-        expect(parse("tinycast://window-size") == nil, "a window-size link with no size is refused")
-    }
-
     static func consentKeyChecks() {
         let plain = DeepLinkInput.none
         let text = DeepLinkInput(fallbackText: "~/Downloads/")
@@ -359,9 +325,6 @@ struct DeepLinkTests {
         expect(
             DeepLinkConsentPolicy.requiresConsent(.command(.openCamera)),
             "turning the camera on asks first")
-        expect(
-            DeepLinkConsentPolicy.requiresConsent(.windowCommand(id: .leftHalf)),
-            "moving another app's window asks first")
         expect(
             DeepLinkConsentPolicy.requiresConsent(.customCommand(id: UUID())),
             "running a script asks first")

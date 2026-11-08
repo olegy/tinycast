@@ -1,10 +1,10 @@
 # Settings file
 
-An opt-in mirror of Tinycast's preferences, the launcher's items and all of window management in
+An opt-in mirror of Tinycast's preferences and the launcher's items in
 `~/.config/tinycast/settings.json`, switched on in **Settings → Backup → Settings File**. `UserDefaults`
 stays the store; the file follows it, and an edit made to the file applies at once. The machinery lives
-in `Features/Settings/` (`Model/`, `Service/`, `SettingsFileSchema.swift`), the launcher's part in
-`Features/Launcher/`, and window management's in `Features/WindowManagement/`.
+in `Features/Settings/` (`Model/`, `Service/`, `SettingsFileSchema.swift`), and the launcher's part in
+`Features/Launcher/`.
 
 ## Invariants
 
@@ -28,8 +28,7 @@ in `Features/Settings/` (`Model/`, `Service/`, `SettingsFileSchema.swift`), the 
   formatting stays until then.
 - **Content and machine state never enter it.** Custom commands, quicklinks, MCP servers and AI
   connections stay where they are, as do the palette's position, the extension toolchain,
-  the shortcuts and aliases of content, extensions and Apple Shortcuts, and what a room learns by
-  being entered.
+  and the shortcuts and aliases of content, extensions and Apple Shortcuts.
 
 ## Layout
 
@@ -47,7 +46,6 @@ value. `[]` removes every shortcut, and omitting the key leaves the current sele
 | `Settings/Model/SettingsFileBinding.swift` | One key bound to wherever its value lives |
 | `Settings/Model/SettingsFileFormat.swift` | The printer and the parser |
 | `Settings/Model/SettingsFileIssue.swift` | Every problem the file can have, and the HUD's line for them |
-| `Settings/Model/SettingsFileIdentity.swift` | A stable UUID from a string, for records written without an `id` |
 | `Settings/Service/SettingsFileRepository.swift` | The sync: import or replace, save, reload |
 | `Settings/Service/SettingsFileMonitor.swift` | Watches the folder and the file, a save-by-rename included |
 | `Settings/SettingsFileSchema.swift` | Each key's binding, and the enum conformances |
@@ -55,8 +53,6 @@ value. `[]` removes every shortcut, and omitting the key leaves the current sele
 | `HotKeys/Service/HotKeySettingsFile.swift` | Applies chords through `HotKeyManager`, conflicts reported |
 | `Launcher/Model/LauncherFileFormat.swift` | A launcher item's shortcut, alias and visibility as JSON |
 | `Launcher/Service/LauncherSettingsFile.swift` | Apps, panes, system actions and built-in commands |
-| `WindowManagement/Model/WindowManagementFileFormat.swift` | Command shortcuts and aliases, custom sizes, layouts and rooms as JSON |
-| `WindowManagement/Service/WindowManagementSettingsFile.swift` | Their five bindings, shortcuts and aliases included |
 
 ## Location
 
@@ -124,7 +120,6 @@ Where a number has a special case, the case is a word:
 | `ai.newChatAfterMinutes` | 2, 5, 10, 30, `"never"` |
 | `ai.toolRounds` | 10, 25, 50, 100, `"unlimited"` |
 | `ai.opensTo` | `"recent"`, `"newConversation"` |
-| `windowManagement.gap` | 0 to 64 |
 
 On first launch, `general.language` is set to the primary system language if supported, otherwise
 `"en"`. That explicit choice is saved; later system-language changes do not change it.
@@ -163,18 +158,6 @@ in `commands.builtIn` — by their ID after `command:`. App Launcher is `general
   after its last shortcut is cleared, even outside the search scopes.
 - `applications.enabled`, `systemSettings.enabled`, `systemActions.enabled` and
   `commands.builtInEnabled` are each pane's category switch; `commands.enabled` stays custom commands'.
-
-## Window management
-
-- **`shortcuts`** lists all 39 commands by ID, `null` when unbound; one left out is unbound too.
-- **`aliases`** lists only the commands that have one.
-- **`customSizes`, `layouts` and `rooms`** each carry their record's `shortcut` and `alias`. A record
-  keeps its `id`, because favorites, aliases, ranking and visibility key on it; one written without an
-  `id` gets a stable one derived from its name.
-- A custom size's `width` and `height` are `"60%"` or `"900pt"`, a bare number read as points. A layout
-  app's `width` and `height` are fractions of its display, in full precision.
-- A room's window numbers and when it was last entered stay out of the file, and survive an edit to
-  the room: `Room.keepingRuntime(of:)` returns a number only to a window of the same app.
 
 ## Adding a setting
 

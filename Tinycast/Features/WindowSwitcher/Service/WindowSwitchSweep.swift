@@ -24,7 +24,7 @@ enum WindowSwitchSweep {
         var entries: [WindowSwitchEntry] = []
         var elements: [Int: Element] = [:]
 
-        for app in WindowInventory.candidates() {
+        for app in candidates() {
             guard let bundleID = app.bundleIdentifier else { continue }
             let pid = app.processIdentifier
             let application = AXWindowAccess.application(for: pid, timeout: sweepTimeout)
@@ -47,8 +47,17 @@ enum WindowSwitchSweep {
         return Snapshot(entries: entries, elements: elements)
     }
 
-    /// Looser than the layout inventory's rule: a minimized window is exactly what a switcher is
-    /// for, and a window on another Space reports no frame until it is raised.
+    /// Every app with a user-facing window, bar us. By pid, since About flips us to `.regular`.
+    private static func candidates() -> [NSRunningApplication] {
+        let ownPID = NSRunningApplication.current.processIdentifier
+        return NSWorkspace.shared.runningApplications.filter {
+            $0.activationPolicy == .regular && !$0.isTerminated
+                && $0.processIdentifier != ownPID
+        }
+    }
+
+    /// A minimized window is exactly what a switcher is for, and a window on another Space
+    /// reports no frame until it is raised.
     private static func isSwitchable(_ window: AXUIElement, minimized: Bool) -> Bool {
         WindowSwitchPolicy.isSwitchable(
             isStandardWindow: AXWindowAccess.string(window, kAXSubroleAttribute)

@@ -34,8 +34,7 @@ enum DeepLinkConsentPolicy {
             requiresConsent(id)
         case .togglePalette, .settingsPane:
             false
-        case .app, .customCommand, .systemAction, .windowCommand, .windowLayout,
-            .windowRoom, .customWindowSize, .quicklink, .quickAction, .appleShortcut,
+        case .app, .customCommand, .systemAction, .quicklink, .quickAction, .appleShortcut,
             .extensionCommand:
             true
         }
@@ -45,12 +44,11 @@ enum DeepLinkConsentPolicy {
     private static func requiresConsent(_ id: CommandID) -> Bool {
         switch id {
         case .fixGrammar, .rewrite, .translate, .summarize, .pasteSequentially, .openCamera,
-            .captureWindowLayout, .openInBrowser, .runShellCommand, .quit:
+            .openInBrowser, .runShellCommand, .quit:
             true
         case .quickAI, .aiChat, .calculatorHistory, .clipboardHistory, .searchEmoji, .searchFiles,
             .searchMenuItems, .switchWindows, .switchWindowsBackwards, .createCustomCommand,
-            .searchCustomCommands, .define, .createWindowLayout,
-            .switchRoom, .createRoom, .createQuicklink, .searchQuicklinks, .importQuicklinks,
+            .searchCustomCommands, .define, .createQuicklink, .searchQuicklinks, .importQuicklinks,
             .searchSnippets, .createSnippet,
             .exportQuicklinks, .exportSettings, .importSettings,
             .checkForUpdates, .about:

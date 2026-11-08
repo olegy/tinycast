@@ -8,14 +8,6 @@ extension HotKeyAction {
             self = action
         } else if let action = SystemActionCatalog.action(forEntryID: entryID) {
             self = .systemAction(id: action.id)
-        } else if let command = WindowCommandCatalog.command(forEntryID: entryID) {
-            self = .windowCommand(id: command.id)
-        } else if let id = CustomWindowSize.id(fromEntryID: entryID) {
-            self = .customWindowSize(id: id)
-        } else if let id = WindowLayout.id(fromEntryID: entryID) {
-            self = .windowLayout(id: id)
-        } else if let id = Room.id(fromEntryID: entryID) {
-            self = .windowRoom(id: id)
         } else if let id = CustomQuickAction.id(fromEntryID: entryID) {
             self = .quickAction(id: id)
         } else if let id = CustomCommand.id(fromEntryID: entryID) {
@@ -34,10 +26,6 @@ extension HotKeyAction {
         switch self {
         case .command(let id): id.hotKeyAction == nil ? nil : id.rawValue
         case .systemAction(let id): SystemActionCatalog.action(id: id).entryID
-        case .windowCommand(let id): WindowCommandCatalog.command(id: id)?.entryID
-        case .customWindowSize(let id): CustomWindowSize.entryIDPrefix + id.uuidString.lowercased()
-        case .windowLayout(let id): WindowLayout.entryIDPrefix + id.uuidString.lowercased()
-        case .windowRoom(let id): Room.entryIDPrefix + id.uuidString.lowercased()
         case .quickAction(let id): CustomQuickAction.entryIDPrefix + id.uuidString.lowercased()
         case .customCommand(let id): CustomCommand.entryIDPrefix + id.uuidString.lowercased()
         case .quicklink(let id): Quicklink.entryIDPrefix + id.uuidString.lowercased()

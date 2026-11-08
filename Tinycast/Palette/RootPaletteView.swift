@@ -85,11 +85,6 @@ struct RootPaletteView: View {
                 session: menuSearch, core: core, vm: vm, openActions: openActions)
         case .switchWindows:
             return WindowSwitchScreen(session: windowSwitch, core: core)
-        case .rooms:
-            return RoomsScreen(coordinator: core.roomCoordinator, session: core.roomSession, vm: vm)
-        case .roomWindows:
-            return RoomPickerScreen(
-                coordinator: core.roomCoordinator, session: core.roomSession, vm: vm)
         case .customCommandEditor:
             return CustomCommandEditorScreen(
                 coordinator: core.customCommandCoordinator, openMenuCorner: menuCorner,
@@ -413,7 +408,6 @@ struct RootPaletteView: View {
                 }
                 if vm.mode != .menuSearch { menuSearch.reset() }
                 if vm.mode != .switchWindows { windowSwitch.reset() }
-                if vm.mode != .rooms, vm.mode != .roomWindows { core.roomCoordinator.screensDidClose() }
                 // Leaving the screen any other way than Escape still ends the command's session.
                 if vm.mode != .extensionCommand, extensions.running != nil {
                     Task { await extensions.stop() }

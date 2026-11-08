@@ -1,7 +1,7 @@
 # Deeplinks
 
-Every launcher row that can take a hotkey can also be run by URL, and so can a saved AI chat and a
-one-off window size. Karabiner-Elements, a Shortcut, a script, a Stream Deck or a web page can
+Every launcher row that can take a hotkey can also be run by URL, and so can a saved AI chat.
+Karabiner-Elements, a Shortcut, a script, a Stream Deck or a web page can
 drive Tinycast without a chord of its own:
 
 ```sh
@@ -19,7 +19,6 @@ exact link, typed fields included, so nobody has to build one by hand.
   (`Model/`).
 - `DeepLinkConsentPolicy` — which links ask, and the key Always Allow stores (`Model/`).
 - `DeepLinkSource` — outside, or a quicklink of ours, and what each may run (`Model/`).
-- `CustomWindowSize+DeepLink` — a window size spelled out in a link (`Model/`).
 - `DeepLinkCoordinator` — on `AppCore`. It parses, gates, asks, and hands the target to its feature
   (`UI/`).
 - `AllowedDeepLinksSection` — Settings → General → Deeplinks, where an Always Allow is removed
@@ -67,12 +66,7 @@ Settings shortcut field; only the Settings window sets it.
 | `tinycast://`                               | Opens the launcher                                              |
 | `tinycast://search?fallbackText=2%2B2`      | Opens the launcher with the text typed                          |
 | `tinycast://command/<slug>`                 | Runs a built-in command                                         |
-| `tinycast://window-command/left-half`       | Runs a window command                                           |
 | `tinycast://system-action/lock-screen`      | Runs a system action                                            |
-| `tinycast://window-size/<uuid>`             | Applies a saved window size                                     |
-| `tinycast://window-size?arguments={…}`      | Applies a size spelled out in the link                          |
-| `tinycast://window-layout/<uuid>`           | Applies a window layout                                         |
-| `tinycast://window-room/<uuid>`             | Enters a room                                                   |
 | `tinycast://quick-action/<uuid>`            | Runs a custom Quick Action                                      |
 | `tinycast://custom-command/<uuid>`          | Runs a custom command                                           |
 | `tinycast://quicklink/<uuid>`               | Opens a quicklink                                               |
@@ -112,7 +106,6 @@ ignored, because each built-in already knows whether it shows a screen.
 | `quicklink/<uuid>`           | `arguments` by argument name; `fallbackText` fills the first required one                    |
 | `custom-command/<uuid>`      | `arguments` as `["a", "b"]`, or by argument name; `fallbackText` is `$1`                     |
 | `system-action/set-volume`   | `arguments` `{volume}`, `["50"]` or `fallbackText`: `0`–`100`, `%` allowed; skips the picker |
-| `window-size`                | `arguments` `{width, height, anchor, x, y}`: `1200` is points, `60%` a share of the screen   |
 
 The search screens are `clipboard-history`, `search-emoji`, `calculator-history`,
 `search-quicklinks`, `search-files`, `define`, `search-custom-commands`,
@@ -123,8 +116,6 @@ row's fields, as a hotkey with no selection does. Any other target ignores its i
   does, and reports the count in a HUD. A quicklink list's question shows each name and link.
 - A volume outside `0`–`100` refuses the link before anything asks.
 - `openWith` is kept only when it names an installed app's bundle ID.
-- A window size refuses, rather than clamps, a value outside what a saved size allows. `anchor` is a
-  `WindowLayoutAnchor` raw value (`top-left`, `center`, …) and `x`/`y` shift it in points.
 
 ## Consent
 
@@ -134,9 +125,8 @@ so a new command fails to build until it is classed:
 
 - **Never asks without input**: anything that only opens a Tinycast screen or editor — search
   screens, Settings, chats, the create commands, Quick AI.
-- **Always asks**: window commands and sizes, layouts, rooms, system actions, quicklinks,
-  custom commands, Apple Shortcuts, custom Quick Actions, the AI text actions, Paste Sequentially,
-  Open Camera and Capture Window Layout.
+- **Always asks**: system actions, quicklinks, custom commands, Apple Shortcuts, custom Quick
+  Actions, the AI text actions, Paste Sequentially and Open Camera.
 
 Input always asks because a page chose it: typed into the launcher it is one Return from a fallback
 row, and as arguments it reaches a script.
@@ -149,8 +139,7 @@ unknown link before any question, so a page cannot learn what exists by asking.
 Always Allow stores `DeepLinkConsentPolicy.key(entryID:input:)`: the row alone, or the row with its
 exact input, the row's ID percent-encoded so a `?` in it cannot fake the split. A grant
 never covers different input, so a Karabiner key with fixed text asks once and an attacker's text
-still asks. A search link's row is `search`. A size spelled out in a link is one target,
-`window-size`, whatever the size.
+still asks. A search link's row is `search`.
 Destructive system actions still ask their own question after it. One question shows at a time: a
 link that arrives meanwhile is logged and dropped. The gate is checked again after the answer, so a
 feature turned off during the question still wins.
@@ -171,9 +160,8 @@ through LaunchServices either.
 A plain `open` (without `-g`) activates Tinycast before the link arrives. Tinycast is an accessory
 app, so it does not take the menu bar, and the menu-bar owner is still the app the reader was in.
 `FrontmostApp.current` returns that app when Tinycast itself is frontmost with no window of its own
-in key. `PaletteCoordinator.targetApp`, `WindowTarget.current()` and the palette's record of the app
-it covered all use it, so a window command, or a paste from a palette a link opened, reaches the
-right app. Pasting with the palette closed still needs the target app active, so quicklinks and Paste
+in key. `PaletteCoordinator.targetApp` and the palette's record of the app it covered both use it,
+so a paste from a palette a link opened reaches the right app. Pasting with the palette closed still needs the target app active, so quicklinks and Paste
 Sequentially want `open -g`.
 
 ## Karabiner-Elements

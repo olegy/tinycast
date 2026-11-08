@@ -46,7 +46,7 @@ struct SettingsFileTest {
                 "general", "appearance", "calculator", "search", "applications",
                 "systemSettings", "systemActions", "commands", "quicklinks", "appleShortcuts", "ai",
                 "quickActions", "fileSearch", "navigation",
-                "windowManagement", "clipboard", "snippets", "emoji", "extensions"
+                "clipboard", "snippets", "emoji", "extensions"
             ])
 
         // A file that could switch one of these on would grant what only the app may ask for.
@@ -108,7 +108,7 @@ struct SettingsFileTest {
 
     private static func testFormat() {
         let values: [SettingsFileKey: SettingsFileJSON] = [
-            .windowShortcuts: .object([]),
+            .clipboardCommands: .object([]),
             .autoSwitchInputSource: .null,
             .searchScopes: .array(["/Applications", "~/Applications"]),
             .showInMenuBar: true,
@@ -116,7 +116,7 @@ struct SettingsFileTest {
             .language: "say \"hi\"\\ / é\n\t\u{01}",
             .fileSearchIgnorePatterns: .array([]),
             .popToRootTimeout: 5,
-            .windowGap: .number(-1.5)
+            .clipboardRetention: .number(-1.5)
         ]
         let golden = """
             {
@@ -136,9 +136,9 @@ struct SettingsFileTest {
               "fileSearch": {
                 "ignorePatterns": []
               },
-              "windowManagement": {
-                "gap": -1.5,
-                "shortcuts": {}
+              "clipboard": {
+                "retentionDays": -1.5,
+                "commands": {}
               }
             }
 

@@ -16,8 +16,8 @@ enum AIPreamble {
         lists those as sources. Never write a link without a URL.
 
         Tinycast also provides a fuzzy app launcher, global and per-app hotkeys, clipboard history \
-        for text and images, an inline calculator, quicklinks, window management, file search and \
-        an emoji picker.
+        for text and images, an inline calculator, quicklinks, a window switcher, file search \
+        and an emoji picker.
 
         It is written in SwiftUI and AppKit against the current macOS only, with no third-party \
         dependencies and no bundled web runtime, and it runs as a menu-bar accessory with no Dock \

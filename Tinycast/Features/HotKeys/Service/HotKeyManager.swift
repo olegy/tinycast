@@ -9,10 +9,6 @@ final class HotKeyManager {
     var onRunCommand: ((CommandID) -> Void)?
     var onRunCustomCommand: ((UUID) -> Void)?
     var onRunSystemAction: ((SystemAction.ID) -> Void)?
-    var onRunWindowCommand: ((WindowCommand.ID) -> Void)?
-    var onRunWindowLayout: ((UUID) -> Void)?
-    var onEnterRoom: ((UUID) -> Void)?
-    var onRunCustomWindowSize: ((UUID) -> Void)?
     var onOpenQuicklink: ((UUID) -> Void)?
     var onRunQuickAction: ((UUID) -> Void)?
     var onRunAppleShortcut: ((UUID) -> Void)?
@@ -55,9 +51,6 @@ final class HotKeyManager {
     private let boundCustomCommandKey = "boundCustomCommandIDs"
     private let boundQuicklinkKey = "boundQuicklinkIDs"
     private let boundQuickActionKey = "boundQuickActionIDs"
-    private let boundWindowLayoutKey = "boundWindowLayoutIDs"
-    private let boundWindowRoomKey = "boundWindowRoomIDs"
-    private let boundCustomWindowSizeKey = "boundCustomWindowSizeIDs"
     private let boundAppleShortcutKey = "boundAppleShortcutIDs"
     private let boundExtensionCommandKey = "boundExtensionCommandEntryIDs"
 
@@ -66,16 +59,10 @@ final class HotKeyManager {
     }
 
     func start(
-        customCommandIDs: Set<UUID>, quicklinkIDs: Set<UUID>, windowLayoutIDs: Set<UUID>,
-        windowRoomIDs: Set<UUID>, customWindowSizeIDs: Set<UUID>, quickActionIDs: Set<UUID>
+        customCommandIDs: Set<UUID>, quicklinkIDs: Set<UUID>, quickActionIDs: Set<UUID>
     ) {
         prune(key: boundCustomCommandKey, live: customCommandIDs) { .customCommand(id: $0) }
         prune(key: boundQuicklinkKey, live: quicklinkIDs) { .quicklink(id: $0) }
-        prune(key: boundWindowLayoutKey, live: windowLayoutIDs) { .windowLayout(id: $0) }
-        prune(key: boundWindowRoomKey, live: windowRoomIDs) { .windowRoom(id: $0) }
-        prune(key: boundCustomWindowSizeKey, live: customWindowSizeIDs) {
-            .customWindowSize(id: $0)
-        }
         prune(key: boundQuickActionKey, live: quickActionIDs) { .quickAction(id: $0) }
         // After the prunes, so a dropped record can't survive in memory this session.
         for action in candidateActions { bindings[action] = storedBinding(for: action) }
@@ -110,13 +97,6 @@ final class HotKeyManager {
     var boundCustomCommandIDs: [UUID] { boundIDs(key: boundCustomCommandKey) }
 
     var boundQuicklinkIDs: [UUID] { boundIDs(key: boundQuicklinkKey) }
-
-    /// Window-layout UUIDs with a binding; authored records, so they need an index of their own.
-    var boundWindowLayoutIDs: [UUID] { boundIDs(key: boundWindowLayoutKey) }
-
-    var boundWindowRoomIDs: [UUID] { boundIDs(key: boundWindowRoomKey) }
-
-    var boundCustomWindowSizeIDs: [UUID] { boundIDs(key: boundCustomWindowSizeKey) }
 
     var boundQuickActionIDs: [UUID] { boundIDs(key: boundQuickActionKey) }
 
@@ -170,17 +150,11 @@ final class HotKeyManager {
             index(id, bound: binding != nil, key: boundQuicklinkKey)
         case .quickAction(let id):
             index(id, bound: binding != nil, key: boundQuickActionKey)
-        case .windowLayout(let id):
-            index(id, bound: binding != nil, key: boundWindowLayoutKey)
-        case .windowRoom(let id):
-            index(id, bound: binding != nil, key: boundWindowRoomKey)
-        case .customWindowSize(let id):
-            index(id, bound: binding != nil, key: boundCustomWindowSizeKey)
         case .appleShortcut(let id):
             index(id, bound: binding != nil, key: boundAppleShortcutKey)
         case .extensionCommand(let entryID):
             index(entryID, bound: binding != nil, key: boundExtensionCommandKey)
-        case .togglePalette, .command, .systemAction, .windowCommand:
+        case .togglePalette, .command, .systemAction:
             break
         }
         candidateActionsCache = nil
@@ -209,13 +183,9 @@ final class HotKeyManager {
         actions += boundCustomCommandIDs.map { .customCommand(id: $0) }
         actions += boundQuicklinkIDs.map { .quicklink(id: $0) }
         actions += boundQuickActionIDs.map { .quickAction(id: $0) }
-        actions += boundWindowLayoutIDs.map { .windowLayout(id: $0) }
-        actions += boundWindowRoomIDs.map { .windowRoom(id: $0) }
-        actions += boundCustomWindowSizeIDs.map { .customWindowSize(id: $0) }
         actions += boundAppleShortcutIDs.map { .appleShortcut(id: $0) }
         actions += boundExtensionCommandEntryIDs.map { .extensionCommand(entryID: $0) }
         actions += SystemAction.ID.allCases.map { .systemAction(id: $0) }
-        actions += WindowCommand.ID.allCases.map { .windowCommand(id: $0) }
         candidateActionsCache = actions
         return actions
     }
@@ -232,14 +202,6 @@ final class HotKeyManager {
             return displayName?(action) ?? String(localized: "Custom Command")
         case .systemAction(let id):
             return SystemActionCatalog.action(id: id).name
-        case .windowCommand(let id):
-            return WindowCommandCatalog.command(id: id)?.name ?? String(localized: "Window Command")
-        case .windowLayout:
-            return displayName?(action) ?? String(localized: "Window Layout")
-        case .windowRoom:
-            return displayName?(action) ?? String(localized: "Room")
-        case .customWindowSize:
-            return displayName?(action) ?? String(localized: "Custom Size")
         case .quicklink:
             return displayName?(action) ?? String(localized: "Quicklink")
         case .quickAction:
@@ -279,10 +241,6 @@ final class HotKeyManager {
         case .settingsPane(let bundleID): AppLauncher.openSettingsPane(bundleID: bundleID)
         case .customCommand(let id): onRunCustomCommand?(id)
         case .systemAction(let id): onRunSystemAction?(id)
-        case .windowCommand(let id): onRunWindowCommand?(id)
-        case .windowLayout(let id): onRunWindowLayout?(id)
-        case .windowRoom(let id): onEnterRoom?(id)
-        case .customWindowSize(let id): onRunCustomWindowSize?(id)
         case .quicklink(let id): onOpenQuicklink?(id)
         case .quickAction(let id): onRunQuickAction?(id)
         case .appleShortcut(let id): onRunAppleShortcut?(id)

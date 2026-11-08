@@ -11,20 +11,11 @@ final class AppCore {
     let customCommands = CustomCommandStore()
     let quicklinks = QuicklinkStore()
     let snippetStore = SnippetStore()
-    let windowLayouts = WindowLayoutStore()
-    let customWindowSizes = CustomWindowSizeStore()
-    let rooms = RoomStore()
-    let roomMinimums = RoomMinimumSizeStore()
-    let roomParking = RoomParkingLedger(
-        fileURL: AppPaths.applicationSupport().appendingPathComponent("room-parking.json"))
-    let roomSession = RoomSession()
     let clipboardStore = ClipboardStore()
     @ObservationIgnored private var clipboardTextIndexer: ClipboardTextIndexer?
     let clipboardManager: ClipboardManager
     let textInjector: TextInjector
     let hotKeys = HotKeyManager()
-    let windowMover = WindowMover()
-    let spaceSwitcher = SpaceSwitcher()
     let inputSourceSwitcher = InputSourceSwitcher()
     let settings: AppSettings
     /// Mirrors settings into settings.json; nil while the Backup pane's switch is off.
@@ -70,8 +61,6 @@ final class AppCore {
     let installedAI = InstalledAIManager()
     @ObservationIgnored private var appliedLaunchRevisions: [InstalledAIKind: Int] = [:]
 
-    /// Set when a layout editor should open with Settings; the pane consumes it.
-    var pendingWindowLayoutEdit: WindowLayoutEditRequest?
     var pendingExtensionStoreInstall: ExtensionDeepLink.StoreInstall?
 
     @ObservationIgnored private(set) lazy var quicklinkCoordinator = QuicklinkCoordinator(
@@ -104,26 +93,6 @@ final class AppCore {
     @ObservationIgnored private(set) lazy var extensionCoordinator = ExtensionCoordinator(
         extensions: extensions, palette: palette, paletteCoordinator: paletteCoordinator,
         settingsCoordinator: settingsCoordinator, settings: settings, core: self)
-    @ObservationIgnored private(set) lazy var windowCommandCoordinator = WindowCommandCoordinator(
-        settings: settings, paletteCoordinator: paletteCoordinator, windowMover: windowMover,
-        spaceSwitcher: spaceSwitcher, customSizes: customWindowSizes)
-    @ObservationIgnored private(set) lazy var customWindowSizeCoordinator =
-        CustomWindowSizeCoordinator(
-            store: customWindowSizes, settings: settings, appIndex: appIndex, hotKeys: hotKeys,
-            favorites: favorites, visibility: visibility, ranking: launcherRanking,
-            aliases: aliases, core: self)
-    @ObservationIgnored private(set) lazy var windowShortcutPresetCoordinator =
-        WindowShortcutPresetCoordinator(hotKeys: hotKeys, core: self)
-    @ObservationIgnored private(set) lazy var windowLayoutCoordinator = WindowLayoutCoordinator(
-        store: windowLayouts, settings: settings, appIndex: appIndex, hotKeys: hotKeys,
-        favorites: favorites, visibility: visibility, ranking: launcherRanking, aliases: aliases,
-        paletteCoordinator: paletteCoordinator, settingsCoordinator: settingsCoordinator,
-        core: self)
-    @ObservationIgnored private(set) lazy var roomCoordinator = RoomCoordinator(
-        store: rooms, minimums: roomMinimums, ledger: roomParking, session: roomSession,
-        settings: settings, appIndex: appIndex, hotKeys: hotKeys, favorites: favorites,
-        visibility: visibility, ranking: launcherRanking, aliases: aliases, palette: palette,
-        paletteCoordinator: paletteCoordinator, core: self)
     @ObservationIgnored private(set) lazy var customCommandCoordinator = CustomCommandCoordinator(
         store: customCommands, settings: settings, appIndex: appIndex,
         paletteCoordinator: paletteCoordinator, settingsCoordinator: settingsCoordinator,
@@ -141,8 +110,6 @@ final class AppCore {
         customCommandCoordinator: customCommandCoordinator,
         systemActionCoordinator: systemActionCoordinator,
         quicklinkCoordinator: quicklinkCoordinator,
-        windowCommandCoordinator: windowCommandCoordinator,
-        windowLayoutCoordinator: windowLayoutCoordinator,
         fileSearchCoordinator: fileSearchCoordinator,
         menuSearchCoordinator: menuSearchCoordinator,
         windowSwitchCoordinator: windowSwitchCoordinator,
@@ -236,6 +203,9 @@ final class AppCore {
             ThemesRemovalMigration.run(extensionsDirectory: ExtensionCatalog.extensionsDirectory())
             EscapeKeyBehaviorRemovalMigration.run(settingsFileEnabled: settings.settingsFileEnabled)
             CalendarRemovalMigration.run(settingsFileEnabled: settings.settingsFileEnabled)
+            WindowManagementRemovalMigration.run(
+                settingsFileEnabled: settings.settingsFileEnabled,
+                applicationSupport: AppPaths.applicationSupport())
             NSApp.setActivationPolicy(.accessory)
             applyAppearance()
             applyMotion()
@@ -266,19 +236,6 @@ final class AppCore {
                 self?.customCommandCoordinator.applyCustomCommandsPresence()
             }
             customCommandCoordinator.applyCustomCommandsPresence()
-            applyWindowCommandsPresence()
-            customWindowSizes.onChange = { [weak self] _ in
-                self?.customWindowSizeCoordinator.applyCustomWindowSizesPresence()
-            }
-            customWindowSizeCoordinator.applyCustomWindowSizesPresence()
-            windowLayouts.onChange = { [weak self] _ in
-                self?.windowLayoutCoordinator.applyWindowLayoutsPresence()
-            }
-            windowLayoutCoordinator.applyWindowLayoutsPresence()
-            rooms.onChange = { [weak self] _ in self?.roomCoordinator.applyRoomsPresence() }
-            roomCoordinator.applyRoomsPresence()
-            // A crash can leave windows parked off-screen; they come home before anything else.
-            roomCoordinator.recoverParkedWindows()
             quicklinks.onChange = { [weak self] _ in
                 self?.quicklinkCoordinator.applyQuicklinksPresence()
             }
@@ -296,7 +253,6 @@ final class AppCore {
                 switch mode {
                 case .menuSearch: self?.menuSearchCoordinator.load()
                 case .switchWindows: self?.windowSwitchCoordinator.load()
-                case .rooms, .roomWindows: self?.roomCoordinator.load()
                 default: break
                 }
             }
@@ -318,16 +274,6 @@ final class AppCore {
             }
             hotKeys.onRunSystemAction = { [weak self] id in
                 self?.systemActionCoordinator.runSystemAction(id: id)
-            }
-            hotKeys.onRunWindowCommand = { [weak self] id in
-                self?.windowCommandCoordinator.runWindowCommand(id: id)
-            }
-            hotKeys.onRunWindowLayout = { [weak self] id in
-                self?.windowLayoutCoordinator.runWindowLayout(id: id)
-            }
-            hotKeys.onEnterRoom = { [weak self] id in self?.roomCoordinator.enterRoom(id: id) }
-            hotKeys.onRunCustomWindowSize = { [weak self] id in
-                self?.windowCommandCoordinator.runCustomWindowSize(id: id)
             }
             hotKeys.onOpenQuicklink = { [weak self] id in
                 self?.quicklinkCoordinator.openQuicklinkFromHotKey(id: id)
@@ -362,9 +308,6 @@ final class AppCore {
             hotKeys.start(
                 customCommandIDs: Set(customCommands.commands.map(\.id)),
                 quicklinkIDs: Set(quicklinks.quicklinks.map(\.id)),
-                windowLayoutIDs: Set(windowLayouts.layouts.map(\.id)),
-                windowRoomIDs: Set(rooms.rooms.map(\.id)),
-                customWindowSizeIDs: Set(customWindowSizes.sizes.map(\.id)),
                 quickActionIDs: Set(customQuickActions.actions.map(\.id)))
 
             observeFeatureSwitches()
@@ -445,17 +388,11 @@ final class AppCore {
             return quicklinks.quicklink(id: id)?.name
         case .quickAction(let id):
             return customQuickActions.action(id: id)?.name
-        case .windowLayout(let id):
-            return windowLayouts.layout(id: id)?.name
-        case .windowRoom(let id):
-            return rooms.room(id: id)?.name
-        case .customWindowSize(let id):
-            return customWindowSizes.size(id: id)?.name
         case .appleShortcut(let id):
             return appleShortcutCoordinator.name(of: id)
         case .extensionCommand(let entryID):
             return appIndex.apps.first { $0.kind == .extensionCommand && $0.id == entryID }?.name
-        case .togglePalette, .command, .systemAction, .windowCommand:
+        case .togglePalette, .command, .systemAction:
             return nil
         }
     }
@@ -500,8 +437,6 @@ final class AppCore {
     func prepareForTermination() {
         settingsFile?.flush()
         clipboardTextIndexer?.stop()
-        windowLayoutCoordinator.prepareForTermination()
-        roomCoordinator.prepareForTermination()
         inputSourceSwitcher.endSession()
         textInjector.prepareForTermination()
         aiChats.reset()
@@ -569,25 +504,6 @@ final class AppCore {
         track(
             { _ = $0.automaticallyCheckForUpdates },
             reproject: { $0.updateCoordinator.applyAutomaticChecking() })
-        track(
-            {
-                _ = $0.windowManagementEnabled
-                _ = $0.windowManagementShowInLauncher
-            },
-            reproject: {
-                $0.applyWindowCommandsPresence()
-                $0.customWindowSizeCoordinator.applyCustomWindowSizesPresence()
-            })
-        track(
-            {
-                _ = $0.windowManagementEnabled
-                _ = $0.windowLayoutsShowInLauncher
-            }, reproject: { $0.windowLayoutCoordinator.applyWindowLayoutsPresence() })
-        track(
-            {
-                _ = $0.windowManagementEnabled
-                _ = $0.windowRoomsShowInLauncher
-            }, reproject: { $0.roomCoordinator.applyEnabled() })
         track(
             {
                 _ = $0.customCommandsEnabled
@@ -729,11 +645,6 @@ final class AppCore {
         mcpCoordinator.applyEnabled()
     }
 
-    private func applyWindowCommandsPresence() {
-        let visible = settings.windowManagementEnabled && settings.windowManagementShowInLauncher
-        appIndex.setWindowCommandsVisible(visible)
-    }
-
     // MARK: - Settings file
 
     /// Mirrors settings into settings.json from now on; `importing` applies the file's own first.
@@ -746,10 +657,7 @@ final class AppCore {
             fileURL: AppPaths.settingsFile(),
             bindings: SettingsFileSchema.bindings(
                 settings: settings, ai: aiSettings, quickActions: quickActionSettings,
-                shortcuts: shortcuts, launcher: launcher,
-                windowManagement: WindowManagementSettingsFile(
-                    sizes: customWindowSizes, layouts: windowLayouts, rooms: rooms, aliases: aliases,
-                    shortcuts: shortcuts)),
+                shortcuts: shortcuts, launcher: launcher),
             commit: shortcuts.commit)
         file.onIssues = { [weak self] issues in self?.reportSettingsFileIssues(issues) }
         settingsFile = file

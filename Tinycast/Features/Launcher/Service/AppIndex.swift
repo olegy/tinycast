@@ -8,9 +8,6 @@ struct AppEntry: Identifiable, Hashable, Sendable {
         case quickAction
         case customCommand
         case systemAction
-        case windowCommand
-        case windowLayout
-        case windowRoom
         case quicklink
         case appleShortcut
         case extensionCommand
@@ -47,21 +44,6 @@ struct AppEntry: Identifiable, Hashable, Sendable {
                     label: "System Action", sectionTitle: "System Actions",
                     openVerb: "Run System Action", canHideFromSearch: true,
                     canRevealInFinder: false, canDragOut: false, isSymbolIcon: true, rankPriority: 3)
-            case .windowCommand:
-                return KindDescriptor(
-                    label: "Window Command", sectionTitle: "Window Management",
-                    openVerb: "Move Window", canHideFromSearch: true,
-                    canRevealInFinder: false, canDragOut: false, isSymbolIcon: true, rankPriority: 3)
-            case .windowLayout:
-                return KindDescriptor(
-                    label: "Window Layout", sectionTitle: "Window Layouts",
-                    openVerb: "Arrange Windows", canHideFromSearch: true,
-                    canRevealInFinder: false, canDragOut: false, isSymbolIcon: true, rankPriority: 3)
-            case .windowRoom:
-                return KindDescriptor(
-                    label: "Room", sectionTitle: "Rooms", openVerb: "Enter Room",
-                    canHideFromSearch: true, canRevealInFinder: false, canDragOut: false,
-                    isSymbolIcon: true, rankPriority: 3)
             case .quicklink:
                 return KindDescriptor(
                     label: "Quicklink", sectionTitle: "Quicklinks",
@@ -161,8 +143,7 @@ struct AppEntry: Identifiable, Hashable, Sendable {
             return bundleID.map { .app(bundleID: $0) }
         case .systemSettings:
             return bundleID.map { .settingsPane(bundleID: $0) }
-        case .command, .quickAction, .customCommand, .systemAction, .windowCommand, .windowLayout,
-            .windowRoom, .quicklink, .appleShortcut:
+        case .command, .quickAction, .customCommand, .systemAction, .quicklink, .appleShortcut:
             return HotKeyAction(entryID: id)
         case .extensionCommand:
             return nil
@@ -192,11 +173,6 @@ struct AppEntry: Identifiable, Hashable, Sendable {
         case .quickAction:
             return CommandCatalog.command(for: self)?.sfSymbol ?? CustomQuickAction.sfSymbol
         case .systemAction: return SystemActionCatalog.action(forEntryID: id)?.sfSymbol ?? "questionmark"
-        case .windowCommand:
-            return WindowCommandCatalog.command(forEntryID: id)?.sfSymbol
-                ?? CustomWindowSize.sfSymbol
-        case .windowLayout: return WindowLayout.sfSymbol
-        case .windowRoom: return Room.sfSymbol
         case .application, .systemSettings, .appleShortcut, .extensionCommand: return "questionmark"
         }
     }
@@ -212,35 +188,6 @@ struct AppEntry: Identifiable, Hashable, Sendable {
 }
 
 extension AppEntry {
-    init(_ layout: WindowLayout) {
-        self.init(
-            id: layout.entryID, name: layout.name,
-            url: URL(string: "tinycast://window-layout/" + layout.id.uuidString)!,
-            bundleID: nil, kind: .windowLayout, symbolName: layout.iconSymbol)
-    }
-
-    init(_ room: Room) {
-        self.init(
-            id: room.entryID, name: room.name,
-            url: URL(string: "tinycast://window-room/" + room.id.uuidString)!,
-            bundleID: nil, kind: .windowRoom)
-    }
-
-    init(_ command: WindowCommand) {
-        self.init(
-            id: command.entryID, name: command.name,
-            url: URL(string: "tinycast://window-command/" + command.id.rawValue)!,
-            bundleID: nil, kind: .windowCommand, alternateTitles: [command.englishName])
-    }
-
-    /// A custom size shares the window commands' kind and section, as custom Quick Actions do.
-    init(_ size: CustomWindowSize) {
-        self.init(
-            id: size.entryID, name: size.name,
-            url: URL(string: "tinycast://window-size/" + size.id.uuidString)!,
-            bundleID: nil, kind: .windowCommand)
-    }
-
     init(_ action: CustomQuickAction) {
         self.init(
             id: action.entryID, name: action.name,
@@ -355,16 +302,8 @@ final class AppIndex {
         }
         .sorted { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }
 
-    private static let allWindowCommandEntries: [AppEntry] = WindowCommandCatalog.all
-        .map(AppEntry.init)
-        .sorted { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }
-
     private var discoveredEntries: [AppEntry] = []
     private var customCommandEntries: [AppEntry] = []
-    private var windowCommandEntries: [AppEntry] = []
-    private var customWindowSizeEntries: [AppEntry] = []
-    private var windowLayoutEntries: [AppEntry] = []
-    private var windowRoomEntries: [AppEntry] = []
     private var quicklinkEntries: [AppEntry] = []
     private var appleShortcutEntries: [AppEntry] = []
     private var customQuickActionEntries: [AppEntry] = []
@@ -462,37 +401,6 @@ final class AppIndex {
     func setExtensionCommands(_ entries: [AppEntry]) {
         guard entries != extensionEntries else { return }
         extensionEntries = entries
-        publishEntries()
-    }
-
-    func setWindowCommandsVisible(_ visible: Bool) {
-        let entries = visible ? Self.allWindowCommandEntries : []
-        guard entries != windowCommandEntries else { return }
-        windowCommandEntries = entries
-        publishEntries()
-    }
-
-    /// Replaces the custom-size slice, which shares its section with the window commands.
-    func setCustomWindowSizes(_ sizes: [CustomWindowSize]) {
-        let entries = sizes.sorted(by: CustomWindowSize.precedes).map(AppEntry.init)
-        guard entries != customWindowSizeEntries else { return }
-        customWindowSizeEntries = entries
-        publishEntries()
-    }
-
-    /// Replaces the layout slice; a toggle can't split its entries from their section.
-    func setWindowLayouts(_ layouts: [WindowLayout]) {
-        let entries = layouts.sorted(by: WindowLayout.precedes).map(AppEntry.init)
-        guard entries != windowLayoutEntries else { return }
-        windowLayoutEntries = entries
-        publishEntries()
-    }
-
-    /// Replaces the room slice, which publishes between the layouts and the window commands.
-    func setWindowRooms(_ rooms: [Room]) {
-        let entries = rooms.sorted(by: Room.precedes).map(AppEntry.init)
-        guard entries != windowRoomEntries else { return }
-        windowRoomEntries = entries
         publishEntries()
     }
 
@@ -633,9 +541,7 @@ final class AppIndex {
             discoveredEntries
             + Self.named(
                 extensionEntries + quicklinkEntries + appleShortcutEntries
-                    + Self.systemActionEntries + windowLayoutEntries + windowRoomEntries
-                    + windowCommandEntries
-                    + customWindowSizeEntries + customCommandEntries + quickActionEntries
+                    + Self.systemActionEntries + customCommandEntries + quickActionEntries
                     + commandEntries)
         guard updated != searchEntries else { return }
         searchEntries = updated

@@ -266,9 +266,9 @@ Debug build of the definition of done, and lint fails on a source string the cat
 - **Never localized**: anything from macOS, the user or an extension — app and pane names, user
   content, everything a Raycast extension supplies or receives — and persisted formats, identifiers,
   log text, prompts sent to a model, and what the calculator parses.
-- **Tinycast's own command names are translated and stay findable in English**: `CommandID`,
-  `SystemAction` and `WindowCommand` keep their English source as `englishName`, which the launcher
-  indexes as an alternate title.
+- **Tinycast's own command names are translated and stay findable in English**: `CommandID` and
+  `SystemAction` keep their English source as `englishName`, which the launcher indexes as an
+  alternate title.
 
 On a fresh installation, Tinycast selects the Mac's primary language if supported, otherwise English,
 and saves that choice before any localization lookup. It does not keep following the Mac's language.

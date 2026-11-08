@@ -18,7 +18,7 @@ third-party dependencies, macOS 26 or later.
   or every app at once.
 - **Global hotkey** — one shortcut summons the palette from anywhere.
 - **Per-app hotkeys** — bind a key to an app; press it to toggle (focus/hide).
-- **Deeplinks** — run any command, window action, quicklink or chat from a
+- **Deeplinks** — run any command, quicklink or chat from a
   `tinycast://` URL, for Karabiner-Elements, Shortcuts or scripts. A link can carry text and
   arguments, and a link from outside asks before it acts. Copy Deeplink (⇧⌘C) gives you the link.
 - **Search Files** — find files and folders instantly from a private index of the folders you choose,
@@ -32,8 +32,6 @@ third-party dependencies, macOS 26 or later.
 - **Apple Shortcuts** — search and run the shortcuts you built in the Shortcuts app, with aliases and
   global hotkeys.
 - **Custom commands** — run named shell commands through fuzzy search or their own global hotkeys.
-- **Window management** — 39 Rectangle-style actions: halves, quarters, thirds, sizing, nudging,
-  edge moves, display moves, fullscreen and Spaces.
 - **System actions** — lock, sleep, restart, empty trash, toggle appearance, Bluetooth, mute, hidden
   files, and more.
 - **Emoji picker** — a searchable emoji grid, one keystroke away.

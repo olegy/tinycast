@@ -140,16 +140,13 @@ If a change touches anything in the right column, the harness on the left is man
 | `palette-placement-test` | `DesignSystem/Theme.swift`, `Palette/PalettePlacement.swift` |
 | `palette-menu-click-test` | `Palette/PalettePanel.swift` — complete click-away presses and subsequent control activation |
 | `hotkey-test` | `HotKeys/Model/DoubleTapModifier.swift`, `DoubleTapDetector.swift`, `ModifierKey.swift`, `ModifierKeyDetector.swift`, `HotKeyBinding.swift`, `HotKeySpelling.swift`, `HotKeyAction.swift`, `Service/KeyShortcut.swift`, and the command→action mapping in `Launcher/Model/CommandID.swift` |
-| `deeplink-test` | `DeepLinks/Model/`, `HotKeys/Model/HotKeyAction+EntryID.swift`, `Settings/SettingsTab.swift` — every bindable command, window command and system action round-trips through its link and its entry ID, stored rows by UUID, case folding, the channel's scheme, the links that must not resolve (Raycast schemes, the `extensions` host), input decoding, encoding and its refusals (bytes, not characters), batches, field filling, consent classes and keys, the quicklink loop rule, chat and window-size links, and every Settings tab slug |
+| `deeplink-test` | `DeepLinks/Model/`, `HotKeys/Model/HotKeyAction+EntryID.swift`, `Settings/SettingsTab.swift` — every bindable command and system action round-trips through its link and its entry ID, stored rows by UUID, case folding, the channel's scheme, the links that must not resolve (Raycast schemes, the `extensions` host), input decoding, encoding and its refusals (bytes, not characters), batches, field filling, consent classes and keys, the quicklink loop rule, chat links, and every Settings tab slug |
 | `fallback-test` | `Launcher/Model/Fallback.swift`, plus the `CommandID` and `Quicklink` ids it is built from |
 | `dictionary-test` | `Dictionary/Model/DictionaryEntry.swift`, `DictionaryMarkup.swift` — a real XHTML record and the plain-text fallback, read into page blocks |
 | `callout-test` | `DesignSystem/Theme.swift`, `HotKeys/UI/CalloutPlacement.swift` |
 | `system-action-test` | `SystemActions/Model/SystemAction.swift` |
 | `microphone-mute-test` | Native input mute, delayed confirmation, device switches and failures; injected CoreAudio calls only |
 | `volume-test` | `SystemActions/Model/VolumeLevel.swift` |
-| `window-command-test` | `WindowManagement/WindowCommand.swift`, `WindowPlacementEngine.swift`, `WindowActionMemory.swift` |
-| `window-layout-test` | `WindowManagement/Model/WindowLayout*.swift` and `CustomWindowSize*.swift` — the layout record, its geometry and its inverse, the plan and the store; custom sizes' units, frames and store |
-| `window-room-test` | `WindowManagement/Model/Room*.swift` — every room layout and its minimum sizes, the grid, arrangement reading, window matching, parking, the plan, Tab's choices and the three stores |
 | `custom-command-test` | Command storage and execution, editor drafts, argument identities and dynamic keyboard focus |
 | `custom-command-list-test` | Browser result snapshots, observation, row actions and empty-library messages |
 | `uninstall-test` | all five pure files in `Uninstall/Model/` |
@@ -173,10 +170,10 @@ If a change touches anything in the right column, the harness on the left is man
 | `text-diff-test` | `QuickActions/Model/TextDiffEngine.swift` — exact chunks, coalescing, Unicode, ties, token-cap boundaries and fast paths |
 | `settings-backup-test` | `Settings/AppSettingsKey.swift`, `Backup/Model/SettingsBackupCoverage.swift` |
 | `settings-file-test` | `Settings/Model/` and `Settings/Service/` — key paths, value tokens, the printer and parser, and the repository's import, replace, save, reload and symlink handling on a scratch folder |
-| `window-file-test` | `WindowManagement/Model/WindowManagementFileFormat.swift` — command shortcuts, custom sizes, layouts and rooms as settings.json spells them, hand edits and bad records |
 | `launcher-settings-file-test` | Launcher settings application — invalid records, partial edits, deferred bundles, shortcut moves and records outside search scopes; isolated preferences and in-memory scan/Carbon effects |
 | `calendar-removal-migration-test` | `Migrations/CalendarRemovalMigration.swift` — retires exactly the Calendar defaults and hotkeys, strips the `calendar` section and My Schedule from the compact bar, and leaves a file with other problems to the import |
 | `themes-removal-migration-test` | `Migrations/ThemesRemovalMigration.swift` — retires exactly the Raycast theme defaults and removes only the Theme command's extension folder |
+| `window-management-removal-migration-test` | `Migrations/WindowManagementRemovalMigration.swift` — retires exactly the Window Management defaults and hotkeys, drops its rows, kinds, links and aliases from the launcher lists, strips the `windowManagement` section, and leaves a file with other problems to the import |
 | `escape-key-behavior-removal-migration-test` | `Migrations/EscapeKeyBehaviorRemovalMigration.swift` — removes the retired default, strips `general.escapeKeyBehavior` from settings.json, and leaves a file with other problems to the import |
 | `backup-archive-test` | all of `Backup/Model/`, plus `Backup/Service/BackupStaging.swift` |
 | `updates-test` | `Updates/Model/` — version precedence, channel filtering, install route, readiness |
@@ -219,7 +216,6 @@ when touching a pure file:
   separators via `format`
 - `Uninstall/Model/`'s deciding half still receives directory **names** and a `PathFacts`, never URLs
 - `HotKeys/Model/DoubleTap*` still take the clock as a parameter
-- `WindowManagement/Model/` still touches no `NSScreen` and makes no AX call, layouts included
 - `Features/PaletteRowIndex.swift` still imports Foundation alone, despite living under `Features/`
 - `Quicklinks/Model/` is still handed the home directory rather than reading it
 - `FileSearch/Model/` is still handed the home directory rather than reading it
@@ -444,7 +440,7 @@ caches, TCC grants and login item, so this cannot disturb an installed copy.
   answers `3`, and ↵ pastes `3,8`; General ▸ Calculator ▸ Number format `English` restores `2.3 + 1.5`
   and re-renders past Calculator History in the chosen format
 - Section headers appear in order: Favorites, Applications, System Settings, Quicklinks,
-  System Actions, Window Management, Custom Commands, Commands
+  System Actions, Custom Commands, Commands
 - With a non-ASCII input source active, ⌘K opens Actions; ↑/↓ move it, ↵ activates, Escape closes it
 - In either ⌘K Actions panel, typing filters immediately in the bottom search band without changing
   the palette query; sections survive filtering, **No Results** is centred, and nothing covers the
@@ -626,7 +622,7 @@ caches, TCC grants and login item, so this cannot disturb an installed copy.
 - Export and import settings: the mixed order survives. Move or remove a saved file: opening reports
   the failure and Remove from Favorites still works.
 
-### System actions and window management
+### System actions
 
 - A confirmation-gated action (Restart, Quit All) confirms, showing the subject's own glyph
 - Restart and Shut Down follow "Reopen windows when logging back in": after logging back in,
@@ -642,22 +638,12 @@ caches, TCC grants and login item, so this cannot disturb an installed copy.
   externally controlled mute reports failure. Rapid repeats while a change is pending are ignored
 - Holding a bound hotkey does **not** stack dialogs
 - Lock Screen locks from a global hotkey with the palette closed
-- Window commands move the window you were last in; cycle-on-repeat steps ½ → ⅓ → ⅔
-- "Top Half" lands flush with the top of the visible frame, on a secondary display too
-- A command with Settings focused places Settings, not the app behind it
-- Cycling, Restore, custom sizes and display moves all work on Settings
-- Fullscreen on Settings toggles it
-- HUDs are never placed
-- Rooms: create one from Switch Room; ⇥ glides the preview through its layouts; ↵ lands its windows
-  with the gap, hides other apps and parks their extra windows; quitting, `kill -9` then relaunching, and
-  turning Window Management off each bring every window back.
-  Repeat on two displays and with Reduce Motion on
 
 ### Deeplinks
 
 Debug answers `tinycast-dev://`; use that scheme for every link below.
 
-- ⇧⌘C on a command, window command, system action, quicklink and extension row says Deeplink
+- ⇧⌘C on a command, system action, quicklink and extension row says Deeplink
   copied; ⌘K lists Copy Deeplink there, and not on an application or a System Settings pane. A
   built-in row's link starts `tinycast-dev://`, and so does an extension row's
 - Type into a quicklink's and a custom command's argument fields, then ⇧⌘C: the link carries the
@@ -668,13 +654,13 @@ Debug answers `tinycast-dev://`; use that scheme for every link below.
   link that reopens that note or chat; a renamed note's old link reports the missing file
 - `open -g` each copied link with the palette closed: it runs what the row's shortcut runs
 - Quit Tinycast, then `open -g` a command link: the app starts and runs it
-- Open a window command's link with a plain `open` (no `-g`): after the question, it moves the
-  window of the app you were in, not Tinycast
+- Open Paste Sequentially's link with a plain `open` (no `-g`): after the question, it pastes into
+  the app you were in, not Tinycast
 - Open a command's link twice: it toggles, as its shortcut does. Turn the feature off: the link shows
   a HUD naming it and runs nothing
 - Hide a command from launcher search: its link still runs. Open a mistyped link, or a quicklink
   link with a made-up UUID: a HUD says it can't open it, and nothing asks
-- The first link to a window command, system action or quicklink asks. Return chooses Cancel. Run
+- The first link to a system action or quicklink asks. Return chooses Cancel. Run
   Once runs it and asks again next time; Always Allow runs it and never asks again. Settings →
   General → Deeplinks lists it; remove it there and the next link asks again. A clipboard-history
   link with no input never asks. Export a backup: the allowed list is not in it
@@ -694,11 +680,9 @@ Debug answers `tinycast-dev://`; use that scheme for every link below.
   two, showing each name and link, adds one, and the HUD says so
 - `system-action/set-volume?fallbackText=30` sets 30% with no picker; `?fallbackText=300` reports the
   link before asking and changes nothing. `note/..` reports it too
-- `window-size?arguments=%7B%22width%22%3A%22800%22%2C%22height%22%3A%2260%25%22%7D` sizes the front
-  window to 800 pt by 60%; `"width":"0"` reports the link
 - `?arguments=nope` on any link: a HUD says it can't open it, and nothing runs
 - `settings/permissions` opens Settings on Permissions; `settings/nope` shows the HUD
-- A quicklink whose link is `tinycast-dev://window-command/left-half` moves the window without
+- A quicklink whose link is `tinycast-dev://system-action/toggle-system-appearance` runs it without
   asking. One whose link is another quicklink's says it can't, and nothing loops
 - `raycast://extensions/<owner>/<ext>/<cmd>` and `tinycast-dev://extensions/<owner>/<ext>/<cmd>`
   still run an installed extension command; `?context=` with a JSON object reaches it as

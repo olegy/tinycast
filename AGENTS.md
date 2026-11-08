@@ -1,7 +1,7 @@
 # Tinycast Lite
 
 A native macOS menu-bar launcher: fuzzy app launcher, global and per-app hotkeys, a text/image
-clipboard history, an inline calculator, quicklinks, window management
+clipboard history, an inline calculator, quicklinks, a window switcher
 and an emoji picker. It also **runs Raycast extensions** natively, in JavaScriptCore.
 SwiftUI + AppKit, running as an accessory with no Dock icon (`LSUIElement`). Zero third-party
 dependencies.

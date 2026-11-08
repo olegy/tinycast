@@ -5,20 +5,19 @@ import Foundation
 enum SettingsFileSchema {
     static func bindings(
         settings: AppSettings, ai: AISettingsStore, quickActions: QuickActionSettingsStore,
-        shortcuts: HotKeySettingsFile, launcher: LauncherSettingsFile,
-        windowManagement: WindowManagementSettingsFile
+        shortcuts: HotKeySettingsFile, launcher: LauncherSettingsFile
     ) -> [SettingsFileBinding] {
         SettingsFileKey.allCases.map { key in
             binding(
                 for: key, settings: settings, ai: ai, quickActions: quickActions,
-                shortcuts: shortcuts, launcher: launcher, windowManagement: windowManagement)
+                shortcuts: shortcuts, launcher: launcher)
         }
     }
 
     private static func binding(
         for key: SettingsFileKey, settings: AppSettings, ai: AISettingsStore,
         quickActions: QuickActionSettingsStore, shortcuts: HotKeySettingsFile,
-        launcher: LauncherSettingsFile, windowManagement: WindowManagementSettingsFile
+        launcher: LauncherSettingsFile
     ) -> SettingsFileBinding {
         func bind<Root: AnyObject, Value: SettingsFileValue>(
             _ root: Root, _ path: ReferenceWritableKeyPath<Root, Value>,
@@ -97,25 +96,6 @@ enum SettingsFileSchema {
         case .menuSearchShowsAppleMenu: return bind(settings, \.menuSearchShowsAppleMenu)
         case .menuSearchDisabledApps: return bind(settings, \.menuSearchDisabledApps)
         case .navigationCommands: return launcher.commandsBinding(for: key, owner: .navigation)
-        case .windowManagementEnabled: return bind(settings, \.windowManagementEnabled)
-        case .windowManagementShowInLauncher:
-            return bind(settings, \.windowManagementShowInLauncher)
-        case .windowGap:
-            return bind(settings, \.windowGap) {
-                WindowPlacementEngine.gapRange.contains($0) ? $0 : nil
-            }
-        case .windowCycle: return bind(settings, \.windowCycle)
-        case .windowWrapsDisplays: return bind(settings, \.windowWrapsDisplays)
-        case .windowKeepsProportions: return bind(settings, \.windowKeepsProportions)
-        case .windowLayoutsShowInLauncher: return bind(settings, \.windowLayoutsShowInLauncher)
-        case .windowRoomsShowInLauncher: return bind(settings, \.windowRoomsShowInLauncher)
-        case .windowShortcuts: return windowManagement.commandShortcutsBinding(for: key)
-        case .windowAliases: return windowManagement.commandAliasesBinding(for: key)
-        case .customWindowSizes: return windowManagement.customSizesBinding(for: key)
-        case .windowLayouts: return windowManagement.layoutsBinding(for: key)
-        case .windowRooms: return windowManagement.roomsBinding(for: key)
-        case .windowManagementCommands:
-            return launcher.commandsBinding(for: key, owner: .windowManagement)
         case .clipboardEnabled: return bind(settings, \.clipboardEnabled)
         case .clipboardRetention: return bind(settings, \.clipboardRetention)
         case .clipboardDefaultAction: return bind(settings, \.clipboardDefaultAction)
@@ -136,7 +116,6 @@ extension AppLanguage: SettingsFileRawValue {}
 extension InterfaceSize: SettingsFileRawValue {}
 extension CalcNumberStyle: SettingsFileRawValue {}
 extension SearchSensitivity: SettingsFileRawValue {}
-extension WindowCycle: SettingsFileRawValue {}
 extension ClipboardDefaultAction: SettingsFileRawValue {}
 extension EmojiSkinTone: SettingsFileRawValue {}
 extension EmojiGridColumns: SettingsFileRawValue {}

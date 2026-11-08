@@ -113,19 +113,10 @@ launchers. We accept that to keep the app simple.
 - **`_` as a number separator** (like `1_000`). ([#1196](https://github.com/abue-ammar/tinycast/issues/1196))
 - **Calculate the text you selected.** Each feature stays separate. ([#1505](https://github.com/abue-ammar/tinycast/issues/1505))
 
-## Window management
+## Window switching
 
-Tinycast is an all-in-one launcher, not a full window manager. Its window tools are finished.
-
-- **Custom snap cycles (like Loop), edge-anchored sizes, or step-by-step undo.** ([#1223](https://github.com/abue-ammar/tinycast/issues/1223), [#1630](https://github.com/abue-ammar/tinycast/issues/1630))
-- **Move a window without resizing it.** It caused odd side effects. ([#1511](https://github.com/abue-ammar/tinycast/issues/1511))
-- **Drag a window to a screen edge to snap it.** ([#984](https://github.com/abue-ammar/tinycast/issues/984))
-- **macOS Fill & Arrange layouts.** ([#652](https://github.com/abue-ammar/tinycast/issues/652))
-- **Layouts per workspace (like FlashSpace).** ([#639](https://github.com/abue-ammar/tinycast/issues/639))
 - **Switch Windows changes.** The order stays stable for muscle memory. No switch-on-release, and no
   alias search. ([#1506](https://github.com/abue-ammar/tinycast/issues/1506), [#1590](https://github.com/abue-ammar/tinycast/issues/1590), [#1589](https://github.com/abue-ammar/tinycast/issues/1589))
-- **Follow Stage Manager.** **Instead:** try Window Rooms. ([#1249](https://github.com/abue-ammar/tinycast/issues/1249))
-- **Safari's width after Mission Control.** Safari may reset its width afterwards. ([#1556](https://github.com/abue-ammar/tinycast/issues/1556))
 
 ## AI
 
@@ -187,8 +178,6 @@ Tinycast is an all-in-one launcher, not a full window manager. Its window tools 
 
 ## Things macOS or other apps won't let us do
 
-- **Move windows between Spaces.** macOS 27 removed the tool for this. Space switching uses a
-  workaround that **may have to go** in a future release. ([#1157](https://github.com/abue-ammar/tinycast/issues/1157), [#417](https://github.com/abue-ammar/tinycast/issues/417))
 - **Use the Spotlight shortcut.** macOS won't give a shortcut Spotlight owns to another app.
   **Instead:** turn off Spotlight's shortcut in System Settings first. ([#358](https://github.com/abue-ammar/tinycast/issues/358))
 - **Read selected text in every app.** Many apps and websites don't share it. ([#1492](https://github.com/abue-ammar/tinycast/issues/1492), [#1420](https://github.com/abue-ammar/tinycast/issues/1420))

@@ -19,7 +19,6 @@ struct SettingsDetailView: View {
             case .quickActions: QuickActionsSettingsView()
             case .fileSearch: FileSearchSettingsView()
             case .navigation: NavigationSettingsView()
-            case .windowManagement: WindowManagementSettingsView()
             case .clipboard: ClipboardSettingsView()
             case .snippets: SnippetsSettingsView()
             case .emoji: EmojiSettingsView()

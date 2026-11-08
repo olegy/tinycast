@@ -3,6 +3,12 @@
 What is new in each Tinycast Lite release. The update window shows the section of the version it
 offers.
 
+## Next
+
+### Removed
+
+- **Window Management** is gone: window commands, custom sizes, window layouts, rooms and Space switching, with their shortcuts, deeplinks and settings pane. Switch Windows stays.
+
 ## 0.12.8-lite.4
 
 ### Removed

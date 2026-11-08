@@ -552,8 +552,7 @@ enum CommandCatalog {
 enum HotKeyAction: Hashable, Sendable {
     case togglePalette, command(CommandID)
     case app(bundleID: String), settingsPane(bundleID: String), quickAction(id: UUID)
-    case customCommand(id: UUID), systemAction(id: SystemAction.ID), windowCommand(id: WindowCommand.ID)
-    case customWindowSize(id: UUID), windowLayout(id: UUID), windowRoom(id: UUID), quicklink(id: UUID)
+    case customCommand(id: UUID), systemAction(id: SystemAction.ID), quicklink(id: UUID)
     case appleShortcut(id: UUID), extensionCommand(entryID: String)
     init?(entryID: String) { nil }
 }
@@ -569,16 +568,10 @@ struct OtherEntry<Tag: Sendable>: Sendable {
     static func id(fromEntryID id: String) -> UUID? { nil }
     static func precedes(_ lhs: Self, _ rhs: Self) -> Bool { lhs.name < rhs.name }
 }
-enum LayoutTag: Sendable {}
-enum RoomTag: Sendable {}
-enum SizeTag: Sendable {}
 enum QuickActionTag: Sendable {}
 enum CommandTag: Sendable {}
 enum QuicklinkTag: Sendable {}
 enum ShortcutTag: Sendable {}
-typealias WindowLayout = OtherEntry<LayoutTag>
-typealias Room = OtherEntry<RoomTag>
-typealias CustomWindowSize = OtherEntry<SizeTag>
 typealias CustomQuickAction = OtherEntry<QuickActionTag>
 typealias CustomCommand = OtherEntry<CommandTag>
 typealias Quicklink = OtherEntry<QuicklinkTag>
@@ -594,18 +587,6 @@ struct SystemAction: Sendable {
 enum SystemActionCatalog {
     static let all: [SystemAction] = []
     static func action(forEntryID id: String) -> SystemAction? { nil }
-}
-struct WindowCommand: Sendable {
-    enum ID: String, Sendable { case fixture }
-    var id = ID.fixture
-    var entryID = ""
-    var name = ""
-    var englishName = ""
-    var sfSymbol = ""
-}
-enum WindowCommandCatalog {
-    static let all: [WindowCommand] = []
-    static func command(forEntryID id: String) -> WindowCommand? { nil }
 }
 enum QuicklinkDestination {
     static func detect(_ link: String) -> Self? { nil }

@@ -55,7 +55,6 @@ struct InterfaceMetrics: Equatable, Sendable {
         var dialogSymbol: CGFloat { scaledPoints(Theme.Radius.dialogSymbol, scale) }
         var dialog: CGFloat { scaledPoints(Theme.Radius.dialog, scale) }
         var thumbnail: CGFloat { scaledPoints(Theme.Radius.thumbnail, scale) }
-        var glyph: CGFloat { scaledPoints(Theme.Radius.glyph, scale) }
         var attachmentChip: CGFloat { scaledPoints(Theme.Radius.attachmentChip, scale) }
         var card: CGFloat { scaledPoints(Theme.Radius.card, scale) }
         var codeBlock: CGFloat { scaledPoints(Theme.Radius.codeBlock, scale) }

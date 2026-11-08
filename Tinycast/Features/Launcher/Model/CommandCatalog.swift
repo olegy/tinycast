@@ -58,8 +58,6 @@ extension SettingsTab {
         case .quickActions: [.fixGrammar, .rewrite, .translate, .summarize]
         case .fileSearch: [.searchFiles]
         case .navigation: [.switchWindows, .switchWindowsBackwards, .searchMenuItems]
-        case .windowManagement:
-            [.createWindowLayout, .captureWindowLayout, .switchRoom, .createRoom]
         case .clipboard: [.clipboardHistory, .pasteSequentially]
         case .snippets: [.searchSnippets, .createSnippet]
         case .emoji: [.searchEmoji]

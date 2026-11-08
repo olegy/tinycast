@@ -37,8 +37,6 @@ final class PaletteCoordinator {
 
     var isVisible: Bool { windowController.isVisible }
 
-    var panelFrame: CGRect? { windowController.visibleFrame }
-
     /// The palette's own view, for AppKit UI anchored to it — a sharing picker, say.
     var anchorView: NSView? { windowController.anchorView }
 

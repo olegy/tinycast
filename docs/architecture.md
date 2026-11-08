@@ -19,16 +19,14 @@ Independently of the folder tree, every mature subsystem has converged on the sa
 │ FileSearch{Query,Result,Scope} ·                                           │
 │ Calculator/* · EmojiCatalog · EmojiGridGeometry · SystemAction ·            │
 │ VolumeLevel ·                                                              │
-│ WindowCommand · WindowPlacementEngine · WindowActionMemory · WindowLayout/* ·      │
-│ CustomWindowSize{,Store} · Room/* ·                                        │
 │ PaletteRowIndex ·                                                          │
 │ Uninstall{Target,SearchRoot,Rules,Protection,Plan} ·                       │
 │ Quicklink{,Destination,Store,Archive} · AppleShortcut ·                    │
 │ TemplateEngine ·                                                           │
 │ ShellCommandRunner · DoubleTap{Modifier,Detector} · ClipboardStore ·       │
 │ AppSettingsKey · SettingsBackupCoverage                                    │
-│ SettingsFile{JSON,Key,Value,Format,Binding,Issue,Identity} ·               │
-│ HotKeySpelling · WindowManagementFileFormat ·                              │
+│ SettingsFile{JSON,Key,Value,Format,Binding,Issue} ·                        │
+│ HotKeySpelling ·                                                           │
 │ SupportReminderSchedule ·                                                  │
 │ MenuSearch{Item,Shortcut,Query,TreeNode,SnapshotPolicy,Target} ·           │
 │ WindowSwitch{Entry,Order,Query}                                            │
@@ -37,20 +35,17 @@ Independently of the folder tree, every mature subsystem has converged on the sa
 ┌─ EFFECT ─────────────────────────▼─────────────────────────────────────────┐
 │ All platform I/O, one folder per feature.                                  │
 │ AppIndex · FileIndexer · SettingsPaneScanner ·                             │
-│ AXWindowAccess · AXScreens · WindowInventory · WindowLayoutRunner ·        │
-│ RoomWindowSweep · RoomRunner ·                                             │
-│ IconCache · WindowMover · UninstallScanner · UninstallRunner ·             │
+│ IconCache · UninstallScanner · UninstallRunner ·                           │
 │ SystemActionRunner · QuicklinkLauncher · TextInjector ·             │
 │ CurrencyRateStore · Paster ·                                               │
 │ HotKeyCenter · ModifierTapMonitor · RunningAppsMonitor ·                   │
 │ CameraSession ·                                                            │
-│ AXMenuAccess · WindowZOrder · WindowSwitchSweep ·                          │
-│ AppleShortcutRunner · SettingsFileRepository · SettingsFileMonitor ·       │
-│ WindowManagementSettingsFile                                               │
+│ AXMenuAccess · AXWindowAccess · WindowZOrder · WindowSwitchSweep ·         │
+│ AppleShortcutRunner · SettingsFileRepository · SettingsFileMonitor         │
 └──────────────────────────────────┬─────────────────────────────────────────┘
                                    │ published through
 ┌─ OBSERVABLE STATE ───────────────▼─────────────────────────────────────────┐
-│ 39 @MainActor @Observable stores, sessions, indices and State types        │
+│ 34 @MainActor @Observable stores, sessions, indices and State types        │
 └──────────────────────────────────┬─────────────────────────────────────────┘
                                    │ rendered by
 ┌─ VIEW ───────────────────────────▼─────────────────────────────────────────┐
@@ -224,7 +219,7 @@ Tinycast/
     PaletteRowIndex.swift   the flat selection index — palette-owned, so it sits at the top
     Launcher/ Clipboard/ Calculator/ Emoji/ FileSearch/ MenuSearch/
     Quicklinks/ Templates/ TextInjection/ Uninstall/ SystemActions/ CustomCommands/ HotKeys/ Backup/
-    WindowManagement/ Onboarding/ Updates/ AI/ Settings/
+    WindowSwitcher/ Onboarding/ Updates/ AI/ Settings/
     Extensions/
         Model/      pure — the harness inputs
         Service/    effects — stores, monitors, runners, AppKit glue

@@ -151,7 +151,7 @@ struct SettingsHistoryTests {
             ("automatically check for updates", .general),
             ("popup", .general),
             ("paste history", .clipboard),
-            ("window manage", .windowManagement),
+            ("menu bar items", .navigation),
             ("skin tone", .emoji),
             ("mcp", .ai)
         ]

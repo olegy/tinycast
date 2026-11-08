@@ -15,7 +15,7 @@ struct EntryDeepLinkTest {
 
         let ids = [
             "command:clipboard-history", "system-action:empty-trash",
-            "window-command:left-half", "quicklink:4F2B0B9A-1111-2222-3333-444455556666",
+            "custom-command:9C1D2E3F-1111-2222-3333-444455556666", "quicklink:4F2B0B9A-1111-2222-3333-444455556666",
             "/Applications/Visual Studio Code & Co+.app", "/System/Applications/Café ☕.app",
             "extension:raycast/spotify?x=1#frag",
         ]

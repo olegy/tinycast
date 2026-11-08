@@ -10,8 +10,6 @@ final class LauncherCoordinator {
     private let customCommandCoordinator: CustomCommandCoordinator
     private let systemActionCoordinator: SystemActionCoordinator
     private let quicklinkCoordinator: QuicklinkCoordinator
-    private let windowCommandCoordinator: WindowCommandCoordinator
-    private let windowLayoutCoordinator: WindowLayoutCoordinator
     private let fileSearchCoordinator: FileSearchCoordinator
     private let menuSearchCoordinator: MenuSearchCoordinator
     private let windowSwitchCoordinator: WindowSwitchCoordinator
@@ -27,8 +25,6 @@ final class LauncherCoordinator {
         customCommandCoordinator: CustomCommandCoordinator,
         systemActionCoordinator: SystemActionCoordinator,
         quicklinkCoordinator: QuicklinkCoordinator,
-        windowCommandCoordinator: WindowCommandCoordinator,
-        windowLayoutCoordinator: WindowLayoutCoordinator,
         fileSearchCoordinator: FileSearchCoordinator,
         menuSearchCoordinator: MenuSearchCoordinator,
         windowSwitchCoordinator: WindowSwitchCoordinator,
@@ -42,8 +38,6 @@ final class LauncherCoordinator {
         self.customCommandCoordinator = customCommandCoordinator
         self.systemActionCoordinator = systemActionCoordinator
         self.quicklinkCoordinator = quicklinkCoordinator
-        self.windowCommandCoordinator = windowCommandCoordinator
-        self.windowLayoutCoordinator = windowLayoutCoordinator
         self.fileSearchCoordinator = fileSearchCoordinator
         self.menuSearchCoordinator = menuSearchCoordinator
         self.windowSwitchCoordinator = windowSwitchCoordinator
@@ -94,27 +88,6 @@ final class LauncherCoordinator {
             systemActionCoordinator.runSystemAction(id: action.id)
             return
         }
-        if app.kind == .windowCommand {
-            if let command = WindowCommandCatalog.command(forEntryID: app.id) {
-                windowCommandCoordinator.runWindowCommand(id: command.id)
-                return
-            }
-            guard let id = CustomWindowSize.id(fromEntryID: app.id) else { return }
-            windowCommandCoordinator.runCustomWindowSize(id: id)
-            return
-        }
-        if app.kind == .windowRoom {
-            // The coordinator hides the palette itself: entering must not restore focus first.
-            guard let id = Room.id(fromEntryID: app.id) else { return }
-            core.roomCoordinator.enterRoom(id: id)
-            return
-        }
-        if app.kind == .windowLayout {
-            // The coordinator hides the palette itself: a layout must not restore focus first.
-            guard let id = WindowLayout.id(fromEntryID: app.id) else { return }
-            windowLayoutCoordinator.runWindowLayout(id: id)
-            return
-        }
         // Before the palette hides: a view command takes the palette over rather than closing it.
         if app.kind == .extensionCommand {
             extensionCoordinator.runExtensionCommand(app, arguments: arguments)
@@ -138,8 +111,8 @@ final class LauncherCoordinator {
         case .systemSettings:
             guard let bundleID = app.bundleID else { return }
             AppLauncher.openSettingsPane(bundleID: bundleID)
-        case .command, .quickAction, .customCommand, .systemAction, .windowCommand, .windowLayout,
-            .windowRoom, .quicklink, .appleShortcut, .extensionCommand:
+        case .command, .quickAction, .customCommand, .systemAction, .quicklink, .appleShortcut,
+            .extensionCommand:
             break  // handled above
         }
     }
@@ -189,16 +162,6 @@ final class LauncherCoordinator {
             core.snippetCoordinator.showSnippets()
         case .createSnippet:
             core.snippetCoordinator.editSnippet(nil)
-        case .createWindowLayout:
-            dismissPalette()
-            windowLayoutCoordinator.editWindowLayout(nil)
-        case .captureWindowLayout:
-            dismissPalette()
-            windowLayoutCoordinator.captureWindowLayout()
-        case .switchRoom:
-            core.roomCoordinator.showRooms()
-        case .createRoom:
-            core.roomCoordinator.createRoom()
         case .createQuicklink:
             quicklinkCoordinator.editQuicklink(nil)
         case .createCustomCommand:

@@ -31,7 +31,7 @@ struct PermissionsSettingsView: View {
                         )
                         VStack(alignment: .leading, spacing: Theme.Spacing.xxs) {
                             SettingsRowTitle(.permissionsAccessibility, "Accessibility")
-                            Text("Allows pasting and window management.")
+                            Text("Allows pasting and switching windows.")
                                 .foregroundStyle(.secondary)
                         }
                     }
