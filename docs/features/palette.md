@@ -156,9 +156,9 @@ still there to be cleared by the next press. A bare backspace in an empty field 
 is the step Escape would have taken had that screen been reached by typing its name. ⌘esc skips the
 whole stack for that same root search from any depth.
 
-`EscapeKeyBehavior` (General settings) can trade the walk back for the old behavior: under
-`closeAndPopToRoot` an empty field closes the window and resets it immediately from any depth. Clearing the query is still the first press either way. In compact mode, expanded
-launcher root search always clears, then collapses, then closes, under either preference.
+There is no preference for this: Escape always walks back. The launcher hotkey is the other way out,
+and it hides the palette as it stands, so the next summon restores that screen until Pop to Root
+Search expires. In compact mode, expanded launcher root search clears, then collapses, then closes.
 
 The header draws a back chevron on **every** screen but the launcher: leaving is what the icon
 slot means once you are off the root, and a slot that changed shape with provenance would read

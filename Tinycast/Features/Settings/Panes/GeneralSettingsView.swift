@@ -45,14 +45,6 @@ struct GeneralSettingsView: View {
                     SettingsRowTitle(.generalGeneral, "Pop to Root Search")
                     Text("After the launcher closes.")
                 }
-                Picker(selection: $settings.escapeKeyBehavior) {
-                    ForEach(EscapeKeyBehavior.allCases) { behavior in
-                        Text(behavior.title).tag(behavior)
-                    }
-                } label: {
-                    SettingsRowTitle(.generalGeneral, "Escape Key Behavior")
-                    Text("When the search field is empty.")
-                }
                 // Empty only when TIS fails; one layout still lists, so the row stays put.
                 if !inputSources.isEmpty {
                     Picker(selection: $settings.autoSwitchInputSourceID) {

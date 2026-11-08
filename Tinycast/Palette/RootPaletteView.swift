@@ -556,7 +556,6 @@ struct RootPaletteView: View {
                     menuOpen: menuOpen, menuQuery: vm.menuQuery,
                     argumentFocused: argumentFocused != nil, query: vm.query, mode: vm.mode,
                     canGoBack: vm.canGoBack,
-                    behavior: settings.escapeKeyBehavior,
                     compactRootExpanded: settings.compactMode && vm.mode == .launcher && !isCollapsed)
                 {
                 case .clearMenuQuery, .closeMenu:

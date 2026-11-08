@@ -7,7 +7,6 @@ enum SettingsFileKey: String, CaseIterable, Sendable {
     case showInMenuBar = "general.showInMenuBar"
     case automaticallyCheckForUpdates = "general.automaticallyCheckForUpdates"
     case popToRootTimeout = "general.popToRootSeconds"
-    case escapeKeyBehavior = "general.escapeKeyBehavior"
     case autoSwitchInputSource = "general.autoSwitchInputSource"
     case language = "general.language"
     case appearance = "appearance.theme"

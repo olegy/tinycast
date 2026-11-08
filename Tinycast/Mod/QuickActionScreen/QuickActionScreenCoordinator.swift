@@ -210,7 +210,7 @@ final class QuickActionScreenCoordinator {
             session.stop()
             return true
         }
-        if core.settings.escapeKeyBehavior == .navigateBackOrClose, palette.pop() { return true }
+        if palette.pop() { return true }
         close()
         return true
     }

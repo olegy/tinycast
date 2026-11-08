@@ -178,6 +178,7 @@ If a change touches anything in the right column, the harness on the left is man
 | `launcher-settings-file-test` | Launcher settings application — invalid records, partial edits, deferred bundles, shortcut moves and records outside search scopes; isolated preferences and in-memory scan/Carbon effects |
 | `calendar-removal-migration-test` | `Migrations/CalendarRemovalMigration.swift` — retires exactly the Calendar defaults and hotkeys, strips the `calendar` section and My Schedule from the compact bar, and leaves a file with other problems to the import |
 | `themes-removal-migration-test` | `Migrations/ThemesRemovalMigration.swift` — retires exactly the Raycast theme defaults and removes only the Theme command's extension folder |
+| `escape-key-behavior-removal-migration-test` | `Migrations/EscapeKeyBehaviorRemovalMigration.swift` — removes the retired default, strips `general.escapeKeyBehavior` from settings.json, and leaves a file with other problems to the import |
 | `backup-archive-test` | all of `Backup/Model/`, plus `Backup/Service/BackupStaging.swift` |
 | `updates-test` | `Updates/Model/` — version precedence, channel filtering, install route, readiness |
 | `update-check-test` | `UpdateCheckStore` — stopping, in-flight cancellation, cached prompt suppression, restart and independent manual checking |
@@ -408,10 +409,11 @@ caches, TCC grants and login item, so this cannot disturb an installed copy.
   still does whatever macOS does with it. Open a menu or dialog over the palette and verify ⌘esc
   passes through while the palette is not key; after dismissing it, the palette chord works again
 - A bare ⌫ in an empty field walks the same path Escape does
-- General ▸ Escape Key Behavior set to `Close window and pop to root`: Escape on sub-screens closes
-  the window, and reopening lands on the root search whatever Pop to Root Search says
+- The launcher hotkey on a sub-screen hides the palette, and pressing it again within Pop to Root
+  Search brings that screen back; Escape on the root closes it, and reopening lands on the root search
 - Reopening focuses the search field with an empty query, in the same position and at the same size
-- Compact mode: typing expands it, and the search bar does **not** shift vertically during the swap
+- Compact mode: typing expands it, and the search bar moves up only the 5pt the expanded header
+  takes to centre it
 - Compact mode: the opening frames show no shortcut fill beneath the query before the buttons emerge
 - Compact mode: configure zero through four unique shortcuts, replace/remove them and move them up/down;
   disabling a feature hides its button without losing its configured position, and Settings marks

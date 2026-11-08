@@ -12,6 +12,7 @@ offers.
 
 ### Changes
 
+- **Escape always walks back.** The Escape Key Behavior setting is gone: Escape clears the search, then steps back screen by screen, and on the root search closes the palette so it opens fresh next time. The launcher hotkey still hides the palette as it is and brings that screen back on the next press, until Pop to Root Search expires.
 - **The expanded palette has hard edges.** A thin line now separates the search bar and the bottom bar from the list, and rows stop at those lines instead of fading out beneath the bars. The search text is smaller, starts without the magnifying glass and sits centred in the search bar. The bottom bar is lower, leaving more room for the list. The bottom buttons lose their capsule: Open and Actions sit bare, split by a short line that hides while you hover either one. This applies to every screen in the palette.
 
 ## 0.12.8-lite.3

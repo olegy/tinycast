@@ -302,7 +302,6 @@ run command-escape-tap-test Tinycast/Palette/CommandEscapeTap.swift
 run palette-escape-test    Tinycast/Palette/PaletteMode.swift \
                            Tinycast/Palette/PaletteEscapeAction.swift \
                            Tinycast/Palette/CommandEscapeTap.swift \
-                           Tinycast/Features/Settings/EscapeKeyBehavior.swift \
                            Tinycast/Features/Quicklinks/Model/Quicklink.swift \
                            Tinycast/Features/Quicklinks/Model/QuicklinkDestination.swift \
                            Tinycast/Features/CustomCommands/Model/CustomCommand.swift
@@ -555,6 +554,9 @@ run settings-file-test     Tinycast/Features/Settings/Model/*.swift \
                            Tinycast/Features/Settings/Service/SettingsFileRepository.swift \
                            Tinycast/Platform/AppPaths.swift
 run calendar-removal-migration-test Tinycast/Migrations/CalendarRemovalMigration.swift \
+                           Tinycast/Features/Settings/Model/*.swift \
+                           Tinycast/Platform/AppPaths.swift
+run escape-key-behavior-removal-migration-test Tinycast/Migrations/EscapeKeyBehaviorRemovalMigration.swift \
                            Tinycast/Features/Settings/Model/*.swift \
                            Tinycast/Platform/AppPaths.swift
 run themes-removal-migration-test Tinycast/Migrations/ThemesRemovalMigration.swift

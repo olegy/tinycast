@@ -234,6 +234,7 @@ final class AppCore {
             // Shorten AppKit's ~2–3s tooltip delay; registration domain, so a user default wins.
             UserDefaults.standard.register(defaults: ["NSInitialToolTipDelay": 250])
             ThemesRemovalMigration.run(extensionsDirectory: ExtensionCatalog.extensionsDirectory())
+            EscapeKeyBehaviorRemovalMigration.run(settingsFileEnabled: settings.settingsFileEnabled)
             CalendarRemovalMigration.run(settingsFileEnabled: settings.settingsFileEnabled)
             NSApp.setActivationPolicy(.accessory)
             applyAppearance()

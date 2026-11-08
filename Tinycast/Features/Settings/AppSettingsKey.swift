@@ -13,7 +13,6 @@ enum AppSettingsKey: String, CaseIterable {
     case showInMenuBar = "showInMenuBar"
     case automaticallyCheckForUpdates = "automaticallyCheckForUpdates"
     case popToRootTimeout = "popToRootTimeout"
-    case escapeKeyBehavior = "escapeKeyBehavior"
     case appearance = "appearance"
     case language = "AppleLanguages"
     case calcNumberStyle = "calculatorNumberStyle"

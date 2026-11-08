@@ -30,30 +30,28 @@ struct PaletteEscapeTests {
     static func resolve(
         menuOpen: Bool = false, menuQuery: String = "", argumentFocused: Bool = false,
         query: String = "", mode: PaletteMode = .launcher, canGoBack: Bool = false,
-        behavior: EscapeKeyBehavior = .navigateBackOrClose, compactRootExpanded: Bool = false
+        compactRootExpanded: Bool = false
     ) -> PaletteEscapeAction {
         PaletteEscapeAction.resolve(
             menuOpen: menuOpen, menuQuery: menuQuery, argumentFocused: argumentFocused,
-            query: query, mode: mode, canGoBack: canGoBack, behavior: behavior,
+            query: query, mode: mode, canGoBack: canGoBack,
             compactRootExpanded: compactRootExpanded)
     }
 
     static func main() {
-        for behavior in EscapeKeyBehavior.allCases {
-            expect(
-                resolve(query: "notes", behavior: behavior, compactRootExpanded: true),
-                .clearQuery, "compact root clears text before collapsing under either preference")
-            expect(
-                resolve(behavior: behavior, compactRootExpanded: true),
-                .collapsePalette, "empty expanded compact root collapses under either preference")
-            expect(resolve(behavior: behavior), .hidePalette, "collapsed root closes on the next Escape")
-            expect(
-                resolve(menuOpen: true, behavior: behavior, compactRootExpanded: true),
-                .closeMenu, "menus still outrank root collapse")
-            expect(
-                resolve(argumentFocused: true, behavior: behavior, compactRootExpanded: true),
-                .leaveArgumentField, "argument focus still outranks root collapse")
-        }
+        expect(
+            resolve(query: "notes", compactRootExpanded: true),
+            .clearQuery, "compact root clears text before collapsing")
+        expect(
+            resolve(compactRootExpanded: true),
+            .collapsePalette, "empty expanded compact root collapses")
+        expect(resolve(), .hidePalette, "collapsed root closes on the next Escape")
+        expect(
+            resolve(menuOpen: true, compactRootExpanded: true),
+            .closeMenu, "menus still outrank root collapse")
+        expect(
+            resolve(argumentFocused: true, compactRootExpanded: true),
+            .leaveArgumentField, "argument focus still outranks root collapse")
         expect(
             resolve(menuOpen: true, menuQuery: "paste"),
             .clearMenuQuery,
@@ -105,24 +103,6 @@ struct PaletteEscapeTests {
             resolve(query: "notes", mode: .clipboard, canGoBack: true),
             .clearQuery,
             "a typed query still clears before the back step it would otherwise skip")
-
-        // Close and pop to root: one press ends the session, whatever it was opened over.
-        expect(
-            resolve(mode: .clipboard, canGoBack: true, behavior: .closeAndPopToRoot),
-            .hidePalette,
-            "close-and-pop-to-root hides even where a back step exists")
-        expect(
-            resolve(mode: .extensionCommand, canGoBack: true, behavior: .closeAndPopToRoot),
-            .hidePalette,
-            "close-and-pop-to-root outranks an extension's own stack too")
-        expect(
-            resolve(query: "notes", behavior: .closeAndPopToRoot),
-            .clearQuery,
-            "clearing the query is the first press under either behavior")
-        expect(
-            resolve(menuOpen: true, canGoBack: true, behavior: .closeAndPopToRoot),
-            .closeMenu,
-            "a menu outranks the behavior setting beneath it")
 
         expect(
             resolve(menuOpen: true, mode: .ai),
