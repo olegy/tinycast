@@ -78,7 +78,11 @@ Add a token rather than a magic number when introducing a new value.
 extension list panel, Quick Actions, dialogs and HUDs. Settings, Onboarding,
 Update and About never scale.
 
-`DesignSystem/InterfaceMetrics.swift` stores **only a scale** and derives every value from the `Theme`
+There are two sizes. Each scales **text** and **geometry** separately: Default keeps `Theme`'s
+geometry with text at 1.1×; Large sets geometry at 1.04× and text at 1.2×.
+
+`DesignSystem/InterfaceMetrics.swift` stores **only two scales** — `scale` for geometry (spacing,
+radius, size, `scaled(_:)`) and `textScale` for `Typography` — and derives every value from the `Theme`
 literal, so `Theme` stays the one place a number is written down. **In any view a scaled surface can
 reach, read `@Environment(\.metrics)` rather than `Theme.Spacing/Radius/Size/Typography`** — the key
 defaults to `.standard`, so a shared `DesignSystem/` component renders unscaled in Settings without

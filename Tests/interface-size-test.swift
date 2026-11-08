@@ -202,7 +202,7 @@ struct InterfaceSizeTests {
                 let base = NSFont.preferredFont(forTextStyle: style)
                 let scaled = NSFont(
                     descriptor: base.fontDescriptor,
-                    size: (base.pointSize * size.scale).rounded())
+                    size: (base.pointSize * size.textScale).rounded())
                 expect(scaled != nil, "\(style.rawValue) rebuilds from its own descriptor")
                 expect(
                     scaled?.familyName == base.familyName,
@@ -213,7 +213,7 @@ struct InterfaceSizeTests {
             }
             expect(
                 metrics.typography.searchFieldSize
-                    == (Theme.Typography.searchFieldSize * size.scale).rounded(),
+                    == (Theme.Typography.searchFieldSize * size.textScale).rounded(),
                 "the search field's stated size scales at \(size.rawValue)")
         }
     }
@@ -233,7 +233,7 @@ struct InterfaceSizeTests {
 
     /// Weakly, not strictly: a 2pt gap rounds to 2 at 1.1, which is the only way to draw it.
     static func sizesGrow() {
-        let ordered = [InterfaceSize.standard, .large, .larger]
+        let ordered = [InterfaceSize.standard, .large]
         for (smaller, larger) in zip(ordered, ordered.dropFirst()) {
             let a = lengths(smaller.metrics)
             let b = lengths(larger.metrics)
@@ -246,6 +246,7 @@ struct InterfaceSizeTests {
                 larger.metrics.size.panelWidth > smaller.metrics.size.panelWidth,
                 "the panel is wider at \(larger.rawValue)")
             expect(smaller.scale < larger.scale, "\(larger.rawValue) scales further")
+            expect(smaller.textScale < larger.textScale, "\(larger.rawValue) sets larger text")
         }
     }
 
@@ -275,7 +276,13 @@ struct InterfaceSizeTests {
     }
 
     static func theEnumIsWellFormed() {
-        expect(InterfaceSize.standard.scale == 1, "the default size changes nothing")
+        expect(InterfaceSize.standard.scale == 1, "the default size keeps Theme's geometry")
+        expect(InterfaceSize.standard.textScale > 1, "the default size still enlarges text")
+        for size in InterfaceSize.allCases {
+            expect(size.textScale > size.scale, "text outgrows geometry at \(size.rawValue)")
+            expect(size.metrics.typography.scale == size.textScale, "fonts follow textScale")
+        }
+        expect(InterfaceSize(rawValue: "standard") == nil, "the retired size falls back to default")
         expect(InterfaceSize(rawValue: "huge") == nil, "an unknown raw value is rejected")
         expect(
             InterfaceSize.allCases.count == Set(InterfaceSize.allCases.map(\.title)).count,

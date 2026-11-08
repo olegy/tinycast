@@ -232,12 +232,12 @@ private struct WindowModeButtonStyle: ButtonStyle {
     }
 }
 
-/// Three glyph steps read as a legend; a true-to-scale "Aa" would look identical at 1.1.
+/// Glyph steps read as a legend; a true-to-scale "Aa" would look nearly identical.
 private struct InterfaceSizeRow: View {
     @Environment(AppSettings.self) private var settings
 
     private static let glyph: [InterfaceSize: CGFloat] = [
-        .standard: 11, .large: 14, .larger: 17
+        .standard: 12, .large: 16
     ]
 
     var body: some View {

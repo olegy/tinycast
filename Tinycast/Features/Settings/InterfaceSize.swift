@@ -2,9 +2,9 @@ import CoreGraphics
 
 /// How large the palette and its floating siblings render; an unset key reads as `.standard`.
 enum InterfaceSize: String, CaseIterable, Identifiable, Sendable {
-    case standard
-    case large
-    case larger
+    // Raw values name the retired sizes whose fonts these keep, so a stored choice carries over.
+    case standard = "large"
+    case large = "larger"
 
     var id: String { rawValue }
 
@@ -12,17 +12,23 @@ enum InterfaceSize: String, CaseIterable, Identifiable, Sendable {
         switch self {
         case .standard: String(localized: "Default")
         case .large: String(localized: "Large")
-        case .larger: String(localized: "Larger")
         }
     }
 
+    /// Frames, spacing and icons: the original proportions, only nudged up at `.large`.
     var scale: CGFloat {
         switch self {
         case .standard: 1
-        case .large: 1.1
-        case .larger: 1.2
+        case .large: 1.04
         }
     }
 
-    var metrics: InterfaceMetrics { InterfaceMetrics(scale: scale) }
+    var textScale: CGFloat {
+        switch self {
+        case .standard: 1.1
+        case .large: 1.2
+        }
+    }
+
+    var metrics: InterfaceMetrics { InterfaceMetrics(scale: scale, textScale: textScale) }
 }

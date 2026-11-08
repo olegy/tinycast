@@ -4,12 +4,19 @@ import SwiftUI
 struct InterfaceMetrics: Equatable, Sendable {
     static let standard = InterfaceMetrics(scale: 1)
 
+    /// Geometry's scale; text scales on its own, so a size can grow its fonts but not its frames.
     let scale: CGFloat
+    let textScale: CGFloat
+
+    init(scale: CGFloat, textScale: CGFloat? = nil) {
+        self.scale = scale
+        self.textScale = textScale ?? scale
+    }
 
     var spacing: Spacing { Spacing(scale: scale) }
     var radius: Radius { Radius(scale: scale) }
     var size: Size { Size(scale: scale) }
-    var typography: Typography { Typography(scale: scale) }
+    var typography: Typography { Typography(scale: textScale) }
 
     /// For a tuned length a surface owns itself, where `Theme` states no token for it.
     func scaled(_ value: CGFloat) -> CGFloat { scaledPoints(value, scale) }
