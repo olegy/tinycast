@@ -239,6 +239,9 @@ final class PalettePanel: NSPanel, AnimatedPanel {
     private func returnKeyboardFromReadOnlyText(for event: NSEvent) {
         if let text = firstResponder as? NSTextView {
             guard !text.isEditable, !Self.selectsText(event) else { return }
+        } else if (firstResponder as? NSView)?.accessibilityRole() == .staticText {
+            // SwiftUI's selectable `Text` is no NSTextView; it only reads as static text.
+            guard !Self.selectsText(event) else { return }
         } else {
             // Re-rendering can remove the focused text from the window, leaving the window itself.
             guard firstResponder === self || firstResponder == nil,

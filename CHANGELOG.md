@@ -15,6 +15,11 @@ offers.
 - **Escape always walks back.** The Escape Key Behavior setting is gone: Escape clears the search, then steps back screen by screen, and on the root search closes the palette so it opens fresh next time. The launcher hotkey takes you home: on any other screen it jumps straight to the root search, and on the root search it closes the palette, which opens fresh next time. Only clicking away keeps your place, and the next summon brings that screen back until Pop to Root Search expires. ⌘Esc no longer jumps to the root search, so Tinycast stops claiming that shortcut and no longer needs Accessibility for it.
 - **The expanded palette has hard edges.** A thin line now separates the search bar and the bottom bar from the list, and rows stop at those lines instead of fading out beneath the bars. The search text is smaller, starts without the magnifying glass and sits centred in the search bar. The bottom bar is lower, leaving more room for the list. The bottom buttons lose their capsule: Open and Actions sit bare, split by a short line that hides while you hover either one. This applies to every screen in the palette.
 
+### Fixes
+
+- **Clipboard History keeps the keyboard after a click on the preview.** After clicking the text in the preview, Escape and the other keys go back to the search and the list instead of beeping; ⌘C still copies the selected text.
+- **Clipboard History's preview no longer touches the line above it.** Text, images and files start level with the list beside them.
+
 ## 0.12.8-lite.3
 
 ### New

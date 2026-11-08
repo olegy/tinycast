@@ -318,6 +318,7 @@ struct ClipboardPreview: View {
                         .font(.system(.subheadline, design: .monospaced))
                         .textSelection(.enabled)
                         .frame(maxWidth: .infinity, alignment: .topLeading)
+                        .padding(.top, topInset)
                 }
             }
         case .image:
@@ -339,10 +340,14 @@ struct ClipboardPreview: View {
                 Image(systemName: "photo").font(.system(.largeTitle))
                     .symbolRenderingMode(.hierarchical).foregroundStyle(.tertiary)
             }
+            .padding(.top, topInset)
         case .file:
-            if let path = item.filePath { FilePreviewStage(path: path) }
+            if let path = item.filePath { FilePreviewStage(path: path).padding(.top, topInset) }
         }
     }
+
+    /// The list's own inset plus its first header's, so both columns start level.
+    private var topInset: CGFloat { metrics.spacing.xs * 2 }
 }
 
 /// The "Information" block; disk-touching details are gathered off the main actor.

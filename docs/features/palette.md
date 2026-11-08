@@ -463,7 +463,8 @@ Two measured details the policy depends on:
 
 A click on read-only text makes it first responder, which would take the arrow keys from the list.
 `PalettePanel.returnKeyboardFromReadOnlyText` leaves it ⌘C, ⌘A and ⇧-movement keys, and hands every
-other key back to the search field before dispatch. A key that finds the window itself first
+other key back to the search field before dispatch. SwiftUI's selectable `Text` (the clipboard
+preview) is no `NSTextView`, so it is recognised by its `.staticText` accessibility role. A key that finds the window itself first
 responder goes back too: the snippet preview re-renders on a selection change, which removes the
 focused text from the window. The field is found by walking the views, since the placeholder drawn
 over it would answer a hit test. It also bumps `focusToken`: SwiftUI's focus state
