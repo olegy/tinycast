@@ -552,9 +552,8 @@ final class ExtensionHostBridge: ExtensionHostAPI {
 
     /// A command URL runs it when installed; every other Raycast URL just brings the palette back.
     private func openRaycastURL(_ url: URL) {
-        // tinycast-space: a theme or confetti link goes where an outside `open` lands, in AppCore.
-        if ["theme", "confetti"].contains(url.host()?.lowercased() ?? "") {
-            if RaycastThemeLink(url: url)?.applies == false { keepsWindowUntil = .now + 1 }
+        // tinycast-space: a confetti link goes where an outside `open` lands, in AppCore.
+        if url.host()?.lowercased() == "confetti" {
             NSApp.delegate?.application?(NSApp, open: [url])
             return
         }

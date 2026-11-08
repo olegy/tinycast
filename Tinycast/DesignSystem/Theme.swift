@@ -378,13 +378,9 @@ enum Theme {
         }
 
         /// The alpha ramp, inverted: white ink over the dark surface, black ink over the light one.
-        static func ramp(dark: Double, light: Double, spaceRole: SpaceTheme.Role = .text) -> Color {
-            // tinycast-space: a Raycast theme keeps the ramp's alphas and swaps its ink. Reading its
-            // revision lets a view drawing the token redraw in place when the theme changes.
-            SpaceTheme.observe()
-            return Color(nsColor: NSColor(name: nil) {
-                SpaceTheme.ink(spaceRole, in: $0, dark: dark, light: light)
-                    ?? ($0.isDark ? .srgbInk(1, alpha: dark) : .srgbInk(0, alpha: light))
+        static func ramp(dark: Double, light: Double) -> Color {
+            Color(nsColor: NSColor(name: nil) {
+                $0.isDark ? .srgbInk(1, alpha: dark) : .srgbInk(0, alpha: light)
             })
         }
 
@@ -404,7 +400,7 @@ enum Theme {
             dark: .srgbInk(0, alpha: 0.18), light: .srgbInk(0, alpha: 0.18))
 
         /// Selection fill, shared by every list so they look identical.
-        static var selection: Color { ramp(dark: 0.10, light: 0.09, spaceRole: .selection) }
+        static var selection: Color { ramp(dark: 0.10, light: 0.09) }
         static var rowHover: Color { ramp(dark: 0.05, light: 0.045) }
         static var emojiCell: Color { ramp(dark: 0.045, light: 0.04) }
         static var emojiHoverBorder: Color { ramp(dark: 0.42, light: 0.34) }
@@ -507,6 +503,6 @@ enum Theme {
 
 extension View {
     func frosted(in shape: some Shape) -> some View {
-        glassEffect(SpaceTheme.tinted(.regular).interactive(), in: shape)  // tinycast-space
+        glassEffect(.regular.interactive(), in: shape)
     }
 }

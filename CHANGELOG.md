@@ -8,6 +8,7 @@ offers.
 ### Removed
 
 - **Calendar** is gone completely: the meeting card on the empty palette, Join Next Meeting, My Schedule, Create Event, Copy Meeting Link, Open in Calendar, meeting details, meetings in launcher search, auto join and the camera preview before a meeting, the calendar menu-bar item, the Calendar settings pane and the Calendars row in Permissions. Tinycast no longer asks for calendar access. Its leftover settings, shortcuts and the `calendar` section in `settings.json` are cleaned up on first launch; My Schedule leaves the compact bar.
+- **Raycast themes** are gone: the Light theme and Dark theme pickers, Browse Themes, importing `raycast://theme` links, the theme background slider and the Theme command. Appearance is just System, Light or Dark, in Tinycast's own colors, and the expanded palette is plain glass again with no tinted backdrop. Saved themes and the Theme command are cleaned up on first launch.
 
 ## 0.12.8-lite.3
 

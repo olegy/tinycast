@@ -231,9 +231,9 @@ final class AppCore {
 
     func start(launchedByUser: Bool) {
         Signposts.interval("AppCore.start") {
-            SpaceTheme.start()  // tinycast-space: before the extension scan, which must see the Theme command
             // Shorten AppKit's ~2–3s tooltip delay; registration domain, so a user default wins.
             UserDefaults.standard.register(defaults: ["NSInitialToolTipDelay": 250])
+            ThemesRemovalMigration.run(extensionsDirectory: ExtensionCatalog.extensionsDirectory())
             CalendarRemovalMigration.run(settingsFileEnabled: settings.settingsFileEnabled)
             NSApp.setActivationPolicy(.accessory)
             applyAppearance()
@@ -404,8 +404,6 @@ final class AppCore {
         }
         // tinycast-space: the link extensions fire when a timer or task finishes.
         if ConfettiOverlay.claims(url) { return ConfettiOverlay.fire() }
-        // tinycast-space: a theme link — ray.so, Raycast's Theme Studio, or the Theme command.
-        if SpaceTheme.handle(url, in: self) { return }
         // tinycast-space: `tinycast://open?id=…`, any launcher entry by its id.
         if EntryDeepLinkActions.handle(url, in: self) { return }
         if deepLinkCoordinator.handles(url) {

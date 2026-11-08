@@ -177,6 +177,7 @@ If a change touches anything in the right column, the harness on the left is man
 | `window-file-test` | `WindowManagement/Model/WindowManagementFileFormat.swift` — command shortcuts, custom sizes, layouts and rooms as settings.json spells them, hand edits and bad records |
 | `launcher-settings-file-test` | Launcher settings application — invalid records, partial edits, deferred bundles, shortcut moves and records outside search scopes; isolated preferences and in-memory scan/Carbon effects |
 | `calendar-removal-migration-test` | `Migrations/CalendarRemovalMigration.swift` — retires exactly the Calendar defaults and hotkeys, strips the `calendar` section and My Schedule from the compact bar, and leaves a file with other problems to the import |
+| `themes-removal-migration-test` | `Migrations/ThemesRemovalMigration.swift` — retires exactly the Raycast theme defaults and removes only the Theme command's extension folder |
 | `backup-archive-test` | all of `Backup/Model/`, plus `Backup/Service/BackupStaging.swift` |
 | `updates-test` | `Updates/Model/` — version precedence, channel filtering, install route, readiness |
 | `update-check-test` | `UpdateCheckStore` — stopping, in-flight cancellation, cached prompt suppression, restart and independent manual checking |

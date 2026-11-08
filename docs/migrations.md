@@ -31,3 +31,4 @@ When the check fails, delete everything the row lists, then the row.
 | Migration | Repairs | Delete with it |
 | --- | --- | --- |
 | `CalendarRemovalMigration` | the `calendar` section left in `settings.json`, which the import reports as unknown on every launch, My Schedule in the compact bar, and the orphaned Calendar defaults, hotkeys and hidden-calendar list | its call in `AppCore.start()`, `Tests/calendar-removal-migration-test.swift`, its `run-tests.sh` entry and its testing.md row |
+| `ThemesRemovalMigration` | the Raycast theme defaults (light and dark slots, imported themes, backdrop opacity) and the Theme command folder written into the extensions directory | its call in `AppCore.start()`, `Tests/themes-removal-migration-test.swift`, its `run-tests.sh` entry and its testing.md row |
