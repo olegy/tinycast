@@ -12,7 +12,7 @@ offers.
 
 ### Changes
 
-- **The expanded palette has hard edges.** A thin line now separates the search bar and the bottom bar from the list, and rows stop at those lines instead of fading out beneath the bars. The search text is a little smaller and starts without the magnifying glass. The bottom buttons lose their capsule: Open and Actions sit bare, split by a short line that hides while you hover either one. This applies to every screen in the palette.
+- **The expanded palette has hard edges.** A thin line now separates the search bar and the bottom bar from the list, and rows stop at those lines instead of fading out beneath the bars. The search text is smaller, starts without the magnifying glass and sits centred in the search bar. The bottom bar is lower, leaving more room for the list. The bottom buttons lose their capsule: Open and Actions sit bare, split by a short line that hides while you hover either one. This applies to every screen in the palette.
 
 ## 0.12.8-lite.3
 

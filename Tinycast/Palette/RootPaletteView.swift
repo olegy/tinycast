@@ -663,7 +663,7 @@ struct RootPaletteView: View {
     private var topDragStrip: some View {
         Color.clear
             // Compact, it stops at the capsule, so a button keeps its whole press.
-            .frame(width: compactCapsuleWidth, height: metrics.size.headerPadding)
+            .frame(width: compactCapsuleWidth, height: headerTopPadding)
             .windowDraggable(settings.paletteDraggable, onBegan: beginDrag, onEnded: endDrag)
     }
 
@@ -812,12 +812,19 @@ struct RootPaletteView: View {
             }
             headerGutter(width: metrics.spacing.md * 2)
         }
-        // Identical metrics in both states, so typing can't move the search bar.
+        // One row height in both states; only the padding around it differs.
         .frame(height: metrics.size.headerHeight)
-        .padding(.top, metrics.size.headerPadding)
-        .padding(.bottom, isCollapsed ? metrics.size.headerPadding : 0)
+        .padding(.top, headerTopPadding)
+        .padding(.bottom, isCollapsed ? metrics.size.headerPadding : headerBottomPadding)
         .frame(maxWidth: .infinity)
     }
+
+    /// Expanded, the padding splits around the row so it centres above the separator.
+    private var headerTopPadding: CGFloat {
+        isCollapsed ? metrics.size.headerPadding : (metrics.size.headerPadding / 2).rounded()
+    }
+
+    private var headerBottomPadding: CGFloat { metrics.size.headerPadding - headerTopPadding }
 
     /// Mode-gated ahead of the cast, which would otherwise cost every other mode a list build.
     private var extensionCommandScreen: ExtensionCommandScreen? {
