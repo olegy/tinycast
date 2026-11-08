@@ -70,6 +70,7 @@ struct InterfaceMetrics: Equatable, Sendable {
         var bottomBarHeight: CGFloat { scaledPoints(Theme.Size.bottomBarHeight, scale) }
         var textAreaUnit: CGFloat { scaledPoints(Theme.Size.textAreaUnit, scale) }
         var barButtonHeight: CGFloat { scaledPoints(Theme.Size.barButtonHeight, scale) }
+        var barSeparatorTick: CGFloat { scaledPoints(Theme.Size.barSeparatorTick, scale) }
         var rowIcon: CGFloat { scaledPoints(Theme.Size.rowIcon, scale) }
         var resultRowIcon: CGFloat { scaledPoints(Theme.Size.resultRowIcon, scale) }
         var colorDot: CGFloat { scaledPoints(Theme.Size.colorDot, scale) }
@@ -216,7 +217,7 @@ struct InterfaceMetrics: Equatable, Sendable {
     }
 }
 
-/// Whole points: a fractional row pitch lands keycap edges and the dissolve mask off-pixel.
+/// Whole points: a fractional row pitch lands keycap edges off-pixel.
 private func scaledPoints(_ value: CGFloat, _ scale: CGFloat) -> CGFloat {
     scale == 1 ? value : (value * scale).rounded()
 }

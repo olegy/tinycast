@@ -61,7 +61,6 @@ struct CustomCommandPreview: View {
                         .padding(metrics.spacing.xl)
                 }
                 .id(command.id)
-                .edgeDissolve()
                 .thinScrollbar()
                 VStack(alignment: .leading, spacing: metrics.spacing.sm) {
                     Text("Information")

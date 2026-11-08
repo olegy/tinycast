@@ -268,6 +268,11 @@ struct RootPaletteView: View {
                         screen.body(selection: sel, scroll: scroll)
                     }
                 }
+                .mask {
+                    BarClip(
+                        top: metrics.size.headerHeight + metrics.size.headerPadding,
+                        bottom: metrics.size.bottomBarHeight)
+                }
                 .safeAreaInset(edge: .top, spacing: 0) { header }
                 .safeAreaInset(edge: .bottom, spacing: 0) {
                     if !isCollapsed {
@@ -683,6 +688,9 @@ struct RootPaletteView: View {
             // The field stops where the capsule will, so it never runs under a button.
             .frame(width: compactCapsuleWidth)
             .frame(maxWidth: .infinity, alignment: .leading)
+            .overlay(alignment: .bottom) {
+                if !isCollapsed { BarSeparator() }
+            }
             // Behind the row, which a glass container would otherwise paint over.
             .background(alignment: .topLeading) {
                 if isCollapsed {
@@ -739,19 +747,11 @@ struct RootPaletteView: View {
         HStack(alignment: .center, spacing: 0) {
             // Matches the list rows and section headers' own indent below.
             headerGutter(width: metrics.spacing.md * 2)
-            // Every sub-screen leaves the same way, so the slot reads the same on all of them.
+            // The root search starts on the section headers' column; a sub-screen leads with Back.
             if vm.mode != .launcher {
                 HeaderBackButton(help: backHelp, action: goBack)
-            } else {
-                Image(systemName: vm.mode.systemImage)
-                    .font(metrics.typography.headerIcon)
-                    .symbolRenderingMode(.hierarchical)
-                    .foregroundStyle(.secondary)
-                    .frame(width: metrics.size.headerIconSlot)
-                    .windowDraggable(settings.paletteDraggable, onBegan: beginDrag, onEnded: endDrag)
+                headerGutter(width: metrics.spacing.xl)
             }
-            // slot + xl equals a row's icon + lg, so the query starts where the row titles do.
-            headerGutter(width: metrics.spacing.xl)
             // One structural position: a field inside a branch loses first responder when it flips.
             headerField
                 .simultaneousGesture(TapGesture().onEnded { resetCompactSelection() })
@@ -885,7 +885,8 @@ struct RootPaletteView: View {
         let font = metrics.typography.searchFieldNSFont
         let text = vm.query.isEmpty ? searchPrompt : vm.query
         let typed = (text as NSString).size(withAttributes: [.font: font]).width
-        let chrome = metrics.size.headerIconSlot + metrics.spacing.md * 3 + metrics.spacing.xl
+        let back = vm.mode == .launcher ? 0 : metrics.size.headerIconSlot + metrics.spacing.xl
+        let chrome = back + metrics.spacing.md * 3
         let room = metrics.size.panelWidth - accessory.width - chrome
         // +3pt so the caret sits after the last glyph rather than on top of it.
         return min(
@@ -954,7 +955,6 @@ struct RootPaletteView: View {
         pillLabel: String, showActionGroup: Bool, formPrimaryShortcut: Bool,
         primaryActionEnabled: Bool, showActions: Bool
     ) -> some View {
-        // Floating controls, no bar; the edge dissolve ghosts the rows passing beneath.
         HStack(spacing: 0) {
             Color.clear.frame(width: 0, height: 0)
                 .modifier(ExtensionToastSlot(extensions: extensions, showing: vm.mode == .extensionCommand))
@@ -970,44 +970,16 @@ struct RootPaletteView: View {
         .padding(.horizontal, metrics.spacing.md)
         .frame(height: metrics.size.bottomBarHeight)
         .frame(maxWidth: .infinity)
+        .overlay(alignment: .top) { BarSeparator() }
     }
 
     private func actionGroup(
         pillLabel: String, formPrimaryShortcut: Bool, primaryActionEnabled: Bool, showActions: Bool
     ) -> some View {
-        HStack(spacing: 2) {
-            BarButton(action: activateSelection) {
-                HStack(spacing: metrics.spacing.sm) {
-                    Text(pillLabel)
-                        .font(metrics.typography.bar)
-                        .foregroundStyle(pillTint)
-                    if formPrimaryShortcut {
-                        HStack(spacing: metrics.spacing.xxs) {
-                            KeyCapChip(text: "⌘", style: .outline)
-                            KeyCapChip(text: "↵", style: .outline)
-                        }
-                    } else {
-                        KeyCapChip(text: "↵", style: .outline)
-                    }
-                }
-            }
-            .disabled(!primaryActionEnabled)
-            if showActions {
-                BarButton(action: toggleActions) {
-                    HStack(spacing: metrics.spacing.sm) {
-                        Text("Actions")
-                            .font(metrics.typography.bar)
-                            .foregroundStyle(Theme.Colors.textSecondary)
-                        HStack(spacing: metrics.spacing.xxs) {
-                            KeyCapChip(text: "⌘", style: .outline)
-                            KeyCapChip(text: "K", style: .outline)
-                        }
-                    }
-                }
-            }
-        }
-        .padding(metrics.spacing.xs)
-        .frosted(in: Capsule())
+        PaletteActionGroup(
+            pillLabel: pillLabel, pillTint: pillTint, formPrimaryShortcut: formPrimaryShortcut,
+            primaryActionEnabled: primaryActionEnabled, showActions: showActions,
+            onPrimary: activateSelection, onActions: toggleActions)
     }
 
     /// The one path opening the Actions menu, sampling the state its rows depend on.
@@ -1622,5 +1594,89 @@ private struct HeaderBackButton: View {
         .onHover { hovered = $0 }
         .animation(.easeOut(duration: Theme.Duration.hover), value: hovered)
         .help(help)
+    }
+}
+
+/// The footer's two actions, split by a tick that hides while either is hovered.
+private struct PaletteActionGroup: View {
+    let pillLabel: String
+    let pillTint: Color
+    let formPrimaryShortcut: Bool
+    let primaryActionEnabled: Bool
+    let showActions: Bool
+    let onPrimary: () -> Void
+    let onActions: () -> Void
+    @State private var primaryHovered = false
+    @State private var actionsHovered = false
+    @Environment(\.metrics) private var metrics
+    @Environment(\.displayScale) private var displayScale
+
+    var body: some View {
+        HStack(spacing: metrics.spacing.xxs) {
+            BarButton(chrome: .rounded, action: onPrimary) {
+                HStack(spacing: metrics.spacing.sm) {
+                    Text(pillLabel)
+                        .font(metrics.typography.bar)
+                        .foregroundStyle(pillTint)
+                    if formPrimaryShortcut {
+                        HStack(spacing: metrics.spacing.xxs) {
+                            KeyCapChip(text: "⌘", style: .outline)
+                            KeyCapChip(text: "↵", style: .outline)
+                        }
+                    } else {
+                        KeyCapChip(text: "↵", style: .outline)
+                    }
+                }
+            }
+            .disabled(!primaryActionEnabled)
+            .onHover { primaryHovered = $0 && primaryActionEnabled }
+            if showActions {
+                Rectangle()
+                    .fill(Theme.Colors.separator)
+                    .frame(width: 1 / displayScale, height: metrics.size.barSeparatorTick)
+                    .opacity(primaryHovered || actionsHovered ? 0 : 1)
+                BarButton(chrome: .rounded, action: onActions) {
+                    HStack(spacing: metrics.spacing.sm) {
+                        Text("Actions")
+                            .font(metrics.typography.bar)
+                            .foregroundStyle(Theme.Colors.textSecondary)
+                        HStack(spacing: metrics.spacing.xxs) {
+                            KeyCapChip(text: "⌘", style: .outline)
+                            KeyCapChip(text: "K", style: .outline)
+                        }
+                    }
+                }
+                .onHover { actionsHovered = $0 }
+            }
+        }
+    }
+}
+
+/// The hard edge between the list and a bar: a device-pixel line in the separator ink.
+private struct BarSeparator: View {
+    @Environment(\.displayScale) private var displayScale
+
+    var body: some View {
+        Rectangle()
+            .fill(Theme.Colors.separator)
+            .frame(height: 1 / displayScale)
+            .frame(maxWidth: .infinity)
+            .allowsHitTesting(false)
+    }
+}
+
+/// Clips the list to the space between the bars, so no row is ever drawn beneath one.
+/// The bars' own heights, not the proxy's insets: a mask's geometry reports none.
+private struct BarClip: View {
+    let top: CGFloat
+    let bottom: CGFloat
+
+    var body: some View {
+        GeometryReader { _ in
+            Rectangle()
+                .padding(.top, top)
+                .padding(.bottom, bottom)
+        }
+        .ignoresSafeArea()
     }
 }

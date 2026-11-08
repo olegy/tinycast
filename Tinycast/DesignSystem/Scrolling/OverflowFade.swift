@@ -74,7 +74,7 @@ struct OverflowFadeMask: ViewModifier {
 }
 
 extension View {
-    /// Attach before `thinScrollbar`. Not `edgeDissolve`, which is tuned to the palette's bars.
+    /// Attach before `thinScrollbar`.
     func overflowFade(band: CGFloat = 24, includingTop: Bool = false) -> some View {
         modifier(OverflowFadeMask(band: band, includesTop: includingTop))
     }

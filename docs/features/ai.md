@@ -561,8 +561,8 @@ and the Actions menu's own chords, and dies with the window.
   the selected chat the same way. Renaming swaps only the row's title for a field: a `ForEach` row
   that is itself an `if`/`else` makes the sidebar `List` diff in quadratic time, which held the main
   thread for seconds on opening the window and on every selection with a few thousand chats.
-- **Transcript**: `ChatTranscriptView` with `surface: .window`, which drops the palette's edge
-  dissolve and thin scrollbar (both are measured against the palette's bars) and centres the column
+- **Transcript**: `ChatTranscriptView` with `surface: .window`, which drops the palette's thin
+  scrollbar (it is measured against the palette's bars) and centres the column
   at `aiChatReadingWidth`. The last finished reply offers Regenerate beside Copy: `AIChatState`
   drops only a trailing reply and asks again with the question and its attachments, of whichever
   model is selected now.

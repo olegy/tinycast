@@ -450,7 +450,7 @@ caches, TCC grants and login item, so this cannot disturb an installed copy.
   System Actions, Window Management, Custom Commands, Commands
 - With a non-ASCII input source active, ⌘K opens Actions; ↑/↓ move it, ↵ activates, Escape closes it
 - In either ⌘K Actions panel, typing filters immediately in the bottom search band without changing
-  the palette query; sections survive filtering, **No Results** is centred, and no dissolve covers the
+  the palette query; sections survive filtering, **No Results** is centred, and nothing covers the
   last row. The native caret blinks; mouse drag and ⌘A select text; ←/→ move through it; ↑/↓ still
   move the menu highlight. Escape clears a non-empty query, then closes the menu on the next press
 - Every header menu — including Emoji categories, File Search filters and extension dropdowns —

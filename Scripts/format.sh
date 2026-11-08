@@ -14,7 +14,6 @@ FORMAT=$(xcrun --find swift-format 2>/dev/null)
 files=()
 while IFS= read -r f; do files+=("$f"); done < <(
     find Tinycast Tests -name '*.swift' ! -name '*.generated.swift' \
-        ! -path 'Tinycast/DesignSystem/Scrolling/EdgeDissolve.swift' \
         ! -path 'Tinycast/DesignSystem/Scrolling/ThinScrollbar.swift' | sort
 )
 

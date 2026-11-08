@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// Lines soft-wrap: a second scroll view would fight the transcript's own dissolve.
+/// Lines soft-wrap: a second scroll view would fight the transcript's own scrolling.
 struct MarkdownCodeView: View {
     @Environment(\.metrics) private var metrics
     let language: String?

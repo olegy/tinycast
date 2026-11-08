@@ -47,7 +47,6 @@ struct QuicklinkEditorView: View {
             .padding(.vertical, metrics.spacing.md)
         }
         .scrollClipDisabled()
-        .edgeDissolve()
         .focusEffectDisabled()
         .task(id: palette.focusToken) {
             palette.noteEditingField(true)

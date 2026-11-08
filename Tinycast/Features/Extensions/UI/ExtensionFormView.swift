@@ -40,7 +40,6 @@ struct ExtensionFormView: View {
                 .hideNativeScrollers()
                 .scrollOriginAnchor()
             }
-            .edgeDissolve()
             .thinScrollbar()
             .scrollFollowsSelection(
                 scroll, row: focusedRowID, atOrigin: selection == 0, proxy: proxy)

@@ -92,7 +92,6 @@ struct ExtensionListView: View {
                 .hideNativeScrollers()
                 .scrollOriginAnchor()
             }
-            .edgeDissolve()
             .thinScrollbar()
             .scrollFollowsSelection(
                 scroll, row: selectedRowID, atOrigin: selection == 0, proxy: proxy)
@@ -143,7 +142,6 @@ struct ExtensionListView: View {
                 .hideNativeScrollers()
                 .scrollOriginAnchor()
             }
-            .edgeDissolve()
             .thinScrollbar()
             .scrollFollowsSelection(
                 scroll, row: selectedRowID, atOrigin: selection < layout.columns, proxy: proxy)

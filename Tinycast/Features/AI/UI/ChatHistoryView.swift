@@ -73,7 +73,6 @@ struct ChatHistoryList: View {
                 .hideNativeScrollers()
                 .scrollOriginAnchor()
             }
-            .edgeDissolve()
             .thinScrollbar()
             // Snap to the origin on the first row so its section header shows too.
             .scrollFollowsSelection(

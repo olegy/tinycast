@@ -30,7 +30,6 @@ struct RoomPickerList: View {
                 .hideNativeScrollers()
                 .scrollOriginAnchor()
             }
-            .edgeDissolve()
             .thinScrollbar()
             .scrollFollowsSelection(scroll, row: selectedID, atOrigin: firstRowSelected, proxy: proxy)
         }

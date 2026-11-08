@@ -182,7 +182,7 @@ entry name, so an unrelated entry builds no path; wildcard and escaped paths kee
 
 `FileSearchScreen.rows` is the exact flat selection order rendered by `FileSearchList`. Results sit in a
 290pt column beside a preview pane, split by the same `Theme.Colors.separator` hairline the clipboard
-draws. The list uses the shared Results header, row metrics, edge dissolve, thin scrollbar and scroll
+draws. The list uses the shared Results header, row metrics, thin scrollbar and scroll
 intent; its header reads **Recent** on the blank screen and **Results** under a query. A row shows
 a fitted native file icon and the full filename — a folder prefixed by its parent's name, dimmed, since
 half the folder hits on a developer machine are some `src` or `Tinycast`. The path itself is the preview's

@@ -80,7 +80,6 @@ struct SnippetEditorView: View {
             .padding(.vertical, metrics.spacing.md)
         }
         .scrollClipDisabled()
-        .edgeDissolve()
         .focusEffectDisabled()
         .task(id: FocusRequest(field: editor.focusedField, token: palette.focusToken)) {
             palette.noteEditingField(true)

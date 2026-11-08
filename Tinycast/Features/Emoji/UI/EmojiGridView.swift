@@ -179,7 +179,6 @@ struct EmojiGridView: View {
                 .hideNativeScrollers()
                 .scrollOriginAnchor()
             }
-            .edgeDissolve()
             .thinScrollbar()
             // Snap to the origin on the first grid row so its header shows too.
             .scrollFollowsSelection(

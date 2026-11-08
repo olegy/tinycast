@@ -302,7 +302,7 @@ width; a dragged one keeps its stored horizontal centre unless the wider bar no 
 **Drag to reposition** (`AppSettings.paletteDraggable`, off by default) is the only thing that moves a
 panel already on screen. `WindowDragHandle` claims mouse-down on the top strip and on the header's
 margins and inter-item gaps (`RootPaletteView.headerGutter`) — everywhere in the header no control
-occupies. The launcher magnifier is a handle too. The search field is one **only while it is empty**:
+occupies. The search field is one **only while it is empty**:
 `EmptyFieldDragHandle` declines the hit-test outright the moment there is text to select, or marked
 text being composed.
 Measuring the query and claiming the run past it was the older rule, and it cost the thing a search
@@ -479,7 +479,7 @@ Hidden or clipped controls cannot claim the cursor. The search rectangle remains
 TextKit 2 `NSTextView`.
 Both clip to their own bounds so AppKit's visible-rect tracking area stays inside the field.
 Without this, the unclipped form scroll view makes each text view track the entire window, and their
-cursor claims overlap even in the gaps between fields. The page itself keeps its edge dissolve.
+cursor claims overlap even in the gaps between fields.
 Each editor session mounts fresh controls; textarea undo stays local and includes placeholder inserts.
 The textarea routes undo/redo to its own manager.
 

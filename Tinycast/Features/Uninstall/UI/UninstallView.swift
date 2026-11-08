@@ -50,7 +50,6 @@ struct UninstallList: View {
                 .hideNativeScrollers()
                 .scrollOriginAnchor()
             }
-            .edgeDissolve()
             .thinScrollbar()
             // On the first row, snap to the origin so the summary header shows too.
             .scrollFollowsSelection(

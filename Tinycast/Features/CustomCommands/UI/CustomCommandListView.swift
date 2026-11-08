@@ -33,7 +33,6 @@ struct CustomCommandList: View {
                 .hideNativeScrollers()
                 .scrollOriginAnchor()
             }
-            .edgeDissolve()
             .thinScrollbar()
             .scrollFollowsSelection(
                 scroll, row: selectedID?.uuidString,

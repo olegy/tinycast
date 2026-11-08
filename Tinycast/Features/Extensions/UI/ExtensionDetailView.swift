@@ -45,7 +45,6 @@ struct ExtensionDetailBody: View {
             .hideNativeScrollers()
         }
         .frame(maxWidth: .infinity)
-        .edgeDissolve()
         .thinScrollbar()
     }
 
@@ -60,7 +59,6 @@ struct ExtensionDetailBody: View {
                 .hideNativeScrollers()
         }
         .frame(width: metrics.scaled(Self.metadataWidth))
-        .edgeDissolve()
         .thinScrollbar()
     }
 }

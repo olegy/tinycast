@@ -89,6 +89,8 @@ enum Theme {
         /// The unit a form's text area counts its minimum height in, so it scales with the interface.
         static let textAreaUnit: CGFloat = 44
         static let barButtonHeight: CGFloat = 28
+        /// The tick between the footer's two actions, well short of the buttons it separates.
+        static let barSeparatorTick: CGFloat = 12
         static let rowIcon: CGFloat = 24
         static let resultRowIcon: CGFloat = 26
         static let colorDot: CGFloat = 8
@@ -333,7 +335,7 @@ enum Theme {
 
     enum Typography {
         /// One size, two frameworks: `TextTrailingDragHandle` measures what the field renders.
-        static let searchFieldSize: CGFloat = 20
+        static let searchFieldSize: CGFloat = 17
         static let searchField = Font.system(size: searchFieldSize, weight: .regular)
         /// `NSFont` is not `Sendable`, hence the isolation; every reader is a view anyway.
         @MainActor static let searchFieldNSFont = NSFont.systemFont(

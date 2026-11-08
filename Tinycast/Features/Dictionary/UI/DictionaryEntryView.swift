@@ -17,7 +17,6 @@ struct DictionaryEntryView: View {
             .padding(.bottom, metrics.spacing.xxl)
             .hideNativeScrollers()
         }
-        .edgeDissolve()
         .thinScrollbar()
         // A new term starts at its headword, not wherever the last one was scrolled to.
         .id(entry.term)

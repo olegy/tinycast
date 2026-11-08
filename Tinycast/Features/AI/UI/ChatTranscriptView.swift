@@ -143,13 +143,13 @@ struct ChatTranscriptView: View {
     }
 }
 
-/// The dissolve and thin bar are tuned to the palette's floating bars; a window scrolls natively.
+/// The thin bar is tuned to the palette; a window scrolls natively.
 private struct TranscriptScrollChrome: ViewModifier {
     let surface: ChatSurface
 
     func body(content: Content) -> some View {
         switch surface {
-        case .palette: content.edgeDissolve().thinScrollbar()
+        case .palette: content.thinScrollbar()
         case .window: content
         }
     }

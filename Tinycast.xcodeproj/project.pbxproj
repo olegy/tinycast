@@ -159,7 +159,6 @@
 		3434E1145AB3F7EA0219C502 /* FavoriteActions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C5FA7F5281B81B20C33DC89 /* FavoriteActions.swift */; };
 		345D1FCC2085BD0D699DD236 /* FileSearchCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF64F5FCB3872996AE57FDBB /* FileSearchCoordinator.swift */; };
 		362651FE29DD01EC4D846F5F /* AppSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F64F4362989516482853CDB /* AppSettings.swift */; };
-		364CB97064000DC67178DDE8 /* EdgeDissolve.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F6F59F3C88C49BDED945F25 /* EdgeDissolve.swift */; };
 		36784C964DB27B94A62EEAA3 /* tinycast.icon in Resources */ = {isa = PBXBuildFile; fileRef = 6621A88681E993D49EEF07A3 /* tinycast.icon */; };
 		36968DFA1E201E681F0BCD42 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1306524F57602D90FCF153C /* Theme.swift */; };
 		36A6FC9C41CDBD4ADA1F8E87 /* AIModelDiscovery.swift in Sources */ = {isa = PBXBuildFile; fileRef = A68649D40F987D1CD24D1112 /* AIModelDiscovery.swift */; };
@@ -1220,7 +1219,6 @@
 		8E822B51C86FD49ADF858784 /* ExtensionImageSize.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExtensionImageSize.swift; sourceTree = "<group>"; };
 		8F1545635C1E94D5E7DFECF1 /* WindowDragHandle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WindowDragHandle.swift; sourceTree = "<group>"; };
 		8F29EE2711B96305EE10B8D8 /* ChatMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatMessage.swift; sourceTree = "<group>"; };
-		8F6F59F3C88C49BDED945F25 /* EdgeDissolve.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EdgeDissolve.swift; sourceTree = "<group>"; };
 		8FC86115B040B8C574EAD0B5 /* FileSearchPolicy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileSearchPolicy.swift; sourceTree = "<group>"; };
 		8FEAC591704D983A2C31188F /* CurrencyRateStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrencyRateStore.swift; sourceTree = "<group>"; };
 		901C92BDC35B5E26BA8BA4AA /* FallbackCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FallbackCoordinator.swift; sourceTree = "<group>"; };
@@ -1767,7 +1765,6 @@
 		16F1DA610F3D792F6B08AFE5 /* Scrolling */ = {
 			isa = PBXGroup;
 			children = (
-				8F6F59F3C88C49BDED945F25 /* EdgeDissolve.swift */,
 				88499DF2F503F2A3A19DEF07 /* OverflowFade.swift */,
 				622E1F1C01B954DCA2199BCD /* ScrollIntent.swift */,
 				2702F140F8DBF373D2ED11A5 /* SelectionFollowing.swift */,
@@ -3790,7 +3787,6 @@
 				48F5623110FDD1FC69CEAF7A /* DisabledApplicationsSection.swift in Sources */,
 				A1F267E9D9914DB60DEEE0AD /* DoubleTapDetector.swift in Sources */,
 				DFB25A4CDD35071B745F2EF9 /* DoubleTapModifier.swift in Sources */,
-				364CB97064000DC67178DDE8 /* EdgeDissolve.swift in Sources */,
 				84DC02099149C542C886B019 /* EmojiCatalog.swift in Sources */,
 				64AD2324BDA6293464C98913 /* EmojiCoordinator.swift in Sources */,
 				309320CB6B5424EA558A4823 /* EmojiData.generated.swift in Sources */,

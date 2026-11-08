@@ -40,7 +40,6 @@ struct SnippetList: View {
                 .hideNativeScrollers()
                 .scrollOriginAnchor()
             }
-            .edgeDissolve()
             .thinScrollbar()
             .scrollFollowsSelection(
                 scroll, row: selectedID, atOrigin: selectedID == results.first?.id, proxy: proxy)
@@ -161,7 +160,6 @@ struct SnippetPreview: View {
                 .padding(.vertical, metrics.spacing.lg)
                 .frame(maxWidth: .infinity, alignment: .leading)
             }
-            .edgeDissolve()
             .background(ClickWatcher(onClick: onClick))
             .task(id: snippet) {
                 let text = try? await SnippetScanner.text(at: snippet.path)

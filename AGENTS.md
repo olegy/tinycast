@@ -135,9 +135,9 @@ feature's doc, under its own `## Invariants`.
   `CountryZoneData.generated.swift` from `node Scripts/gen-countries.js`, and
   `Resources/RaycastRuntime.generated.js` from `Scripts/raycast-runtime/build.mjs` — the runtime is
   committed so building the app never needs Node.
-- **`DesignSystem/Scrolling/EdgeDissolve.swift` and `ThinScrollbar.swift` are off-limits.** Both are
-  tuned by eye against the palette's floating bars, so any edit is a visual regression. Needing to touch
-  one to fix a scroll bug means the real fix belongs elsewhere.
+- **`DesignSystem/Scrolling/ThinScrollbar.swift` is off-limits.** It is tuned by eye against the
+  palette's bars, so any edit is a visual regression. Needing to touch it to fix a scroll bug means the
+  real fix belongs elsewhere.
 
 ## Conventions worth knowing up front
 

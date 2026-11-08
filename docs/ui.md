@@ -12,9 +12,9 @@ Read this before touching any view body, `Theme` value, or the panel chrome.
 
 Tinycast is a **command palette**: a borderless floating panel whose surface is native Liquid Glass,
 without an additional palette scrim. Everything on that surface uses an appearance-aware ink ramp.
-The header and bottom bar **float over the list as fully transparent overlays**; there are no hard-edged bars, strips, or dividers. Rows don't clip under the bars, they
-**dissolve**: a scroll-driven gradient mask ghosts them as they pass beneath. Floating controls (the
-action pill, popover menus) are **Liquid Glass**.
+The header and bottom bar are transparent and each meets the list at a **hairline separator**; rows
+are clipped at those lines and never drawn beneath a bar. The footer's actions are bare buttons split
+by a short tick, with no capsule around them. Popover menus are **Liquid Glass**.
 
 That paragraph describes **Dark**, which is the design. Light is the same design with the ink
 inverted: the same native glass, and a black-alpha ramp at matched stops. Nothing about
@@ -24,8 +24,8 @@ Five load-bearing ideas, in priority order:
 
 1. **Surface = native glass in both palette modes.** No extra scrim or solid background. Depth comes from the desktop showing through.
 2. **One alpha ramp, never grays.** Ink at fixed stops — white over the dark surface, black over the light one.
-3. **Floating bars, not chrome.** Header/footer are transparent overlays; the list fills the whole panel.
-4. **Edges dissolve, they don't clip.** Scroll-driven mask, no separators between list and bars.
+3. **Transparent bars, hard edges.** Header/footer have no fill; a hairline separates each from the list.
+4. **Lists clip at the bars.** No fade, no underlap: a row is either between the separators or hidden.
 5. **Glass owns its contours.** The palette and floating controls use native glass without painted outlines.
 
 ---
@@ -37,11 +37,11 @@ These are the things that quietly break the look if changed. Preserve them unles
 - **Dark is the baseline and its values are frozen.** Every `Theme.Colors` token resolves per appearance, and its **dark branch is the literal the forced-dark build shipped** — restated, never recomputed. Retune a light branch freely; touch a dark one only when the task is to change Dark. `AppCore.applyAppearance()` is the only place an appearance is assigned, from `AppSettings.appearance`; `.system` assigns `nil` so AppKit follows macOS.
 - **New colors go through `Theme.Colors.ramp(dark:light:)`** (an alpha that inverts) or `adaptive(dark:light:)` (two explicit `NSColor`s, for anything that isn't a plain inversion — `layoutPreviewGround`). Never a bare `Color.white.opacity(…)` in a view: it disappears in Light.
 - **No grays, no opaque fills on the surface.** Reach for `Theme.Colors.*` instead of `.gray`, `NSColor.windowBackground`, etc.
-- **Some colors stay fixed in both appearances, on purpose.** The `EdgeDissolve`/`OverflowFade` gradients are **mask luminance, not color** — inverting them breaks the dissolve everywhere. `ExtensionTintColors` and a tinted `IconCache` tile keep white ink, because a saturated tile carries its own contrast. The selected compact shortcut glyph also stays white over its contrasting fill. And `IconCache` cannot use a dynamic `NSColor` at all: it rasterizes off-main, so the surface is carried explicitly and is part of the cache key.
+- **Some colors stay fixed in both appearances, on purpose.** The `OverflowFade` gradient is **mask luminance, not color** — inverting it breaks the fade everywhere. `ExtensionTintColors` and a tinted `IconCache` tile keep white ink, because a saturated tile carries its own contrast. The selected compact shortcut glyph also stays white over its contrasting fill. And `IconCache` cannot use a dynamic `NSColor` at all: it rasterizes off-main, so the surface is carried explicitly and is part of the cache key.
 - **An icon is drawn for a surface _and_ a system icon style, and both move under you.** macOS restyles the icons `NSWorkspace` hands out when System Settings → Appearance → **Icon & widget style** changes, so `IconStyleMonitor` and Tinycast's own appearance both call `IconCache.invalidateStyled()`. **The monitor may not invalidate on the notification itself.** AppKit posts `NSWorkspaceIconAppearanceConfigurationDidChange` before IconServices has swapped what `NSWorkspace` vends — measured at 25–120ms behind, jittering run to run — and the images it hands back are live objects macOS restyles in place, so flattening one on the signal freezes the _outgoing_ style into a bitmap nothing ever invalidates again. `IconStyleMonitor` therefore polls `IconCache.styleFingerprint()` until the pixels actually move, and only then invalidates. Waiting also sidesteps the cost: re-flattening every icon the instant a restyle begins forces a cold IconServices regeneration, measured at 160× the settled draw cost. That drops the cached bitmaps, bumps every cache key so an in-flight decode cannot repopulate a stale one, and moves `IconCache.style.generation`. **Any view that draws an icon must key its fetch on that generation** — wrap the view's own key in `IconRequest`, or call `IconCache.observeStyle()` where the icon is resolved synchronously in a `body`. It is reached through `IconCache` rather than injected precisely because icons are drawn in menus, popovers and every list, where a missed injection would be a silent staleness bug.
-- **No hard dividers between the list and the bars.** The header and bottom bar are `safeAreaInset` overlays with no background; separation comes from `edgeDissolve()`, nothing else. (One deliberate exception: the vertical hairline between a list and its preview pane, as the clipboard and file search screens draw.)
+- **The bars meet the list at hairlines, and the list is clipped there.** The header and bottom bar are `safeAreaInset`s with no background; each draws a device-pixel `Theme.Colors.separator` line (`BarSeparator`) on its list-facing edge, and `RootPaletteView` masks the screen to the space between the insets (`BarClip`), once, for every screen. A screen never adds its own fade or underlap. The compact bar draws no separator.
 - **The expanded panel corner is clipped once, at the root.** `RootPaletteView.body` ends with `.background(GlassEffectView()) → .clipShape(RoundedRectangle(26, .continuous))`. The clip is last; neither palette mode adds a scrim over its glass. Compact uses zero root corner radius and a four-point drawing outset so its native glass shapes own their contours without touching the window boundary.
-- **Don't use the native scroll edge effect.** Inside a transparent panel it renders a hard-bounded rectangle. Use `edgeDissolve()`, or a gradient `mask` where a surface owns its own fade — `scrollEdgeEffectStyle` draws a _material_ where a scroll view meets a safe area, so over a surface that already has `GlassEffectView` it composites to nothing. Tried and rejected on `QuickActionResultView`, with and without `safeAreaBar`. This is a rule about the borderless panels; the Settings window is a titled `NSWindow` whose system titlebar draws the band itself (see "Settings").
+- **Don't use the native scroll edge effect.** Inside a transparent panel it renders a hard-bounded rectangle. The palette clips its screens at the bars; a surface that owns its own fade uses a gradient `mask` — `scrollEdgeEffectStyle` draws a _material_ where a scroll view meets a safe area, so over a surface that already has `GlassEffectView` it composites to nothing. Tried and rejected on `QuickActionResultView`, with and without `safeAreaBar`. This is a rule about the borderless panels; the Settings window is a titled `NSWindow` whose system titlebar draws the band itself (see "Settings").
 - **Test over a light desktop.** Transparency and corner masking bugs only show over bright wallpaper. Dark wallpaper hides them.
 - **No `NSAlert` or system popovers.** Every confirmation, failure report, value prompt and transient readout is Tinycast's own SwiftUI surface (see "Dialogs & HUD"). An Aqua alert on an alpha-over-vibrancy app reads as a different product, and its `runModal` run loop keeps Carbon hotkeys firing underneath.
 - **Animations follow one switch.** General → Appearance → **Show animations**
@@ -61,7 +61,7 @@ These are the things that quietly break the look if changed. Preserve them unles
 - **In the palette, a hover label is Tinycast's `tooltip`, never `.help()`**: an AppKit tooltip never appears while the app sits inactive behind the non-activating panel. A Settings window activates the app, so `.help()` shows there and stays the label to use. The tooltip hangs above its control by default; a control in the palette header passes `edge: .bottom`, since above it is off the window, and a label may run to several lines — the chat's attachment pill lists every staged name.
   Native form controls opt into `dismissOnPress` to hide the label until the next hover.
 - **A transient readout is a HUD, not a dialog.** `VolumeHUDController`'s box is volume and mute only, since that one needs an actual level and number; every other success or info confirmation goes through `MessageHUDController`'s pill, whose leading glyph _is_ its `DialogTone`. A pill has no subject to name, so the icon rule above does not apply to it — and that mapping stays file-scoped so nothing can reach for it when building a `DialogRequest`. A new HUD means a new presenter, not a second shape bolted onto an existing controller.
-- **Native glass supplies borderless surfaces and floating controls.** The action capsule and `PopoverMenu` use it inside the palette; dialogs apply one system `.glassEffect(.regular)` to their root surface. Dialog buttons stay matte so their roles remain legible. Both HUDs use `GlassEffectView()` followed by their shape clip.
+- **Native glass supplies borderless surfaces and floating controls.** `PopoverMenu` uses it inside the palette; dialogs apply one system `.glassEffect(.regular)` to their root surface. Dialog buttons stay matte so their roles remain legible. Both HUDs use `GlassEffectView()` followed by their shape clip.
 
 ---
 
@@ -99,8 +99,8 @@ this, member by member, including that `.standard` is `Theme` verbatim.
 
 `xxs` is the tight gap between adjacent keycap chips (used everywhere keycaps sit side by side).
 
-Row content insets are `md`; list horizontal inset is `md`; the search icon aligns with rows via
-`md * 2`; the `xl` gap after it starts the query on the row titles' column.
+Row content insets are `md`; list horizontal inset is `md`; the root query starts at
+`md * 2`, on the section headers' column; a sub-screen's back chevron sits there, followed by an `xl` gap.
 
 Section-header rhythm has two dedicated tokens: `sectionHeaderBottom` (header → first row) and
 `sectionSpacing` (gap above every header **except the list's first**, which reads as the previous
@@ -254,11 +254,11 @@ An extension's own surfaces live in `ExtensionColors` (`Features/Extensions/UI/`
 Source: `Palette/PalettePanel.swift`, `Palette/RootPaletteView.swift`.
 
 - **`PalettePanel`** is a borderless `NSPanel`: `isOpaque = false`, `backgroundColor = .clear`, `.palette` level (one above `.modalPanel`, so other apps' open panels never cover it), `hasShadow`, and an `AnimatedPanel`, so it opens with `.documentWindow`. It hosts SwiftUI via `NSHostingView`. `PaletteWindowController` centers it slightly above screen center (`+8%`) and dismisses it on `windowDidResignKey`.
-- **The results layer fills the whole panel.** The header and bottom bar attach via `.safeAreaInset(edge: .top/.bottom)` as transparent overlays that float _over_ the list. The list underlaps them and dissolves at the edges.
-- **Header** (`headerHeight 36`): a back-chevron _or_ mode glyph, then the plain `TextField` (no border/background). Sub-screens (Clipboard, Calculator History) show the back chevron; the launcher shows a magnifying glass. The search icon aligns horizontally with row content, and the query with the row titles.
+- **The results layer sits between the bars.** The header and bottom bar attach via `.safeAreaInset(edge: .top/.bottom)` with no background, each with a hairline on its list side; the screen is masked to the space between them.
+- **Header** (`headerHeight 36`): the plain `TextField` (no border/background, `searchFieldSize 17`). The launcher has no glyph, so its query starts on the section headers' column; sub-screens (Clipboard, Calculator History) lead with the back chevron.
 - **Compact bar** (`compactHeight 56`, a full capsule; the expanded panel keeps `panel 26`): the window itself is bare and the shapes are glass. `CompactBar` draws them behind the header row: a native `.regular` glass `Capsule`, then one round button per enabled configured shortcut (zero to four) — Clipboard History, Emoji & Symbols, Search Files and Search Quicklinks by default — so the capsule takes whatever width they leave, and the row is narrowed to match. On every summon the capsule starts at full width and pulls back with an undershoot while each button, parked small inside its end, beads out a beat after the last; its glyph blurs in once the glass has formed. The compact bar adds no scrim or mask over the glass. Keyboard selection tints the existing glass circle and uses a white monochrome glyph; the system material draws the face and contour together, without an overlaid fill or stroke. Activation runs its command synchronously with animations disabled, so no shortcut shapes animate beneath the expanded panel. Leaving fades the bar whole; it parks again after the window has gone. The glass shapes share one `GlassEffectContainer`, and `Theme.CompactBarMotion` holds every value. With **Show animations** off the bar lands at rest: `motionScope()` strips its springs, and the park wait runs through `Motion.duration(_:)`. The glyphs sit above the container, never inside it, where a morph would smear them — and the header row sits outside it, because a container paints its merged glass over any loose content within. The window keeps its native shadow in both modes so the glass shapes remain distinct against light backgrounds.
 - **Compact keyboard entry:** pressing `↓` in the collapsed launcher expands the results and selects the first row without replacing or defocusing the shared search field.
-- **Bottom bar** (`bottomBarHeight 52`): the action group on the right — floating glass, no bar background; an extension toast takes the left side. The action group is one glass `Capsule` holding the primary-action pill (label + `↵`) and the Actions toggle (`⌘K`).
+- **Bottom bar** (`bottomBarHeight 52`): the action group on the right, no background; an extension toast takes the left side. The group is two bare `.rounded` `BarButton`s — the primary action (label + `↵`) and the Actions toggle (`⌘K`) — split by a `barSeparatorTick 12` hairline that hides while either button is hovered, so the hover fill never meets it.
 - **`BarButton`** is the shared bar control: bare label at rest, a `rowHover` capsule on hover, `barButtonHeight 28`. Set `isSelected` and it fills with `selection` instead, which beats hover. Set `isCompact` for `sm` padding instead of `md`: around a 16-point glyph frame that makes a 28-point square. It carries the footer's two buttons and the clipboard header's type filter, so those hover identically. Hover state lives inside it, so sweeping one never re-renders the palette body.
 
 ---
@@ -284,29 +284,11 @@ top edge. Find marks words in `Colors.findMatch` / `findCurrent`, the system yel
 `spacing.chatLine 4` apart on both surfaces. A source chip is a frosted capsule like a choice, led
 by a `chatSourceBadge 18` number disc. Jump to Latest is a `chatJumpToLatest 30` arrow disc at the
 transcript's bottom edge. The transcript itself is the palette's `ChatTranscriptView`
-with `surface: .window`, which leaves out `edgeDissolve` and `thinScrollbar` — both are measured
-against the palette's bars — and caps the column at `aiChatReadingWidth`, centred. Its gutter sits
+with `surface: .window`, which leaves out `thinScrollbar` — it is measured against the palette's
+bars — and caps the column at `aiChatReadingWidth`, centred. Its gutter sits
 outside that cap, as the composer's does, so a reply, its code blocks and the composer share both
 edges; a window reply takes no inset of its own, while the palette keeps `spacing.sm` to line up
 with its header's chevron.
-
----
-
-## The edge dissolve
-
-Source: `DesignSystem/Scrolling/EdgeDissolve.swift`.
-
-The signature effect. A scroll-driven `LinearGradient` mask on each list so rows soften as they approach
-a floating bar, ghost beneath it, and vanish only at the window edge. Attach with `.edgeDissolve()` on
-the `ScrollView`, **before `.thinScrollbar()`** (so the scrollbar overlay stays unmasked).
-
-- Fade bands: top = `headerHeight + headerPadding + 32`, bottom = `bottomBarHeight + 28` — each overshoots its bar into the visible list, so the ramp finishes ~32/28px _past_ the bar rather than cliffing at its edge.
-- Alpha floors mid-scroll (not to 0): **top 0.15, bottom 0.25**, eased by how much content is hidden past the edge (`1 − (1 − floor)·clamp(dist/band, 0, 1)`).
-- Only masks when the list is scrollable; the edge stop stays transparent so rubber-band bounces still dissolve. A list that fits gets no mask.
-- The mask spans the scroll view's **full** frame (`.ignoresSafeArea()`) — otherwise the bars' safe-area insets shift the gradient onto at-rest rows.
-
-**Palette only.** Every one of its call sites is a palette screen, and the bands above are measured
-against the palette's bars. A Settings list underlaps nothing, so it uses `.overflowFade()` instead.
 
 ---
 
@@ -369,11 +351,11 @@ Source: `Theme.frosted(in:)`, `DesignSystem/PopoverMenu.swift`.
 
 Glass is normally for floating controls. The dialog root is the one modal-surface exception.
 
-- `View.frosted(in:)` = `glassEffect(.regular.interactive(), in:)` — regular, interactive glass, so it follows the system Liquid Glass (clear ↔ tinted) setting; `.clear` ignores that setting. Used on the action-group capsule. Dialogs intentionally use untinted, non-interactive `.glassEffect(.regular)` on their root instead; HUDs retain the panel recipe (see "Dialogs & HUD"). Retune it in `frosted(in:)`, not per call site.
+- `View.frosted(in:)` = `glassEffect(.regular.interactive(), in:)` — regular, interactive glass, so it follows the system Liquid Glass (clear ↔ tinted) setting; `.clear` ignores that setting. Used on floating capsules such as chat chips and extension toasts. Dialogs intentionally use untinted, non-interactive `.glassEffect(.regular)` on their root instead; HUDs retain the panel recipe (see "Dialogs & HUD"). Retune it in `frosted(in:)`, not per call site.
 - **Menus are in-window overlays, not system popovers.** `.contextMenu`/`NSMenu` stall clicks for seconds inside a `LazyVStack` and spill outside the panel. Use `PopoverMenu` anchored to a corner via `.overlay`, inset `menuInset` (8pt) so its own corner isn't clipped by the panel's. A menu hung off a control instead of a corner — the clipboard type filter, `.topTrailing` — insets by that control's own metrics so their edges line up.
 - **A menu's `width` is fixed, never intrinsic**, so it can't jitter as its rows change. Every header menu states its own at its `RootPaletteView.menuContent` case — `menuWidth 276`, or a token of its own where that reads too wide (`clipboardFilterMenuWidth`, `fileSearchFilterMenuWidth`, `emojiCategoryMenuWidth`) — so retuning one never moves another. Native footer menus add 30pt without changing those header widths; extension Actions owns its nearby 310pt width inside the feature.
 - **`PopoverMenu`** uses `glassEffect(.regular)` with `menuPanel 16` corners and **no hand-tuned shadow** — Tahoe glass carries its own elevation; adding a drop shadow reads heavy and non-native. The ⌘K menu takes the palette's own `radius.panel` on every corner instead, so it matches the window it stands over.
-- Its native search field is a row-height sibling of the scroller, above header menus or below footer menus. It uses an 18pt horizontal inset to align with the visible row glyphs. The top field stays vertically symmetric; the bottom field keeps its 1pt optical lift. Menus omit the adjacent edge dissolve and centre **No Results** in one row when their filtered rows are empty. The 8pt resting list inset belongs to the scroll content, so rows can reach the surface edges without shifting their initial position; hover fills keep the dedicated `menuRow 10` corner.
+- Its native search field is a row-height sibling of the scroller, above header menus or below footer menus. It uses an 18pt horizontal inset to align with the visible row glyphs. The top field stays vertically symmetric; the bottom field keeps its 1pt optical lift. Menus have no fade beside the field and centre **No Results** in one row when their filtered rows are empty. The 8pt resting list inset belongs to the scroll content, so rows can reach the surface edges without shifting their initial position; hover fills keep the dedicated `menuRow 10` corner.
 - `PopoverMenuRow`: leading glyph, label, trailing shortcut glyph and `menuHover` fill on hover. Menus open and close with AppKit's native `.documentWindow` animation, through `AnimatedPanel`.
 - The glyph is a `PopoverMenuIcon`: `.symbol` (SF Symbol, `monochrome`, `menuSymbol` — or **red** when `isDestructive`) `.file` (a real app icon via `IconCache`, used by the paste rows to show the paste target) or `.thumbnail` (a picture's own preview, cropped to the slot, used by the chat's staged-file rows). `PopoverMenuItem` keeps a `systemImage:` convenience init, so symbol rows read exactly as before.
 - **Every glyph kind shares one square `menuIcon` (20) slot**, which pins one row height. A native SF Symbol uses the dedicated 14pt Medium `menuSymbol` font; file and brand icons keep their own artwork sizing inside the same slot, and a thumbnail fills it.
