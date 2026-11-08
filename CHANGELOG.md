@@ -3,7 +3,7 @@
 What is new in each Tinycast Lite release. The update window shows the section of the version it
 offers.
 
-## Next
+## 0.12.8-lite.4
 
 ### Removed
 
