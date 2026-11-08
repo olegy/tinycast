@@ -1,4 +1,3 @@
-import Carbon.HIToolbox
 import Foundation
 
 /// One press may never skip a step the user can still see and throw work away.
@@ -9,15 +8,6 @@ struct PaletteEscapeTests {
     static var passes = 0
 
     static func expect(_ actual: PaletteEscapeAction, _ expected: PaletteEscapeAction, _ message: String) {
-        if actual == expected {
-            passes += 1
-        } else {
-            failures += 1
-            print("FAIL: \(message) — got \(actual), want \(expected)")
-        }
-    }
-
-    static func expectChord(_ actual: Bool, _ expected: Bool, _ message: String) {
         if actual == expected {
             passes += 1
         } else {
@@ -125,30 +115,6 @@ struct PaletteEscapeTests {
             resolve(menuOpen: true, argumentFocused: true, query: "search"),
             .closeMenu,
             "a menu still outranks the argument field beneath it")
-
-        // ⌘esc never reaches the responder chain, so the tap decides what counts as the chord.
-        expectChord(
-            CommandEscapeTap.isChord(keyCode: Int64(kVK_Escape), flags: [.maskCommand]),
-            true, "a bare ⌘esc is the root-search chord")
-        expectChord(
-            CommandEscapeTap.isChord(keyCode: Int64(kVK_Escape), flags: []),
-            false, "an unmodified Escape belongs to the palette's own handler")
-        expectChord(
-            CommandEscapeTap.isChord(
-                keyCode: Int64(kVK_Escape), flags: [.maskCommand, .maskAlternate]),
-            false, "⌥⌘esc is Force Quit and must pass straight through")
-        expectChord(
-            CommandEscapeTap.isChord(
-                keyCode: Int64(kVK_Escape), flags: [.maskCommand, .maskShift]),
-            false, "any further modifier spells somebody else's chord")
-        expectChord(
-            CommandEscapeTap.isChord(keyCode: Int64(kVK_ANSI_A), flags: [.maskCommand]),
-            false, "⌘A is not it")
-        // Caps Lock and fn ride along on real hardware without changing which chord was struck.
-        expectChord(
-            CommandEscapeTap.isChord(
-                keyCode: Int64(kVK_Escape), flags: [.maskCommand, .maskAlphaShift, .maskSecondaryFn]),
-            true, "the flags a real keyboard adds do not disqualify the chord")
 
         print("\(passes) passed, \(failures) failed")
         if failures > 0 { exit(1) }

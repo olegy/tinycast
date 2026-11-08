@@ -197,7 +197,6 @@
 		4109B5CF37DCA4BCDAE46412 /* ShellCommandRunner.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBFE3C41897391C14DB5A55C /* ShellCommandRunner.swift */; };
 		410F1B5FFAA44378AC9EC2DB /* SystemSettingsSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 951E746BA1AD25D167A1775F /* SystemSettingsSettingsView.swift */; };
 		41C5B5B0E637FAA4AFD4BF13 /* BundleNameCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57694B58B0A17CAC1D697FAA /* BundleNameCache.swift */; };
-		42CDB6A71960204B194EDC8B /* CommandEscapeTap.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0D05FD9A7137951B2EC6C39 /* CommandEscapeTap.swift */; };
 		439F72D2C096C9B814DF11D7 /* FileSearchPolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8FC86115B040B8C574EAD0B5 /* FileSearchPolicy.swift */; };
 		43DBCE7B5A84D0D6322124F5 /* MessageHUDController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B2CB71671625A1F446316A1 /* MessageHUDController.swift */; };
 		44646A576847F2D9FB68D8CF /* MCPServerManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2F8B8787A7197579A6F6ECC /* MCPServerManager.swift */; };
@@ -1430,7 +1429,6 @@
 		D03E3DB2E1E28057B98FC1DF /* ExtensionFieldHint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExtensionFieldHint.swift; sourceTree = "<group>"; };
 		D0508EBDFD6E59370AB2E5B7 /* UninstallScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UninstallScreen.swift; sourceTree = "<group>"; };
 		D0C8025ED5F2833127E20C05 /* ExtensionFieldChrome.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExtensionFieldChrome.swift; sourceTree = "<group>"; };
-		D0D05FD9A7137951B2EC6C39 /* CommandEscapeTap.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommandEscapeTap.swift; sourceTree = "<group>"; };
 		D0DAB24CD8B804E92AEACEE8 /* ClipboardTextIndexer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClipboardTextIndexer.swift; sourceTree = "<group>"; };
 		D12159696E332C8A78BDBF17 /* ChatMarkdownRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatMarkdownRenderer.swift; sourceTree = "<group>"; };
 		D23A98172AA46F5C0C89C4AB /* RootPaletteView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootPaletteView.swift; sourceTree = "<group>"; };
@@ -2975,7 +2973,6 @@
 			children = (
 				761BF04E2CB1821C6AA3C7B0 /* ActionMenuSearchQuery.swift */,
 				81E2A3F7C4FCA7120A3F6EF5 /* ArmedHover.swift */,
-				D0D05FD9A7137951B2EC6C39 /* CommandEscapeTap.swift */,
 				D3A6E15A480A4779ACCE259D /* EmptyResults.swift */,
 				9D4C3D9FA2F775DC650985D8 /* HoverArming.swift */,
 				BF96A1566757811AD434C0F9 /* MenuPanel.swift */,
@@ -3737,7 +3734,6 @@
 				F13789E3732E844EE7584561 /* ColorValue.swift in Sources */,
 				4EBFBA1CC7DA9B22C396DBEC /* CommandArgumentsRow.swift in Sources */,
 				89872774514D83EC2BD60F1E /* CommandCatalog.swift in Sources */,
-				42CDB6A71960204B194EDC8B /* CommandEscapeTap.swift in Sources */,
 				BEAAD72E748375E0039AC90F /* CommandID.swift in Sources */,
 				51E8877F53ABA0E51B2493FA /* CommandOutputPresenter.swift in Sources */,
 				C45CCAE9AE2D3BCAC2BF80BE /* CommandOutputView.swift in Sources */,

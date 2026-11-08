@@ -132,7 +132,6 @@ If a change touches anything in the right column, the harness on the left is man
 | `pasteboard-test` | `Clipboard/Service/ClipboardManager.swift` capture and `Paster.write` — what a Finder copy reads as, and what a file or image entry writes back |
 | `emoji-test` | `Emoji/Model/EmojiCatalog.swift`, `EmojiGridGeometry.swift`, the generated data and keyword packs |
 | `emoji-search-test` | `Emoji/Service/EmojiIndex.swift`, `FrequentEmojiStore.swift`, `Scripts/gen-emoji.js`'s keyword format, multilingual search |
-| `command-escape-tap-test` | `Palette/CommandEscapeTap.swift` — dedicated run-loop dispatch while main is blocked, timeout recovery, stale actions, installation cancellation and teardown; private ports and unposted events only |
 | `palette-navigation-test` | `Palette/PaletteState.swift`'s screen motions — `prepare`, `replace`, `push`, `pop` — and hover arming, pointer drift, scroll disarming and highlight tokens |
 | `compact-bar-test` | Compact shortcut order, selection boundaries, zero-to-four slots, identifiers, isolated preferences and invalid settings-file rejection |
 | `palette-selection-test` | `Features/PaletteRowIndex.swift` |
@@ -397,20 +396,16 @@ caches, TCC grants and login item, so this cannot disturb an installed copy.
 
 ### Core
 
-- Palette hotkey opens the launcher; pressing it again closes it; Escape clears a non-empty query,
+- Palette hotkey opens the launcher; pressing it again on the root closes it; Escape clears a non-empty query,
   then hides on a second press; clicking away closes it
 - Search a mode command (Clipboard History, Search Emoji, Search Quicklinks, Search Files, Quick AI)
   and run it: Escape returns to the launcher **with the query still typed and the row still
   selected**, and the next press clears it. The same screen from its own global hotkey hides the
   palette instead, and shows its own header icon rather than a back chevron
-- ⌘esc from any depth lands on an empty root search with the window still open — **must be checked
-  on a real keyboard**: macOS claims the chord, so `CommandEscapeTap` is the only thing that
-  delivers it and it needs Accessibility granted to the running build. With the palette closed, ⌘esc
-  still does whatever macOS does with it. Open a menu or dialog over the palette and verify ⌘esc
-  passes through while the palette is not key; after dismissing it, the palette chord works again
 - A bare ⌫ in an empty field walks the same path Escape does
-- The launcher hotkey on a sub-screen hides the palette, and pressing it again within Pop to Root
-  Search brings that screen back; Escape on the root closes it, and reopening lands on the root search
+- The launcher hotkey on a sub-screen lands on the root search; pressing it again hides the palette,
+  and reopening lands on a fresh root search. Clicking away from a sub-screen and reopening within
+  Pop to Root Search brings that screen back
 - Reopening focuses the search field with an empty query, in the same position and at the same size
 - Compact mode: typing expands it, and the search bar moves up only the 5pt the expanded header
   takes to centre it
