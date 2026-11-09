@@ -741,9 +741,9 @@ struct RootPaletteView: View {
         HStack(alignment: .center, spacing: 0) {
             // Matches the list rows and section headers' own indent below.
             headerGutter(width: metrics.spacing.md * 2)
-            // The root search starts on the section headers' column; a sub-screen leads with Back.
-            if vm.mode != .launcher {
-                HeaderBackButton(help: backHelp, action: goBack)
+            // A screen with nothing beneath it starts on the section headers' column, like the root.
+            if hasBackStep {
+                HeaderBackButton(action: goBack)
                 headerGutter(width: metrics.spacing.xl)
             }
             // One structural position: a field inside a branch loses first responder when it flips.
@@ -1481,13 +1481,6 @@ struct RootPaletteView: View {
         vm.canGoBack || (vm.mode == .extensionCommand && extensions.navigationDepth > 1)
     }
 
-    /// Never promises a step the click does not take: a root screen closes rather than backs.
-    private var backHelp: String {
-        hasBackStep
-            ? String(localized: "Esc to go back or ⌘ Esc to go to root search")
-            : String(localized: "Esc to close or ⌘ Esc to go to root search")
-    }
-
     private func goBack() {
         if vm.mode == .customCommandEditor {
             core.customCommandCoordinator.cancelCustomCommandEditing()
@@ -1563,7 +1556,6 @@ private struct SearchFieldHiding: ViewModifier {
 
 /// Hover state lives here, so lighting the chevron never re-renders the header around it.
 private struct HeaderBackButton: View {
-    let help: String
     let action: () -> Void
     @State private var hovered = false
     @Environment(\.metrics) private var metrics
@@ -1580,7 +1572,7 @@ private struct HeaderBackButton: View {
         .buttonStyle(.plain)
         .onHover { hovered = $0 }
         .animation(.easeOut(duration: Theme.Duration.hover), value: hovered)
-        .help(help)
+        .help("Esc to go back or ⌘ Esc to go to root search")
     }
 }
 

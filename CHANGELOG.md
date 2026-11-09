@@ -10,6 +10,7 @@ offers.
 - **Shorter bottom-bar labels.** The bottom bar names the action with a verb alone where the selected row already says what it acts on: Copy, Open, Run, Save, Create, Activate, Uninstall. The ⌘K menu keeps the full names.
 - **Snippets show Paste in the bottom bar.** A one-line snippet now shows Paste ⌘↵ beside Copy, so it is clear that it can be pasted.
 - **Quick AI ⇥ moved to the bottom bar**, next to the other actions, instead of sitting at the right of the search field.
+- **The back chevron shows only when there is a screen to go back to.** A screen opened straight by its hotkey no longer shows it, since Escape there closes the palette.
 
 ### Removed
 

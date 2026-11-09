@@ -161,11 +161,11 @@ home: off the root it lands on the root search in one press, and on the root it 
 the palette and resets it. Only a close by losing focus keeps the screen, for the next summon to
 restore until Pop to Root Search expires. In compact mode, expanded launcher root search clears, then collapses, then closes.
 
-The header draws a back chevron on **every** screen but the launcher: leaving is what the icon
-slot means once you are off the root, and a slot that changed shape with provenance would read
-as two different controls. Where the click lands still depends on the stack — a pushed screen
-pops, a root one closes — so `backHelp` says which, rather than promising a step that is really
-a close. It lights to `textPrimary` under the pointer over `Theme.Duration.hover`, and
+The header draws a back chevron only where there is a screen to go back to: one pushed from
+another screen, or an extension that has pushed a view of its own. A screen opened straight by its
+hotkey has nothing beneath it, so Escape closes the palette and the header shows no chevron —
+its field starts on the section headers' column, as the launcher's does. The chevron lights to
+`textPrimary` under the pointer over `Theme.Duration.hover`, and
 `HeaderBackButton` keeps that hover state to itself so the header around it never re-renders.
 
 The launcher advertises the first hop in the bottom bar — `Quick AI` beside a ⇥ key cap, after
@@ -183,7 +183,7 @@ the text is submitted, not seeded, and the hint reads the case back out (`== .as
 restating the rule.
 
 **A ring hop is a step, so Escape walks back out the way Tab came in** — launcher → chat → clipboard
-takes two presses to unwind, and the back chevron's tooltip stops promising a step it cannot take.
+takes two presses to unwind, and the back chevron stays up for both.
 The launcher is the ring's root, so the hop that closes the ring resets the stack instead of stacking
 a third screen; ringing round forever therefore never grows the stack past two.
 

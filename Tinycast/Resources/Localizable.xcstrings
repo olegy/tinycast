@@ -37703,58 +37703,6 @@
         }
       }
     },
-    "Esc to close or ⌘ Esc to go to root search" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Esc zum Schließen oder ⌘ Esc zurück zur Hauptsuche"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Esc para cerrar o ⌘ Esc para volver a la búsqueda principal"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Échap pour fermer ou ⌘ Échap pour revenir à la recherche principale"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Escで閉じる、⌘ Escでメイン検索に戻る"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Esc로 닫기 또는 ⌘ Esc로 기본 검색으로 돌아가기"
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Esc para fechar ou ⌘ Esc para voltar à busca principal"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Esc — закрыть, ⌘ Esc — вернуться к основному поиску"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "按 Esc 关闭，或按 ⌘ Esc 返回主搜索"
-          }
-        }
-      }
-    },
     "Esc to go back or ⌘ Esc to go to root search" : {
       "comment" : "Tooltip on the palette's back button; keep key names",
       "localizations" : {
