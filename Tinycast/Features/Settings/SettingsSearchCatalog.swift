@@ -107,7 +107,7 @@ enum SettingsSearchCatalog {
 
     static let entries: [SettingsSearchEntry] =
         general + applications + systemSettings + systemActions + commands + quicklinks
-        + appleShortcuts + fallbacks + clipboard + snippets + fileSearch
+        + appleShortcuts + fallbacks + clipboard + snippets + statusIcons + fileSearch
         + navigation + emoji + ai + quickActions + extensions + permissions
         + backup + about
 
@@ -345,6 +345,24 @@ enum SettingsSearchCatalog {
         .init(
             .snippetsEditor, "Open Snippets With",
             keywords: ["external editor", "zed", "obsidian", "app"])
+    ]
+
+    private static let statusIcons: [SettingsSearchEntry] = [
+        .init(
+            pane: .statusIcons,
+            keywords: ["menu bar", "status", "icons", "dns", "bottom bar"]),
+        .init(
+            .statusIconsStatusIcons, "Enable Status Icons",
+            keywords: ["menu bar", "status", "icons", "bottom bar"]),
+        .init(
+            .statusIconsDNS, "Show DNS icon",
+            keywords: ["dns", "lock", "resolver", "status", "dnscrypt"]),
+        .init(
+            .statusIconsDNS, "Local resolvers",
+            keywords: ["dns", "resolver", "localhost", "127.0.0.1", "dnscrypt"]),
+        .init(
+            .statusIconsDNS, "On click, run",
+            keywords: ["dns", "custom command", "click", "toggle"])
     ]
 
     private static let fileSearch: [SettingsSearchEntry] = [

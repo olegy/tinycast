@@ -42,6 +42,10 @@ enum SettingsBackupCoverage {
         "appleShortcutsEnabled": .appleShortcutsEnabled,
         "snippetsEnabled": .snippetsEnabled,
         "snippetsShowInLauncher": .snippetsShowInLauncher,
+        "statusIconsEnabled": .statusIconsEnabled,
+        "statusDNSEnabled": .statusDNSEnabled,
+        "statusDNSLocalResolvers": .statusDNSLocalResolvers,
+        "statusDNSCommand": .statusDNSCommand,
         "extensionsShowInLauncher": .extensionsShowInLauncher
     ]
 

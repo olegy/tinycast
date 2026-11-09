@@ -98,6 +98,9 @@ final class AppCore {
         paletteCoordinator: paletteCoordinator, settingsCoordinator: settingsCoordinator,
         hotKeys: hotKeys, favorites: favorites, visibility: visibility,
         ranking: launcherRanking, aliases: aliases, activationPolicy: activationPolicy, core: self)
+    @ObservationIgnored private(set) lazy var statusIconCoordinator = StatusIconCoordinator(
+        settings: settings, customCommands: customCommands,
+        customCommandCoordinator: customCommandCoordinator)
     @ObservationIgnored private(set) lazy var appleShortcutCoordinator = AppleShortcutCoordinator(
         settings: settings, appIndex: appIndex, hotKeys: hotKeys, favorites: favorites,
         visibility: visibility, ranking: launcherRanking, aliases: aliases,
@@ -242,6 +245,7 @@ final class AppCore {
             snippetStore.onFailures = { [weak self] in self?.snippetCoordinator.reportFailures($0) }
             // Unconditional: a disabled feature has to take its command rows down with it.
             snippetCoordinator.applyEnabled()
+            statusIconCoordinator.applyEnabled()
             appleShortcutCoordinator.applyPresence()
             paletteCoordinator.onLauncherShown = { [weak self] in
                 self?.appleShortcutCoordinator.refresh()
@@ -518,6 +522,12 @@ final class AppCore {
                 _ = $0.snippetFolders
                 _ = $0.snippetExcludePatterns
             }, reproject: { $0.snippetCoordinator.applyEnabled() })
+        track(
+            {
+                _ = $0.statusIconsEnabled
+                _ = $0.statusDNSEnabled
+                _ = $0.statusDNSLocalResolvers
+            }, reproject: { $0.statusIconCoordinator.applyEnabled() })
         track(
             { _ = $0.appleShortcutsEnabled },
             reproject: { $0.appleShortcutCoordinator.applyPresence() })

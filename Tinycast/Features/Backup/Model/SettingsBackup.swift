@@ -63,6 +63,11 @@ struct SettingsBackup: Codable {
         // Carried: reading the user's Markdown grants no permission class; the folders stay behind.
         var snippetsEnabled: Bool?
         var snippetsShowInLauncher: Bool?
+        // Carried: reading the DNS state grants nothing, and the command it runs travels too.
+        var statusIconsEnabled: Bool?
+        var statusDNSEnabled: Bool?
+        var statusDNSLocalResolvers: String?
+        var statusDNSCommand: String?
     }
 
     struct HotkeyBackup: Codable {
@@ -136,7 +141,11 @@ extension SettingsBackup {
             quicklinkConfirmsBeforeDelete: s.quicklinkConfirmsBeforeDelete,
             appleShortcutsEnabled: s.appleShortcutsEnabled,
             snippetsEnabled: s.snippetsEnabled,
-            snippetsShowInLauncher: s.snippetsShowInLauncher)
+            snippetsShowInLauncher: s.snippetsShowInLauncher,
+            statusIconsEnabled: s.statusIconsEnabled,
+            statusDNSEnabled: s.statusDNSEnabled,
+            statusDNSLocalResolvers: s.statusDNSLocalResolvers,
+            statusDNSCommand: s.statusDNSCommand?.uuidString.lowercased())
 
         let hk = core.hotKeys
         var hotkeys = HotkeyBackup()
@@ -367,6 +376,22 @@ extension SettingsBackup {
         }
         if let flag = s.snippetsShowInLauncher {
             settings.snippetsShowInLauncher = flag
+            count += 1
+        }
+        if let flag = s.statusIconsEnabled {
+            settings.statusIconsEnabled = flag
+            count += 1
+        }
+        if let flag = s.statusDNSEnabled {
+            settings.statusDNSEnabled = flag
+            count += 1
+        }
+        if let resolvers = s.statusDNSLocalResolvers {
+            settings.statusDNSLocalResolvers = resolvers
+            count += 1
+        }
+        if let raw = s.statusDNSCommand, let id = UUID(uuidString: raw) {
+            settings.statusDNSCommand = id
             count += 1
         }
         if let flag = s.quicklinkOpensNewWindow {

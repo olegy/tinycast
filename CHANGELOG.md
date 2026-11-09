@@ -5,6 +5,10 @@ offers.
 
 ## Next
 
+### New
+
+- **Status Icons.** Small icons at the left of the launcher's bottom bar show a state that changes on its own, so its menu-bar item can go. The first one is DNS: a closed lock while every DNS server is local (for example dnscrypt-proxy on 127.0.0.1), an open lock on an orange tile otherwise; hover shows the addresses, and a click can run one of your Custom Commands. Turn it on in Settings → Status Icons.
+
 ### Changes
 
 - **Shorter bottom-bar labels.** The bottom bar names the action with a verb alone where the selected row already says what it acts on: Copy, Open, Run, Save, Create, Activate, Uninstall. The ⌘K menu keeps the full names.

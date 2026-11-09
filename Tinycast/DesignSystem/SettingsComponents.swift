@@ -300,7 +300,8 @@ struct FeatureSwitchSection: View {
     let enableTitle: LocalizedStringResource
     var enableSubtitle: LocalizedStringResource?
     @Binding var isEnabled: Bool
-    @Binding var showsInLauncher: Bool
+    /// Nil for a feature with no launcher commands, which then has no such row.
+    var showsInLauncher: Binding<Bool>?
     var showsIcon = false
     var showsHeader = true
 
@@ -323,9 +324,11 @@ struct FeatureSwitchSection: View {
                     if let enableSubtitle { Text(enableSubtitle) }
                 }
             }
-            Toggle("Show in launcher", isOn: $showsInLauncher)
-                // The switch above stays live so the feature can always be turned back on.
-                .settingsEnabled(isEnabled)
+            if let showsInLauncher {
+                Toggle("Show in launcher", isOn: showsInLauncher)
+                    // The switch above stays live so the feature can always be turned back on.
+                    .settingsEnabled(isEnabled)
+            }
         } header: {
             if showsHeader { SettingsSectionHeader(anchor) }
         }

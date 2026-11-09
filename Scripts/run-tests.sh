@@ -458,6 +458,7 @@ run snippets-test          Tinycast/Features/Snippets/Model/*.swift \
                            Tinycast/Features/Snippets/Service/SnippetScanner.swift \
                            Tinycast/Features/Snippets/Service/SnippetFileWriter.swift \
                            Tinycast/Features/FileSearch/Model/FileSearchIgnoreList.swift
+run status-icons-test      Tinycast/Features/StatusIcons/Model/*.swift
 run text-injection-test    Tinycast/Platform/AccessibilityText.swift \
                            Tinycast/Features/Templates/Model/TemplateEngine.swift \
                            Tinycast/Features/TextInjection/Service/*.swift

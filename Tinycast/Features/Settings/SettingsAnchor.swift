@@ -65,6 +65,9 @@ extension SettingsAnchor {
     static let snippetsExcludedFolders = Self(tab: .snippets, title: "Excluded Folders")
     static let snippetsEditor = Self(tab: .snippets, title: "Editor")
 
+    static let statusIconsStatusIcons = Self(tab: .statusIcons, title: "Status Icons")
+    static let statusIconsDNS = Self(tab: .statusIcons, title: "DNS")
+
     static let fileSearchFileSearch = Self(tab: .fileSearch, title: "File Search")
     static let fileSearchFullDiskAccess = Self(tab: .fileSearch, title: "Full Disk Access")
     static let fileSearchIndex = Self(tab: .fileSearch, title: "Index")

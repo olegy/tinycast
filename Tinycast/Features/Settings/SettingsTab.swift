@@ -1,6 +1,6 @@
 enum SettingsTab: CaseIterable, Identifiable {
     case general, applications, systemSettings, systemActions, commands, quicklinks, appleShortcuts,
-        fallbacks, clipboard, snippets, fileSearch, navigation, emoji,
+        fallbacks, clipboard, snippets, statusIcons, fileSearch, navigation, emoji,
         ai, quickActions, extensions, permissions, backup, about
     /// The case, never an index: a selectable `List` flattens section and row IDs together.
     var id: Self { self }
@@ -23,6 +23,7 @@ enum SettingsTab: CaseIterable, Identifiable {
         case .fallbacks: "fallbacks"
         case .clipboard: "clipboard"
         case .snippets: "snippets"
+        case .statusIcons: "status-icons"
         case .fileSearch: "file-search"
         case .navigation: "navigation"
         case .emoji: "emoji"
@@ -51,6 +52,7 @@ enum SettingsTab: CaseIterable, Identifiable {
         case .navigation: return String(localized: "Navigation")
         case .clipboard: return String(localized: "Clipboard")
         case .snippets: return String(localized: "Snippets")
+        case .statusIcons: return String(localized: "Status Icons")
         case .emoji: return String(localized: "Emoji & Symbols")
         case .extensions: return String(localized: "Extensions")
         case .permissions: return String(localized: "Permissions")
@@ -75,6 +77,7 @@ enum SettingsTab: CaseIterable, Identifiable {
         case .navigation: return "arrow.left.arrow.right"
         case .clipboard: return "doc.on.clipboard"
         case .snippets: return "curlybraces"
+        case .statusIcons: return "menubar.rectangle"
         case .emoji: return "face.smiling"
         case .extensions: return "puzzlepiece.extension"
         case .permissions: return "lock.shield"
@@ -110,7 +113,7 @@ enum SettingsSection: CaseIterable, Identifiable {
         case .features:
             // Everyday tools first; AI and extensions are opt-in extras.
             return [
-                .clipboard, .snippets, .fileSearch, .navigation,
+                .clipboard, .snippets, .statusIcons, .fileSearch, .navigation,
                 .emoji, .ai, .quickActions, .extensions
             ]
         case .advanced: return [.backup, .about]

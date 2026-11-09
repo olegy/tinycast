@@ -155,6 +155,7 @@ If a change touches anything in the right column, the harness on the left is man
 | `quicklink-coordinator-test` | Opening and requested arguments, launcher editing, current enabled-state preservation, deletion during editing and feature gates; no platform effects or on-screen focus checks |
 | `apple-shortcut-test` | all of `AppleShortcuts/Model/` — the `shortcuts list` parser and entry ids |
 | `snippets-test` | `Snippets/Model/*.swift`, `SnippetScanner`, `SnippetFileWriter` — frontmatter recognition, byte-preserving keyword and content edits (CRLF, list values, removal), fences and the copy/paste table, words, tags, search and order, file-name rules, `.vault.json`, writes that ask before replacing, case-only renames, head-only scans past 4 KB, excluded and hidden folders |
+| `status-icons-test` | `StatusIcons/Model/*.swift` — DNS classification (loopback, external, mixed, none, a custom list), parsing the Local resolvers field (blanks, stray commas, IPv6 case), and each state's glyph, tone and tooltip |
 | `template-test` | `Templates/Model/TemplateEngine.swift` — every placeholder, parameter and modifier, argument order, cursor offsets, encoding and the Raycast aliases, against an injected clock, locale and UUIDs |
 | `text-injection-test` | `TextInjection/Service/` — the delivery queue, completion, AX confirmation, Unicode chunking, the pasteboard lease and the borrowed ⌘C, and in-process insertion into our own editor |
 | `symbols-test` | `Extensions/Service/SymbolCatalog.swift`, against this machine's CoreGlyphs |

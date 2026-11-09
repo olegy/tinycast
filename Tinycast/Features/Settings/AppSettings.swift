@@ -334,6 +334,29 @@ final class AppSettings {
         didSet { defaults.set(snippetEditorBundleID, forKey: Key.snippetEditorBundleID.rawValue) }
     }
 
+    /// Off means no DNS subscription and nothing at the left of the bottom bar.
+    var statusIconsEnabled: Bool {
+        didSet { defaults.set(statusIconsEnabled, forKey: Key.statusIconsEnabled.rawValue) }
+    }
+
+    var statusDNSEnabled: Bool {
+        didSet { defaults.set(statusDNSEnabled, forKey: Key.statusDNSEnabled.rawValue) }
+    }
+
+    /// Comma-separated; `DNSStatus.localResolvers(from:)` is the one parser.
+    var statusDNSLocalResolvers: String {
+        didSet {
+            defaults.set(statusDNSLocalResolvers, forKey: Key.statusDNSLocalResolvers.rawValue)
+        }
+    }
+
+    /// The custom command a click on the DNS icon runs; a deleted one reads as none.
+    var statusDNSCommand: UUID? {
+        didSet {
+            defaults.set(statusDNSCommand?.uuidString, forKey: Key.statusDNSCommand.rawValue)
+        }
+    }
+
     /// Off means the Shortcuts tool is never run, down to a bound shortcut running nothing.
     var appleShortcutsEnabled: Bool {
         didSet { defaults.set(appleShortcutsEnabled, forKey: Key.appleShortcutsEnabled.rawValue) }
@@ -495,6 +518,13 @@ final class AppSettings {
         snippetFolders = defaults.stringArray(forKey: Key.snippetFolders.rawValue) ?? []
         snippetExcludePatterns = defaults.stringArray(forKey: Key.snippetExcludePatterns.rawValue) ?? []
         snippetEditorBundleID = defaults.string(forKey: Key.snippetEditorBundleID.rawValue)
+        statusIconsEnabled = defaults.bool(forKey: Key.statusIconsEnabled.rawValue)
+        statusDNSEnabled = defaults.bool(forKey: Key.statusDNSEnabled.rawValue)
+        statusDNSLocalResolvers =
+            defaults.string(forKey: Key.statusDNSLocalResolvers.rawValue)
+            ?? DNSStatus.defaultLocalResolvers
+        statusDNSCommand =
+            defaults.string(forKey: Key.statusDNSCommand.rawValue).flatMap(UUID.init(uuidString:))
         appleShortcutsEnabled = defaults.bool(forKey: Key.appleShortcutsEnabled.rawValue)
         quicklinkOpensNewWindow = defaults.bool(forKey: Key.quicklinkOpensNewWindow.rawValue)
         quicklinkPassesSelectedText = defaults.bool(

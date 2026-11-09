@@ -940,7 +940,7 @@ struct RootPaletteView: View {
     ) -> some View {
         let showsTabHint = tabOpensChat
         return HStack(spacing: 0) {
-            Color.clear.frame(width: 0, height: 0)
+            bottomBarLeading
                 .modifier(ExtensionToastSlot(extensions: extensions, showing: vm.mode == .extensionCommand))
             if showActionGroup || showsTabHint {
                 PaletteActionGroup(
@@ -961,6 +961,14 @@ struct RootPaletteView: View {
         .frame(height: metrics.size.bottomBarHeight)
         .frame(maxWidth: .infinity)
         .overlay(alignment: .top) { BarSeparator() }
+    }
+
+    /// The bar's left side belongs to the screen; only the root search shows anything there yet.
+    @ViewBuilder private var bottomBarLeading: some View {
+        switch vm.mode {
+        case .launcher: StatusIconStrip()
+        default: Color.clear.frame(width: 0, height: 0)
+        }
     }
 
     private func activateSecondary() {

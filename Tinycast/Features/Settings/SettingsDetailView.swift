@@ -21,6 +21,7 @@ struct SettingsDetailView: View {
             case .navigation: NavigationSettingsView()
             case .clipboard: ClipboardSettingsView()
             case .snippets: SnippetsSettingsView()
+            case .statusIcons: StatusIconsSettingsView()
             case .emoji: EmojiSettingsView()
             case .extensions: ExtensionsSettingsView()
             case .permissions: PermissionsSettingsView()
