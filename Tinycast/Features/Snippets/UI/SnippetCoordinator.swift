@@ -11,6 +11,8 @@ final class SnippetCoordinator {
     private(set) var editor: SnippetEditorSession?
     /// The snippet the list selects once it shows it, wherever a save or rescan has moved it.
     private(set) var focusPath: String?
+    /// The selected snippet's body, shown by the preview and read by the footer to offer Paste.
+    private(set) var preview: SnippetPreviewText?
     private let store: SnippetStore
     private let settings: AppSettings
     private let appIndex: AppIndex
@@ -87,6 +89,13 @@ final class SnippetCoordinator {
             return nil
         }
         return SnippetDocument(text: text).content
+    }
+
+    /// Owned by the preview's task, so a newer selection cancels a read still in flight.
+    func loadPreview(of snippet: Snippet) async {
+        let text = try? await SnippetScanner.text(at: snippet.path)
+        guard !Task.isCancelled else { return }
+        preview = SnippetPreviewText(snippet: snippet, content: SnippetDocument(text: text ?? "").content)
     }
 
     func noteUse(_ snippet: Snippet) {
@@ -297,4 +306,9 @@ final class SnippetCoordinator {
             title: String(localized: "Couldn’t Save “\(name)”"), message: error.localizedDescription,
             symbol: Self.symbol, tone: .danger)
     }
+}
+
+struct SnippetPreviewText: Equatable {
+    let snippet: Snippet
+    let content: String
 }

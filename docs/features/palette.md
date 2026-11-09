@@ -168,8 +168,9 @@ pops, a root one closes — so `backHelp` says which, rather than promising a st
 a close. It lights to `textPrimary` under the pointer over `Theme.Duration.hover`, and
 `HeaderBackButton` keeps that hover state to itself so the header around it never re-renders.
 
-The launcher advertises the first hop in the header — `Quick AI` beside a ⇥ key cap.
-It is drawn only when Tab really would open Quick AI, a condition read
+The launcher advertises the first hop in the bottom bar — `Quick AI` beside a ⇥ key cap, after
+the primary and secondary actions and before Actions. It is drawn only when Tab really would open
+Quick AI, a condition read
 back out of `PaletteTabAction` rather than restated, so a hint can never promise a destination the
 key does not go to: an argument field to walk takes Tab first, and the hint steps aside for it.
 

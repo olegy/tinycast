@@ -6,7 +6,7 @@ struct WindowSwitchScreen: PaletteScreen {
 
     var rows: [WindowSwitchEntry] { session.filtered }
 
-    var primaryActionTitle: String { String(localized: "Switch to Window") }
+    var primaryActionTitle: String { String(localized: "Activate") }
 
     private func entry(at selection: Int) -> WindowSwitchEntry? {
         rows.indices.contains(selection) ? rows[selection] : nil

@@ -108,6 +108,8 @@ private extension MenuPanelCorner {
     func activate(at selection: Int)
     /// ⌘↵. False when the selection has no secondary action, leaving the key unhandled.
     func secondary(at selection: Int) -> Bool
+    /// Names ⌘↵ in the footer beside the primary action; nil keeps it to the ⌘K menu.
+    func secondaryActionTitle(at selection: Int) -> String?
     /// ⌃⌘↵. False when the selection has no third action, leaving the chord to `secondary`.
     func tertiary(at selection: Int) -> Bool
     /// ⌥↵. False on every screen with nothing to paste, which is most of them.
@@ -147,6 +149,7 @@ extension PaletteScreen {
                 placeholder: String(localized: "Search for actions…"), placement: .bottom),
             onActivate: onActivate, preferredSelection: filtered.bestMatch)
     }
+    func secondaryActionTitle(at selection: Int) -> String? { nil }
     func tertiary(at selection: Int) -> Bool { false }
     func pasteKeepingWindowOpen(at selection: Int) -> Bool { false }
     func perform(_ shortcut: PaletteShortcut, at selection: Int) -> Bool { false }

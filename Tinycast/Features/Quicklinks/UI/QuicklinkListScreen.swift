@@ -15,7 +15,7 @@ struct QuicklinkListScreen: PaletteScreen {
         return store.enabled.filter { $0.name.localizedCaseInsensitiveContains(query) }
     }
 
-    var primaryActionTitle: String { String(localized: "Open Quicklink") }
+    var primaryActionTitle: String { String(localized: "Open") }
 
     /// A prompt for one row opens on that row, so the show's reset can't move it back to the top.
     var landingSelection: Int {

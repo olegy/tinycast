@@ -275,6 +275,7 @@ struct RootPaletteView: View {
                             pillLabel: screen.primaryActionTitle, showActionGroup: showActionGroup,
                             formPrimaryShortcut: screen.hidesSearchField && screen.actsWithoutRows,
                             primaryActionEnabled: screen.isPrimaryActionEnabled(at: sel),
+                            secondaryLabel: showActionGroup ? screen.secondaryActionTitle(at: sel) : nil,
                             showActions: screen.hasActions(at: sel))
                     }
                 }
@@ -753,10 +754,6 @@ struct RootPaletteView: View {
                 // Given room last: at the default priority it would split it with the field.
                 Spacer(minLength: 0).layoutPriority(-1)
             }
-            if tabOpensChat {
-                headerGutter(width: metrics.spacing.md)
-                quickAITabHint
-            }
             if !isCollapsed, vm.mode == .clipboard {
                 headerGutter(width: metrics.spacing.md)
                 ClipboardFilterButton(
@@ -830,20 +827,6 @@ struct RootPaletteView: View {
         guard !isCollapsed else { return nil }
         let screen = screen
         return screen.headerAccessory(at: selection(in: screen), focus: $argumentFocused)
-    }
-
-    /// Nothing else advertises Tab, so the launcher says where it goes.
-    private var quickAITabHint: some View {
-        BarButton(chrome: .rounded, action: cycleMode) {
-            HStack(spacing: metrics.spacing.sm) {
-                Text("Quick AI")
-                    .font(metrics.typography.bar)
-                    .foregroundStyle(Theme.Colors.textSecondary)
-                KeyCapChip(text: "⇥", style: .outline)
-                    .accessibilityHidden(true)
-            }
-        }
-        .help("Press Tab to ask Quick AI")
     }
 
     /// Resolved through `PaletteTabAction`, so the hint cannot promise the wrong destination.
@@ -953,16 +936,23 @@ struct RootPaletteView: View {
 
     private func bottomBar(
         pillLabel: String, showActionGroup: Bool, formPrimaryShortcut: Bool,
-        primaryActionEnabled: Bool, showActions: Bool
+        primaryActionEnabled: Bool, secondaryLabel: String?, showActions: Bool
     ) -> some View {
-        HStack(spacing: 0) {
+        let showsTabHint = tabOpensChat
+        return HStack(spacing: 0) {
             Color.clear.frame(width: 0, height: 0)
                 .modifier(ExtensionToastSlot(extensions: extensions, showing: vm.mode == .extensionCommand))
-            if showActionGroup {
-                actionGroup(
-                    pillLabel: pillLabel, formPrimaryShortcut: formPrimaryShortcut,
-                    primaryActionEnabled: primaryActionEnabled,
-                    showActions: showActions
+            if showActionGroup || showsTabHint {
+                PaletteActionGroup(
+                    primary: showActionGroup
+                        ? PaletteActionGroup.Primary(
+                            label: pillLabel, tint: pillTint, formShortcut: formPrimaryShortcut,
+                            enabled: primaryActionEnabled)
+                        : nil,
+                    secondaryLabel: secondaryLabel, showsTabHint: showsTabHint,
+                    showActions: showActionGroup && showActions,
+                    onPrimary: activateSelection, onSecondary: activateSecondary,
+                    onTabHint: cycleMode, onActions: toggleActions
                 )
                 .fixedSize()
             }
@@ -973,13 +963,10 @@ struct RootPaletteView: View {
         .overlay(alignment: .top) { BarSeparator() }
     }
 
-    private func actionGroup(
-        pillLabel: String, formPrimaryShortcut: Bool, primaryActionEnabled: Bool, showActions: Bool
-    ) -> some View {
-        PaletteActionGroup(
-            pillLabel: pillLabel, pillTint: pillTint, formPrimaryShortcut: formPrimaryShortcut,
-            primaryActionEnabled: primaryActionEnabled, showActions: showActions,
-            onPrimary: activateSelection, onActions: toggleActions)
+    private func activateSecondary() {
+        guard !isCollapsed else { return }
+        let screen = screen
+        _ = screen.secondary(at: selection(in: screen))
     }
 
     /// The one path opening the Actions menu, sampling the state its rows depend on.
@@ -1597,57 +1584,107 @@ private struct HeaderBackButton: View {
     }
 }
 
-/// The footer's two actions, split by a tick that hides while either is hovered.
+/// The footer's actions in priority order, split by ticks that hide beside a hovered button.
 private struct PaletteActionGroup: View {
-    let pillLabel: String
-    let pillTint: Color
-    let formPrimaryShortcut: Bool
-    let primaryActionEnabled: Bool
+    struct Primary {
+        let label: String
+        let tint: Color
+        let formShortcut: Bool
+        let enabled: Bool
+    }
+
+    private enum Slot: Hashable {
+        case primary, secondary, tabHint, actions
+    }
+
+    let primary: Primary?
+    let secondaryLabel: String?
+    let showsTabHint: Bool
     let showActions: Bool
     let onPrimary: () -> Void
+    let onSecondary: () -> Void
+    let onTabHint: () -> Void
     let onActions: () -> Void
-    @State private var primaryHovered = false
-    @State private var actionsHovered = false
+    @State private var hovered: Slot?
     @Environment(\.metrics) private var metrics
     @Environment(\.displayScale) private var displayScale
 
+    private var slots: [Slot] {
+        var slots: [Slot] = []
+        if primary != nil { slots.append(.primary) }
+        if primary != nil, secondaryLabel != nil { slots.append(.secondary) }
+        if showsTabHint { slots.append(.tabHint) }
+        if showActions { slots.append(.actions) }
+        return slots
+    }
+
     var body: some View {
+        let slots = slots
         HStack(spacing: metrics.spacing.xxs) {
-            BarButton(chrome: .rounded, action: onPrimary) {
-                HStack(spacing: metrics.spacing.sm) {
-                    Text(pillLabel)
-                        .font(metrics.typography.bar)
-                        .foregroundStyle(pillTint)
-                    if formPrimaryShortcut {
-                        HStack(spacing: metrics.spacing.xxs) {
-                            KeyCapChip(text: "⌘", style: .outline)
-                            KeyCapChip(text: "↵", style: .outline)
-                        }
-                    } else {
-                        KeyCapChip(text: "↵", style: .outline)
-                    }
+            ForEach(Array(slots.enumerated()), id: \.element) { index, slot in
+                if index > 0 {
+                    Rectangle()
+                        .fill(Theme.Colors.separator)
+                        .frame(width: 1 / displayScale, height: metrics.size.barSeparatorTick)
+                        .opacity(hovered == slot || hovered == slots[index - 1] ? 0 : 1)
                 }
+                button(for: slot)
             }
-            .disabled(!primaryActionEnabled)
-            .onHover { primaryHovered = $0 && primaryActionEnabled }
-            if showActions {
-                Rectangle()
-                    .fill(Theme.Colors.separator)
-                    .frame(width: 1 / displayScale, height: metrics.size.barSeparatorTick)
-                    .opacity(primaryHovered || actionsHovered ? 0 : 1)
-                BarButton(chrome: .rounded, action: onActions) {
-                    HStack(spacing: metrics.spacing.sm) {
-                        Text("Actions")
-                            .font(metrics.typography.bar)
-                            .foregroundStyle(Theme.Colors.textSecondary)
-                        HStack(spacing: metrics.spacing.xxs) {
-                            KeyCapChip(text: "⌘", style: .outline)
-                            KeyCapChip(text: "K", style: .outline)
-                        }
-                    }
+        }
+    }
+
+    @ViewBuilder
+    private func button(for slot: Slot) -> some View {
+        switch slot {
+        case .primary:
+            if let primary {
+                BarButton(chrome: .rounded, action: onPrimary) {
+                    label(
+                        primary.label, tint: primary.tint, keys: primary.formShortcut ? ["⌘", "↵"] : ["↵"])
                 }
-                .onHover { actionsHovered = $0 }
+                .disabled(!primary.enabled)
+                .onHover { track(.primary, $0 && primary.enabled) }
             }
+        case .secondary:
+            BarButton(chrome: .rounded, action: onSecondary) {
+                label(secondaryLabel ?? "", tint: Theme.Colors.textSecondary, keys: ["⌘", "↵"])
+            }
+            .onHover { track(.secondary, $0) }
+        case .tabHint:
+            BarButton(chrome: .rounded, action: onTabHint) {
+                label(
+                    String(localized: "Quick AI"), tint: Theme.Colors.textSecondary, keys: ["⇥"],
+                    hidesKeys: true)
+            }
+            .help("Press Tab to ask Quick AI")
+            .onHover { track(.tabHint, $0) }
+        case .actions:
+            BarButton(chrome: .rounded, action: onActions) {
+                label(String(localized: "Actions"), tint: Theme.Colors.textSecondary, keys: ["⌘", "K"])
+            }
+            .onHover { track(.actions, $0) }
+        }
+    }
+
+    private func label(
+        _ text: String, tint: Color, keys: [String], hidesKeys: Bool = false
+    ) -> some View {
+        HStack(spacing: metrics.spacing.sm) {
+            Text(text)
+                .font(metrics.typography.bar)
+                .foregroundStyle(tint)
+            HStack(spacing: metrics.spacing.xxs) {
+                ForEach(keys, id: \.self) { KeyCapChip(text: $0, style: .outline) }
+            }
+            .accessibilityHidden(hidesKeys)
+        }
+    }
+
+    private func track(_ slot: Slot, _ isHovered: Bool) {
+        if isHovered {
+            hovered = slot
+        } else if hovered == slot {
+            hovered = nil
         }
     }
 }

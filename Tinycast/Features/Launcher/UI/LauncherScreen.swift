@@ -141,12 +141,11 @@ struct LauncherScreen: PaletteScreen {
     var primaryActionTitle: String {
         switch row(at: clampedSelection) {
         case .calc: return String(localized: "Copy Answer")
-        case .color: return String(localized: "Copy Color")
-        case .entry(let app): return app.kind.descriptor.openVerb.resolved()
-        case .file(let result):
-            return result.isDirectory ? String(localized: "Open Folder") : String(localized: "Open File")
+        case .color: return String(localized: "Copy")
+        case .entry(let app): return app.kind.descriptor.barVerb.resolved()
+        case .file: return String(localized: "Open")
         case .fallback(let fallback, _): return fallback.openVerb
-        case nil: return String(localized: "Open Application")
+        case nil: return String(localized: "Open")
         }
     }
 

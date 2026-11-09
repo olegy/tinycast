@@ -8,7 +8,7 @@ struct SnippetEditorScreen: PaletteScreen {
     var rows: [Snippet] { [] }
     var primaryActionTitle: String {
         coordinator.editor?.isCreating == false
-            ? String(localized: "Save Snippet") : String(localized: "Create Snippet")
+            ? String(localized: "Save") : String(localized: "Create")
     }
     let hidesSearchField = true
     let actsWithoutRows = true

@@ -28,6 +28,8 @@ scan, no watcher, no Search Snippets or Create Snippet command.
   must match, case aside. Never fuzzy, never the body: Snippet Surfer dropped Raycast's fuzzy match
   because it found `chat` in unrelated names.
 - **↵ copies, ⌘↵ pastes only a single line.** `SnippetClipboardText` decides both; see below.
+  The bottom bar shows `Paste ⌘↵` beside `Copy ↵` once the preview has loaded a pasteable body;
+  the coordinator owns that loaded body, so the preview and the bar read the same one.
 - **`Model/` is Foundation-only**, compiled by `snippets-test` with the scanner and the writer.
 
 ## Files and folders

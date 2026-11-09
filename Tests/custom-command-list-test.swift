@@ -23,7 +23,7 @@ struct CustomCommandListTests {
 
         let empty = screen()
         expect(empty.rows.isEmpty, "an empty library has no rows")
-        expect(empty.primaryActionTitle == "Create Custom Command", "empty libraries offer creation")
+        expect(empty.primaryActionTitle == "Create", "empty libraries offer creation")
         _ = empty.body(selection: 0, scroll: ScrollIntent())
         expect(EmptyResults.lastText == "No custom commands yet", "an empty library has its own message")
 

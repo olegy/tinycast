@@ -10,7 +10,7 @@ struct SnippetsScreen: PaletteScreen {
 
     var rows: [Snippet] { SnippetSearch.filter(store.snippets, query: vm.query) }
 
-    var primaryActionTitle: String { String(localized: "Copy to Clipboard") }
+    var primaryActionTitle: String { String(localized: "Copy") }
 
     private func snippet(at selection: Int) -> Snippet? {
         let rows = rows
@@ -33,6 +33,14 @@ struct SnippetsScreen: PaletteScreen {
         guard let snippet = snippet(at: selection) else { return false }
         coordinator.paste(snippet)
         return true
+    }
+
+    /// Read off the loaded preview: until it arrives the footer shows Copy alone, never a guess.
+    func secondaryActionTitle(at selection: Int) -> String? {
+        guard let snippet = snippet(at: selection), let preview = coordinator.preview,
+            preview.snippet == snippet, SnippetClipboardText.paste(preview.content) != nil
+        else { return nil }
+        return String(localized: "Paste")
     }
 
     func perform(_ shortcut: PaletteShortcut, at selection: Int) -> Bool {
@@ -105,7 +113,9 @@ struct SnippetsScreen: PaletteScreen {
                 )
                 .frame(width: metrics.size.clipboardListWidth)
                 Rectangle().fill(Theme.Colors.separator).frame(width: Theme.Size.hairline)
-                SnippetPreview(snippet: selected, onClick: { if let selected { coordinator.noteUse(selected) } })
+                SnippetPreview(
+                    snippet: selected, coordinator: coordinator,
+                    onClick: { if let selected { coordinator.noteUse(selected) } })
             }
         }
     }

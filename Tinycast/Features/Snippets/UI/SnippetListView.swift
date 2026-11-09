@@ -134,13 +134,8 @@ struct SnippetEmptyState: View {
 struct SnippetPreview: View {
     @Environment(\.metrics) private var metrics
     let snippet: Snippet?
+    let coordinator: SnippetCoordinator
     let onClick: () -> Void
-    @State private var loaded: Loaded?
-
-    private struct Loaded: Equatable {
-        let snippet: Snippet
-        let content: String
-    }
 
     var body: some View {
         if let snippet {
@@ -152,8 +147,8 @@ struct SnippetPreview: View {
                     let tags = snippet.folders.map { "/" + $0.lowercased() } + snippet.keywordTags.map { "#" + $0 }
                     if !tags.isEmpty { tagLine(tags) }
                     Rectangle().fill(Theme.Colors.separator).frame(height: Theme.Size.hairline)
-                    if let loaded, loaded.snippet == snippet {
-                        ChatMarkdownText(blocks: MarkdownBlock.parse(loaded.content))
+                    if let preview = coordinator.preview, preview.snippet == snippet {
+                        ChatMarkdownText(blocks: MarkdownBlock.parse(preview.content))
                     }
                 }
                 .padding(.horizontal, metrics.spacing.xl)
@@ -161,11 +156,7 @@ struct SnippetPreview: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
             }
             .background(ClickWatcher(onClick: onClick))
-            .task(id: snippet) {
-                let text = try? await SnippetScanner.text(at: snippet.path)
-                guard !Task.isCancelled else { return }
-                loaded = Loaded(snippet: snippet, content: SnippetDocument(text: text ?? "").content)
-            }
+            .task(id: snippet) { await coordinator.loadPreview(of: snippet) }
         } else {
             Color.clear
         }

@@ -15,7 +15,7 @@ struct UninstallScreen: PaletteScreen {
         }
     }
 
-    var primaryActionTitle: String { String(localized: "Uninstall Application") }
+    var primaryActionTitle: String { String(localized: "Uninstall") }
 
     /// Stands in for the section headers the other lists use.
     private var summary: String {

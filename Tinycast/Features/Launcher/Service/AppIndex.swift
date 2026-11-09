@@ -17,49 +17,49 @@ struct AppEntry: Identifiable, Hashable, Sendable {
             case .application:
                 return KindDescriptor(
                     label: "Application", sectionTitle: "Applications",
-                    openVerb: "Open Application", canHideFromSearch: true,
+                    openVerb: "Open Application", barVerb: "Open", canHideFromSearch: true,
                     canRevealInFinder: true, canDragOut: true, isSymbolIcon: false, rankPriority: 4)
             case .systemSettings:
                 return KindDescriptor(
                     label: "System Setting", sectionTitle: "System Settings",
-                    openVerb: "Open System Setting", canHideFromSearch: true,
+                    openVerb: "Open System Setting", barVerb: "Open", canHideFromSearch: true,
                     canRevealInFinder: true, canDragOut: false, isSymbolIcon: false, rankPriority: 1)
             case .command:
                 return KindDescriptor(
                     label: "Command", sectionTitle: "Commands",
-                    openVerb: "Run Command", canHideFromSearch: true,
+                    openVerb: "Run Command", barVerb: "Run", canHideFromSearch: true,
                     canRevealInFinder: false, canDragOut: false, isSymbolIcon: true, rankPriority: 3)
             case .quickAction:
                 return KindDescriptor(
                     label: "Quick Action", sectionTitle: "Quick Actions",
-                    openVerb: "Run Quick Action", canHideFromSearch: true,
+                    openVerb: "Run Quick Action", barVerb: "Run", canHideFromSearch: true,
                     canRevealInFinder: false, canDragOut: false, isSymbolIcon: true, rankPriority: 3)
             case .customCommand:
                 return KindDescriptor(
                     label: "Custom Command", sectionTitle: "Custom Commands",
-                    openVerb: "Run Custom Command", canHideFromSearch: false,
+                    openVerb: "Run Custom Command", barVerb: "Run", canHideFromSearch: false,
                     canRevealInFinder: false, canDragOut: false, isSymbolIcon: true, rankPriority: 3)
             case .systemAction:
                 return KindDescriptor(
                     label: "System Action", sectionTitle: "System Actions",
-                    openVerb: "Run System Action", canHideFromSearch: true,
+                    openVerb: "Run System Action", barVerb: "Run", canHideFromSearch: true,
                     canRevealInFinder: false, canDragOut: false, isSymbolIcon: true, rankPriority: 3)
             case .quicklink:
                 return KindDescriptor(
                     label: "Quicklink", sectionTitle: "Quicklinks",
-                    openVerb: "Open Quicklink", canHideFromSearch: false,
+                    openVerb: "Open Quicklink", barVerb: "Open", canHideFromSearch: false,
                     canRevealInFinder: false, canDragOut: false, isSymbolIcon: true, rankPriority: 2)
             case .appleShortcut:
                 // File-backed so every row draws the Shortcuts app's own icon.
                 return KindDescriptor(
                     label: "Apple Shortcut", sectionTitle: "Apple Shortcuts",
-                    openVerb: "Run Shortcut", canHideFromSearch: true,
+                    openVerb: "Run Shortcut", barVerb: "Run", canHideFromSearch: true,
                     canRevealInFinder: false, canDragOut: false, isSymbolIcon: false, rankPriority: 3)
             case .extensionCommand:
                 // The label is per-entry, the owning extension's title; this is the fallback.
                 return KindDescriptor(
                     label: "Extension", sectionTitle: "Extensions",
-                    openVerb: "Run Command", canHideFromSearch: true,
+                    openVerb: "Run Command", barVerb: "Run", canHideFromSearch: true,
                     canRevealInFinder: false, canDragOut: false, isSymbolIcon: true, rankPriority: 3)
             }
         }
@@ -70,6 +70,8 @@ struct AppEntry: Identifiable, Hashable, Sendable {
         let label: LocalizedStringResource
         let sectionTitle: LocalizedStringResource
         let openVerb: LocalizedStringResource
+        /// The footer's word for `openVerb`: the selected row already names the object.
+        let barVerb: LocalizedStringResource
         /// Only where Settings lists a per-item checkbox to put it back: a hide is never one-way.
         let canHideFromSearch: Bool
         let canRevealInFinder: Bool

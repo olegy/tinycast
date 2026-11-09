@@ -22,9 +22,7 @@ struct FileSearchScreen: PaletteScreen {
     var actsWithoutRows: Bool { needsAccess }
 
     var primaryActionTitle: String {
-        if needsAccess { return String(localized: "Open Privacy Settings") }
-        guard let result = result(at: vm.selection) else { return String(localized: "Open File") }
-        return result.isDirectory ? String(localized: "Open Folder") : String(localized: "Open File")
+        needsAccess ? String(localized: "Open Settings") : String(localized: "Open")
     }
 
     private func result(at selection: Int) -> FileSearchResult? {
