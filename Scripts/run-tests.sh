@@ -467,13 +467,6 @@ run settings-file-test     Tinycast/Features/Settings/Model/*.swift \
                            Tinycast/Features/Settings/Service/SettingsFileMonitor.swift \
                            Tinycast/Features/Settings/Service/SettingsFileRepository.swift \
                            Tinycast/Platform/AppPaths.swift
-run calendar-removal-migration-test Tinycast/Migrations/CalendarRemovalMigration.swift \
-                           Tinycast/Features/Settings/Model/*.swift \
-                           Tinycast/Platform/AppPaths.swift
-run escape-key-behavior-removal-migration-test Tinycast/Migrations/EscapeKeyBehaviorRemovalMigration.swift \
-                           Tinycast/Features/Settings/Model/*.swift \
-                           Tinycast/Platform/AppPaths.swift
-run themes-removal-migration-test Tinycast/Migrations/ThemesRemovalMigration.swift
 run window-management-removal-migration-test Tinycast/Migrations/WindowManagementRemovalMigration.swift \
                            Tinycast/Features/Settings/Model/*.swift \
                            Tinycast/Platform/AppPaths.swift

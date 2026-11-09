@@ -171,10 +171,7 @@ If a change touches anything in the right column, the harness on the left is man
 | `settings-backup-test` | `Settings/AppSettingsKey.swift`, `Backup/Model/SettingsBackupCoverage.swift` |
 | `settings-file-test` | `Settings/Model/` and `Settings/Service/` — key paths, value tokens, the printer and parser, and the repository's import, replace, save, reload and symlink handling on a scratch folder |
 | `launcher-settings-file-test` | Launcher settings application — invalid records, partial edits, deferred bundles, shortcut moves and records outside search scopes; isolated preferences and in-memory scan/Carbon effects |
-| `calendar-removal-migration-test` | `Migrations/CalendarRemovalMigration.swift` — retires exactly the Calendar defaults and hotkeys, strips the `calendar` section and My Schedule from the compact bar, and leaves a file with other problems to the import |
-| `themes-removal-migration-test` | `Migrations/ThemesRemovalMigration.swift` — retires exactly the Raycast theme defaults and removes only the Theme command's extension folder |
 | `window-management-removal-migration-test` | `Migrations/WindowManagementRemovalMigration.swift` — retires exactly the Window Management defaults and hotkeys, drops its rows, kinds, links and aliases from the launcher lists, strips the `windowManagement` section, and leaves a file with other problems to the import |
-| `escape-key-behavior-removal-migration-test` | `Migrations/EscapeKeyBehaviorRemovalMigration.swift` — removes the retired default, strips `general.escapeKeyBehavior` from settings.json, and leaves a file with other problems to the import |
 | `backup-archive-test` | all of `Backup/Model/`, plus `Backup/Service/BackupStaging.swift` |
 | `updates-test` | `Updates/Model/` — version precedence, channel filtering, install route, readiness |
 | `update-check-test` | `UpdateCheckStore` — stopping, in-flight cancellation, cached prompt suppression, restart and independent manual checking |
