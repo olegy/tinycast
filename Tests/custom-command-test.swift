@@ -515,6 +515,80 @@ struct CustomCommandTests {
             "stopping kills the whole command tree, not just the shell",
             survivors.log.trimmingCharacters(in: .whitespacesAndNewlines) == "0")
 
+        // MARK: Option lists
+
+        let dns = CommandOptionList.parse(
+            """
+            Choose DNS resolver
+            🔒 DNS: dnscrypt-proxy
+            ---
+            Use dnscrypt-proxy | arg=on icon=lock.shield disabled=true
+            Use provider DNS | arg=off icon=network default=true refresh=true
+
+            """)
+        check("the first header line is the prompt", dns.prompt == "Choose DNS resolver")
+        check("the second header line is the status", dns.status == "🔒 DNS: dnscrypt-proxy")
+        check("options follow the separator", dns.options.map(\.title) == ["Use dnscrypt-proxy", "Use provider DNS"])
+        check(
+            "parameters fill an option",
+            dns.options[0].argument == "on" && dns.options[0].icon == "lock.shield"
+                && dns.options[0].isDisabled && !dns.options[0].refreshes)
+        check("the enabled default lands", dns.landingIndex == 1 && dns.options[1].refreshes)
+
+        let promptOnly = CommandOptionList.parse("Select volume to mount\n---\nDUMP\nTEMP | subtitle=\"smb · 4NAS\"")
+        check("a prompt alone sets no status", promptOnly.prompt == "Select volume to mount" && promptOnly.status == nil)
+        check("an option without arg passes its title", promptOnly.options[0].argument == "DUMP")
+        check("a quoted value keeps its spaces", promptOnly.options[1].subtitle == "smb · 4NAS")
+
+        let statusOnly = CommandOptionList.parse("\n3 volumes\n---\nA")
+        check("a blank first line leaves the prompt default", statusOnly.prompt == nil && statusOnly.status == "3 volumes")
+
+        let bare = CommandOptionList.parse("Macintosh HD\n\nBackup Disk\n")
+        check(
+            "without a separator every line is an option",
+            bare.prompt == nil && bare.options.map(\.argument) == ["Macintosh HD", "Backup Disk"])
+        check("ids stay unique past blank lines", Set(bare.options.map(\.id)).count == 2)
+
+        let allDisabled = CommandOptionList.parse("---\nA | disabled=true default=true\nB")
+        check("a disabled default is skipped", allDisabled.landingIndex == 1)
+        let odd = CommandOptionList.parse("---\nX | arg= junk 'single quoted'=1 subtitle='a b' refresh=TRUE")
+        check(
+            "unreadable parameters are dropped, not the option",
+            odd.options.first?.argument == "X" && odd.options.first?.subtitle == "a b"
+                && odd.options.first?.refreshes == true)
+        check("an empty list parses", CommandOptionList.parse("").options.isEmpty)
+
+        let listed = await ShellCommandRunner.listOptions(
+            "printf '\\nstatus\\n---\\nA\\n'; printf %s \"$TINYCAST_PHASE\" >&2",
+            environment: ["TINYCAST_PHASE": "list"], timeout: .seconds(10))
+        check(
+            "a list-run keeps stdout whole, blank first line included",
+            listed.standardOutput == "\nstatus\n---\nA\n" && listed.standardError == "list")
+        let started = ContinuousClock().now
+        let slow = await ShellCommandRunner.listOptions("sleep 5", timeout: .milliseconds(300))
+        check(
+            "a list-run is killed at its deadline",
+            slow.termination == .timedOut && ContinuousClock().now - started < .seconds(3))
+        let cancelled = Task { await ShellCommandRunner.listOptions("sleep 5", timeout: .seconds(10)) }
+        try? await Task.sleep(for: .milliseconds(200))
+        let cancelStart = ContinuousClock().now
+        cancelled.cancel()
+        let cancelledResult = await cancelled.value
+        check(
+            "cancelling a list-run stops it",
+            cancelledResult.termination == .stopped
+                && ContinuousClock().now - cancelStart < .seconds(3))
+        let optionCommand = CustomCommand(
+            name: "Options", command: "true", arguments: [CustomCommandArgument(name: "x")],
+            listsOptions: true)
+        check(
+            "a command listing options keeps no typed arguments",
+            CustomCommandArgument.sanitized(optionCommand).isEmpty)
+        let decodedOld = try? JSONDecoder().decode(
+            CustomCommand.self,
+            from: Data(#"{"id":"\#(UUID().uuidString)","name":"n","command":"c"}"#.utf8))
+        check("a stored command without the flag lists no options", decodedOld?.listsOptions == false)
+
         // MARK: Working directory
 
         let home = FileManager.default.homeDirectoryForCurrentUser.path

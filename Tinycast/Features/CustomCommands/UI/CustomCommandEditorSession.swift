@@ -6,7 +6,7 @@ final class CustomCommandEditorSession {
     enum Field: Hashable {
         case name, icon, command, workingDirectory, chooseDirectory, addArgument
         case argumentName(UUID), argumentOptional(UUID), removeArgument(UUID)
-        case rootSearch, shellEnvironment, confirmation, successConfirmation, output
+        case listsOptions, rootSearch, shellEnvironment, confirmation, successConfirmation, output
     }
 
     struct ArgumentDraft: Identifiable {
@@ -27,6 +27,7 @@ final class CustomCommandEditorSession {
     var requiresConfirmation: Bool
     var showsConfirmation: Bool
     var showsOutput: Bool
+    var listsOptions: Bool
     var selection: TextSelection?
     var focusedField: Field = .name
     var errorMessage: String?
@@ -46,6 +47,7 @@ final class CustomCommandEditorSession {
         requiresConfirmation = command?.requiresConfirmation ?? false
         showsConfirmation = command?.showsConfirmation ?? false
         showsOutput = command?.showsOutput ?? false
+        listsOptions = command?.listsOptions ?? false
     }
 
     var canSave: Bool {
@@ -60,14 +62,21 @@ final class CustomCommandEditorSession {
             loadsShellEnvironment: loadsShellEnvironment, requiresConfirmation: requiresConfirmation,
             showsConfirmation: showsConfirmation,
             arguments: arguments.map { CustomCommandArgument(name: $0.name, isOptional: $0.isOptional) },
-            showsOutput: showsOutput, workingDirectory: workingDirectory, iconSymbol: iconSymbol)
+            showsOutput: showsOutput, workingDirectory: workingDirectory, iconSymbol: iconSymbol,
+            listsOptions: listsOptions)
     }
 
     var focusOrder: [Field] {
-        [.name, .icon, .command, .workingDirectory, .chooseDirectory]
-            + arguments.flatMap { [.argumentName($0.id), .argumentOptional($0.id), .removeArgument($0.id)] }
-            + (arguments.count < CustomCommandArgument.limit ? [.addArgument] : [])
+        [.name, .icon, .command, .workingDirectory, .chooseDirectory, .listsOptions]
+            + argumentFields
             + [.rootSearch, .shellEnvironment, .confirmation, .successConfirmation, .output]
+    }
+
+    /// Options fill `$1`, so their switch hides the typed arguments rather than mixing the two.
+    private var argumentFields: [Field] {
+        guard !listsOptions else { return [] }
+        return arguments.flatMap { [.argumentName($0.id), .argumentOptional($0.id), .removeArgument($0.id)] }
+            + (arguments.count < CustomCommandArgument.limit ? [.addArgument] : [])
     }
 
     func advanceFocus(backwards: Bool) {

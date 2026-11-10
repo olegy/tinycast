@@ -426,6 +426,7 @@ run deeplink-test          Tinycast/Features/DeepLinks/Model/DeepLink.swift \
                            Tinycast/Features/AppleShortcuts/Model/AppleShortcut.swift \
                            Tinycast/Platform/LocalizedResource.swift
 run custom-command-test    Tinycast/Platform/PseudoTerminal.swift \
+                           Tinycast/Features/CustomCommands/Model/CommandOptionList.swift \
                            Tinycast/Platform/ProcessExit.swift \
                            Tinycast/Features/CustomCommands/Model/CustomCommand.swift \
                            Tinycast/Features/CustomCommands/Model/RaycastScriptImport.swift \

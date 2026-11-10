@@ -7,6 +7,8 @@ enum ShellCommandTermination: Sendable, Equatable {
     case launchFailed(String)
     /// Apart from the status, which a signalled shell reports as 143 or 15.
     case stopped
+    /// Killed at a list-run's deadline; the run that acts never has one.
+    case timedOut
 
     /// A signal death reports the signal as its status, so it fails here like any non-zero exit.
     var succeeded: Bool { self == .exited(status: 0) }
@@ -54,6 +56,8 @@ enum ShellCommandRunner {
     private static let standardErrorLimit = 8 * 1024
     /// Only the last line is ever shown, so this is a generous bound on one of them.
     private static let standardOutputLimit = 4 * 1024
+    /// A list of options is read whole, so its bound is the list's, not one line's.
+    private static let optionListLimit = 256 * 1024
     private static let shell = "/bin/zsh"
     /// Big enough that a chatty command needs few reads, small enough to stay live.
     private static let readSize = 16 * 1024
@@ -70,7 +74,7 @@ enum ShellCommandRunner {
     /// Fire-and-forget, keeping only the error tail; shown output goes through `stream`.
     nonisolated static func run(
         _ command: String, arguments: [String] = [], loadingShellEnvironment: Bool = false,
-        workingDirectory: String? = nil
+        workingDirectory: String? = nil, environment: [String: String] = [:]
     ) async -> ShellCommandResult {
         await withCheckedContinuation { continuation in
             queue.async {
@@ -78,14 +82,45 @@ enum ShellCommandRunner {
                     returning: execute(
                         command, arguments: arguments,
                         loadingShellEnvironment: loadingShellEnvironment,
-                        workingDirectory: workingDirectory))
+                        workingDirectory: workingDirectory, environment: environment,
+                        capture: .tail(standardOutputLimit), control: nil))
             }
         }
     }
 
+    /// A list-run: all of stdout, killed at `timeout` or when the calling task is cancelled.
+    nonisolated static func listOptions(
+        _ command: String, loadingShellEnvironment: Bool = false, workingDirectory: String? = nil,
+        environment: [String: String] = [:], timeout: Duration
+    ) async -> ShellCommandResult {
+        let control = RunControl()
+        return await withTaskCancellationHandler {
+            await withCheckedContinuation { continuation in
+                queue.async {
+                    continuation.resume(
+                        returning: execute(
+                            command, arguments: [], loadingShellEnvironment: loadingShellEnvironment,
+                            workingDirectory: workingDirectory, environment: environment,
+                            capture: .head(optionListLimit), control: control))
+                }
+                queue.asyncAfter(deadline: .now() + timeout.dispatchInterval) {
+                    control.end(.timedOut)
+                }
+            }
+        } onCancel: {
+            control.end(.stopped)
+        }
+    }
+
+    private enum Capture {
+        case tail(Int)
+        case head(Int)
+    }
+
     nonisolated private static func execute(
         _ command: String, arguments: [String], loadingShellEnvironment: Bool,
-        workingDirectory: String?
+        workingDirectory: String?, environment: [String: String], capture: Capture,
+        control: RunControl?
     ) -> ShellCommandResult {
         let launch: Launch
         do {
@@ -102,9 +137,8 @@ enum ShellCommandRunner {
         process.arguments = launch.arguments
         process.currentDirectoryURL = URL(fileURLWithPath: launch.directory)
         // Lets a shell config skip slow sections when Tinycast is the caller.
-        process.environment = ProcessInfo.processInfo.environment.merging(["TINYCAST": "1"]) { _, new in
-            new
-        }
+        process.environment = ProcessInfo.processInfo.environment
+            .merging(environment.merging(["TINYCAST": "1"]) { _, new in new }) { _, new in new }
         // Load-bearing: a config that prompts reads EOF and moves on, never hanging.
         process.standardInput = FileHandle.nullDevice
 
@@ -118,15 +152,64 @@ enum ShellCommandRunner {
         }
 
         do {
-            try process.runObservingExit().wait()
+            let exit = try process.runObservingExit()
+            control?.attach(process.processIdentifier)
+            exit.wait()
+            control?.detach()
         } catch {
             return ShellCommandResult(termination: .launchFailed(error.localizedDescription))
         }
 
+        let standardOutput: String?
+        switch capture {
+        case .tail(let limit): standardOutput = output?.readSuffix(limit: limit)
+        case .head(let limit): standardOutput = output?.readPrefix(limit: limit)
+        }
         return ShellCommandResult(
-            termination: .exited(status: process.terminationStatus),
-            standardOutput: output?.readSuffix(limit: standardOutputLimit),
+            termination: control?.ending ?? .exited(status: process.terminationStatus),
+            standardOutput: standardOutput,
             standardError: errors?.readSuffix(limit: standardErrorLimit))
+    }
+
+    /// Shared by the waiting queue, a deadline and a cancelled task, so it carries its own lock.
+    private final class RunControl: @unchecked Sendable {
+        private let lock = NSLock()
+        /// Cleared once the wait returns, so a late signal never reaches a reused pid.
+        private var pid: pid_t?
+        private var reason: ShellCommandTermination?
+
+        var ending: ShellCommandTermination? { lock.withLock { reason } }
+
+        /// A cancellation that came first still ends the process the moment it exists.
+        func attach(_ pid: pid_t) {
+            let ended = lock.withLock {
+                self.pid = pid
+                return reason != nil
+            }
+            if ended { signal(SIGTERM) }
+        }
+
+        func detach() {
+            lock.withLock { pid = nil }
+        }
+
+        /// The first reason wins: a deadline after a cancellation is not a timeout.
+        func end(_ reason: ShellCommandTermination) {
+            let first = lock.withLock {
+                guard self.reason == nil else { return false }
+                self.reason = reason
+                return true
+            }
+            guard first else { return }
+            signal(SIGTERM)
+            queue.asyncAfter(deadline: .now() + stopGrace) { [self] in signal(SIGKILL) }
+        }
+
+        private func signal(_ signal: Int32) {
+            lock.withLock {
+                if let pid { kill(pid, signal) }
+            }
+        }
     }
 
     // MARK: - Streaming
@@ -134,7 +217,7 @@ enum ShellCommandRunner {
     /// Runs under a pseudo-terminal; see `PseudoTerminal` for why a pipe cannot do this.
     nonisolated static func stream(
         _ command: String, arguments: [String] = [], loadingShellEnvironment: Bool = false,
-        workingDirectory: String? = nil
+        workingDirectory: String? = nil, environment extra: [String: String] = [:]
     ) -> ShellCommandSession {
         let launch: Launch
         do {
@@ -145,7 +228,7 @@ enum ShellCommandRunner {
             return failedSession(error.reason)
         }
 
-        var environment = ProcessInfo.processInfo.environment
+        var environment = ProcessInfo.processInfo.environment.merging(extra) { _, new in new }
         environment["TINYCAST"] = "1"
         // A terminal makes tools colour output, so ask for colour the window can draw.
         environment["TERM"] = "xterm-256color"
@@ -391,6 +474,14 @@ enum ShellCommandRunner {
                 .nilIfEmpty
         }
 
+        /// Untrimmed: a list's blank first line is a meaningful empty prompt.
+        func readPrefix(limit: Int) -> String? {
+            try? handle.synchronize()
+            try? handle.seek(toOffset: 0)
+            guard let data = try? handle.read(upToCount: limit), !data.isEmpty else { return nil }
+            return String(bytes: data, encoding: .utf8) ?? String(bytes: data, encoding: .isoLatin1)
+        }
+
         func remove() {
             try? handle.close()
             try? FileManager.default.removeItem(at: url)
@@ -415,4 +506,10 @@ enum ShellCommandRunner {
 
 extension String {
     fileprivate var nilIfEmpty: String? { isEmpty ? nil : self }
+}
+
+extension Duration {
+    fileprivate var dispatchInterval: DispatchTimeInterval {
+        .milliseconds(Int(self / .milliseconds(1)))
+    }
 }

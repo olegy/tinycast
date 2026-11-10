@@ -8,6 +8,7 @@ offers.
 ### New
 
 - **Status Icons.** Small emoji at the right of the launcher's search field show a state that changes on its own, so its menu-bar item can go. The first one is DNS: 🔒 while every DNS server is local (for example dnscrypt-proxy on 127.0.0.1), 🌐 while one is your provider's, 🤷 when there is none; hover shows the addresses, and a click can run one of your Custom Commands. Turn it on in Settings → Status Icons.
+- **Custom Commands can offer options.** Turn on **Lists options** and the command, run without `$1`, prints its choices; the palette lists them on its own screen, and the one you pick runs the command again with it as `$1`. The first line above `---` becomes the search field's prompt, an optional second line shows at the left of the bottom bar, and each option can be dimmed, preselected, given a subtitle and an icon, or keep the palette open and refresh the list after it runs. One `eject` or `vmount` script now replaces a command per volume.
 
 ### Changes
 

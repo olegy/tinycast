@@ -15,9 +15,14 @@ final class PaletteState {
             restoredSelection = nil
             // mod: quick-action-screen — leaving the screen, by any path, ends its session.
             if oldValue == .quickAction, mode != .quickAction { onQuickActionScreenLeft?() }
+            if oldValue == .customCommandOptions, mode != .customCommandOptions {
+                onCommandOptionsScreenLeft?(false)
+            }
         }
     }
     @ObservationIgnored var onQuickActionScreenLeft: (() -> Void)?  // mod: quick-action-screen
+    /// Left by navigating, or hidden: either way a list-run nobody can see is stopped.
+    @ObservationIgnored var onCommandOptionsScreenLeft: ((_ hidden: Bool) -> Void)?
     /// The screens below `mode`, innermost last: a summon starts a new one, navigating pushes on.
     private(set) var backStack: [PaletteFrame] = []
     var query: String = "" { didSet { restoredSelection = nil } }
@@ -87,6 +92,7 @@ final class PaletteState {
 
     func noteVisible(_ visible: Bool) {
         isVisible = visible
+        if !visible, mode == .customCommandOptions { onCommandOptionsScreenLeft?(true) }
     }
 
     var canGoBack: Bool { !backStack.isEmpty }

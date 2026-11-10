@@ -250,10 +250,14 @@ final class AppCore {
             paletteCoordinator.onLauncherShown = { [weak self] in
                 self?.appleShortcutCoordinator.refresh()
             }
+            palette.onCommandOptionsScreenLeft = { [weak self] hidden in
+                self?.customCommandCoordinator.optionsScreenLeft(hidden: hidden)
+            }
             paletteCoordinator.onScreenOpening = { [weak self] mode in
                 switch mode {
                 case .menuSearch: self?.menuSearchCoordinator.load()
                 case .switchWindows: self?.windowSwitchCoordinator.load()
+                case .customCommandOptions: self?.customCommandCoordinator.reloadOptions()
                 default: break
                 }
             }

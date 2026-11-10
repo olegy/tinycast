@@ -38,10 +38,21 @@ struct CustomCommandEditorView: View {
                     .id(CustomCommandEditorSession.Field.command)
                     FormRow("Run In", alignment: .top) { workingDirectoryField }
                         .id(CustomCommandEditorSession.Field.workingDirectory)
-                    FormRow(
-                        "Arguments", alignment: .top,
-                        labelInset: editor.arguments.isEmpty ? 0 : metrics.spacing.lg
-                    ) { argumentsSection }
+                    FormRow("Options", alignment: .top) {
+                        option(
+                            String(localized: "Lists options"),
+                            detail: String(
+                                localized: """
+                                    Run without $1 it prints choices to pick from; the chosen one runs it as $1.
+                                    """),
+                            value: $editor.listsOptions, focus: .listsOptions)
+                    }
+                    if !editor.listsOptions {
+                        FormRow(
+                            "Arguments", alignment: .top,
+                            labelInset: editor.arguments.isEmpty ? 0 : metrics.spacing.lg
+                        ) { argumentsSection }
+                    }
                     FormRow {
                         VStack(alignment: .leading, spacing: metrics.spacing.lg) {
                             option(

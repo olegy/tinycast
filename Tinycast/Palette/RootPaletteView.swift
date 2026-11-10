@@ -93,6 +93,10 @@ struct RootPaletteView: View {
             return CustomCommandListScreen(
                 store: core.customCommands, coordinator: core.customCommandCoordinator,
                 vm: vm, metrics: metrics, openActions: openActions)
+        case .customCommandOptions:
+            return CommandOptionsScreen(
+                session: core.customCommandCoordinator.options,
+                coordinator: core.customCommandCoordinator, vm: vm)
         case .clipboard:
             return ClipboardScreen(
                 store: store, core: core, vm: vm, openActions: openActions,
@@ -894,6 +898,9 @@ struct RootPaletteView: View {
         if vm.mode == .extensionCommand, let placeholder = extensionScreen.searchPlaceholder {
             return placeholder
         }
+        if vm.mode == .customCommandOptions, let prompt = core.customCommandCoordinator.options?.prompt {
+            return prompt
+        }
         return vm.mode.placeholder
     }
 
@@ -951,7 +958,7 @@ struct RootPaletteView: View {
     ) -> some View {
         let showsTabHint = tabOpensChat
         return HStack(spacing: 0) {
-            Color.clear.frame(width: 0, height: 0)
+            bottomStatus
                 .modifier(ExtensionToastSlot(extensions: extensions, showing: vm.mode == .extensionCommand))
             if showActionGroup || showsTabHint {
                 PaletteActionGroup(
@@ -972,6 +979,25 @@ struct RootPaletteView: View {
         .frame(height: metrics.size.bottomBarHeight)
         .frame(maxWidth: .infinity)
         .overlay(alignment: .top) { BarSeparator() }
+    }
+
+    /// A screen's own words at the bar's left, where an extension's toast would otherwise sit.
+    @ViewBuilder private var bottomStatus: some View {
+        if vm.mode == .customCommandOptions, let session = core.customCommandCoordinator.options {
+            HStack(spacing: metrics.spacing.sm) {
+                if session.isBusy, session.list != nil { ProgressView().controlSize(.mini) }
+                if let status = session.status {
+                    Text(status)
+                        .font(metrics.typography.bar)
+                        .foregroundStyle(Theme.Colors.textSecondary)
+                        .lineLimit(1)
+                        .truncationMode(.tail)
+                }
+            }
+            .padding(.trailing, metrics.spacing.md)
+        } else {
+            Color.clear.frame(width: 0, height: 0)
+        }
     }
 
     private func activateSecondary() {

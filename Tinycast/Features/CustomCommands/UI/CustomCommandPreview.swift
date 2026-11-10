@@ -30,6 +30,10 @@ struct CustomCommandPreview: View {
                 label: String(localized: "Output"),
                 value: command.showsOutput ? String(localized: "Show output") : String(localized: "Silent"))
         ]
+        if command.listsOptions {
+            rows.append(
+                InfoRow(label: String(localized: "Options"), value: String(localized: "Listed by the command")))
+        }
         if !command.arguments.isEmpty {
             let arguments = command.arguments.enumerated().map { index, argument in
                 let name = "\(CustomCommandArgument.fieldID(at: index)) · \(argument.name)"

@@ -27,12 +27,19 @@ struct CustomCommandArgument: Codable, Hashable, Sendable {
         }
         return Array(cleaned.prefix(limit))
     }
+
+    /// An option's argument is `$1`, so a command listing options takes no typed ones.
+    static func sanitized(_ command: CustomCommand) -> [CustomCommandArgument] {
+        command.listsOptions ? [] : sanitized(command.arguments)
+    }
 }
 
 struct CustomCommand: Codable, Hashable, Identifiable, Sendable {
     static let entryIDPrefix = "custom-command:"
     /// One glyph for every custom command, so every surface reads as the same thing.
     static let sfSymbol = "terminal"
+    /// `list` while a command prints its options, `run` when one of them is acted on.
+    static let phaseVariable = "TINYCAST_PHASE"
 
     let id: UUID
     var name: String
@@ -52,13 +59,16 @@ struct CustomCommand: Codable, Hashable, Identifiable, Sendable {
     var workingDirectory: String?
     /// The launcher glyph; nil falls back to the shared terminal symbol.
     var iconSymbol: String?
+    /// Run with no `$1` it prints its choices; the chosen one's argument then runs it for real.
+    var listsOptions: Bool
 
     init(
         id: UUID = UUID(), name: String, command: String, isEnabled: Bool = true,
         showsInRootSearch: Bool = true, loadsShellEnvironment: Bool = false,
         requiresConfirmation: Bool = false, showsConfirmation: Bool = false,
         arguments: [CustomCommandArgument] = [],
-        showsOutput: Bool = false, workingDirectory: String? = nil, iconSymbol: String? = nil
+        showsOutput: Bool = false, workingDirectory: String? = nil, iconSymbol: String? = nil,
+        listsOptions: Bool = false
     ) {
         self.id = id
         self.name = name
@@ -72,6 +82,7 @@ struct CustomCommand: Codable, Hashable, Identifiable, Sendable {
         self.showsOutput = showsOutput
         self.workingDirectory = workingDirectory
         self.iconSymbol = iconSymbol
+        self.listsOptions = listsOptions
     }
 
     var symbol: String { iconSymbol ?? Self.sfSymbol }
@@ -96,7 +107,7 @@ struct CustomCommand: Codable, Hashable, Identifiable, Sendable {
     private enum CodingKeys: String, CodingKey {
         case id, name, command, isEnabled, showsInRootSearch, loadsShellEnvironment
         case requiresConfirmation, showsConfirmation, arguments, showsOutput, workingDirectory
-        case iconSymbol
+        case iconSymbol, listsOptions
     }
 
     init(from decoder: Decoder) throws {
@@ -118,6 +129,7 @@ struct CustomCommand: Codable, Hashable, Identifiable, Sendable {
         showsOutput = try container.decodeIfPresent(Bool.self, forKey: .showsOutput) ?? false
         workingDirectory = try container.decodeIfPresent(String.self, forKey: .workingDirectory)
         iconSymbol = try container.decodeIfPresent(String.self, forKey: .iconSymbol)
+        listsOptions = try container.decodeIfPresent(Bool.self, forKey: .listsOptions) ?? false
     }
 }
 
@@ -249,7 +261,7 @@ final class CustomCommandStore {
         var value = draft
         value.name = draft.name.trimmingCharacters(in: .whitespacesAndNewlines)
         value.command = draft.command.trimmingCharacters(in: .whitespacesAndNewlines)
-        value.arguments = CustomCommandArgument.sanitized(draft.arguments)
+        value.arguments = CustomCommandArgument.sanitized(draft)
         value.workingDirectory = draft.workingDirectory?.cleanedPathComponent
         value.iconSymbol = draft.iconSymbol?.cleanedPathComponent
         guard !value.name.isEmpty else { throw CustomCommandValidationError.emptyName }
@@ -287,7 +299,7 @@ final class CustomCommandStore {
             var cleaned = value
             cleaned.name = value.name.trimmingCharacters(in: .whitespacesAndNewlines)
             cleaned.command = value.command.trimmingCharacters(in: .whitespacesAndNewlines)
-            cleaned.arguments = CustomCommandArgument.sanitized(value.arguments)
+            cleaned.arguments = CustomCommandArgument.sanitized(value)
             cleaned.workingDirectory = value.workingDirectory?.cleanedPathComponent
             cleaned.iconSymbol = value.iconSymbol?.cleanedPathComponent
             let foldedName = cleaned.name.folding(options: [.caseInsensitive], locale: .current)

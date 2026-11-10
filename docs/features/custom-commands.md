@@ -23,6 +23,9 @@ without re-registering. "Show in launcher" only hides the section; shortcuts kee
   and `runCustomCommand` refuses it, so neither a row nor its still-registered shortcut can run it.
   Name, command text, arguments, alias, favorite slot and shortcut stay exactly as they were, and the
   **Settings → Commands** row is the one place that turns it back on.
+- **A list-run has no side effects, by contract.** A command with **Lists options** is run with no
+  `$1` only to print its choices, so it may run on every open of its screen and never asks for
+  confirmation; the run that acts is the one with an option's argument.
 - **An argument value is never spliced into the command text.** It is handed to zsh as a positional
   parameter, so a value carrying `;`, backticks or `$(…)` is data the script reads, never syntax the
   shell runs. `custom-command-test` asserts this directly.
@@ -92,7 +95,7 @@ If the item is deleted from Settings during editing, Save reports that failure a
 - standard input reading EOF immediately
 - `TINYCAST=1` added to the inherited environment
 - up to 8 KiB of standard error retained for a failure dialog
-- standard output discarded
+- standard output discarded, except by a [list-run](#options)
 
 **Show output** takes a different route entirely — see [Show output](#show-output). Nothing else does.
 
@@ -185,6 +188,49 @@ Values reach zsh as **positional parameters**, never as text substituted into th
 
 so the script reads them as `$1`, `$2`, and a value containing `; rm -rf ~` is a string, not a second
 command. An optional argument submitted empty still occupies its slot, so `$2` never becomes `$3`.
+
+### Options
+
+A command with **Lists options** (`listsOptions`) is run twice. Run with no `$1` — the **list-run**
+— it prints its choices; the palette shows them on the `.customCommandOptions` screen instead of
+closing, and the chosen one runs the same command with its argument as `$1`, after which
+everything is as for any command: confirmation, silence, pill or output window. `TINYCAST_PHASE` is
+`list` or `run` for such a command, so a script can tell the two apart by more than an empty `$1`.
+In a terminal the same script stays usable: `eject` lists, `eject all` acts.
+
+The output is xbar's line format, parsed by `Model/CommandOptionList.swift`:
+
+```
+Select volume to eject
+3 volumes mounted
+---
+Eject all | arg=all default=true icon=eject refresh=true
+DUMP | arg=/Volumes/DUMP subtitle="smb · 4NAS" refresh=true
+```
+
+- Above `---`, the first line is the **prompt**, shown as the search field's placeholder in place
+  of `Search options…`; the optional second is the **status**, at the left of the bottom bar where an
+  extension's toast would sit. Further header lines are ignored, and a blank first line keeps the
+  default prompt.
+- Below it, one option per line: the title, then after ` | ` space-separated `key=value`
+  parameters, quoted with `"` or `'` when the value has spaces. Without `---` every line is an
+  option and there is no header — `ls /Volumes` is a complete list-run.
+- `arg` is what reaches `$1`, the title when absent or empty; `disabled=true` dims a row and refuses
+  it; `default=true` lands the highlight, else the first enabled row does; `subtitle` is grey text at
+  the right; `icon` an SF Symbol, else the command's own; `refresh=true` keeps the palette open, runs
+  the action, then lists again with the same option highlighted when it is still offered. A command
+  showing output ignores `refresh`: its window is where it reports.
+
+A query filters the rows and never reorders them: the script's order is the list's meaning. The
+list-run reads all of stdout up to 256 KiB and is killed after `CommandOptionsSession.listTimeout`
+(10 s), so a slow network volume cannot hold the palette; leaving the screen or hiding the palette
+cancels it. A failed or timed-out list-run shows its status and stderr on the screen rather than in
+a dialog. The screen lists again every time it opens, a restored one included, so it never shows a
+stale state.
+
+Options and [arguments](#arguments) never mix: both would claim `$1`, so the editor hides the
+arguments while the switch is on and the store drops any a command listing options carries. A
+hotkey or favorite slot on such a command opens the palette straight onto its options.
 
 ### Show output
 
@@ -333,6 +379,10 @@ Foundation-only harness. Verify by hand:
     command as the script preview and actions; Run collects arguments and respects confirmation.
 20. From the browser, ⌘E opens the existing editor and Escape restores the query and row. ⌘N works
     with no matches; ⌃X opens the deletion confirmation, and Cancel leaves the command intact.
+21. A command listing options opens its screen with a spinner, then its prompt as the placeholder,
+    its status at the bottom left and the default row highlighted; a disabled row will not run.
+22. A `refresh=true` option keeps the palette, and the list comes back with the change; Escape
+    during a slow list-run returns at once and leaves no `sleep` behind.
 
 ## Importing Raycast scripts
 

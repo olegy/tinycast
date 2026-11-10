@@ -6,6 +6,8 @@ import Observation
 @Observable
 final class CustomCommandCoordinator {
     private(set) var editor: CustomCommandEditorSession?
+    /// The options screen's command, alive while that screen is the palette's.
+    private(set) var options: CommandOptionsSession?
     private let store: CustomCommandStore
     private let settings: AppSettings
     private let appIndex: AppIndex
@@ -252,6 +254,7 @@ final class CustomCommandCoordinator {
         // Also the feature switch: with it off a registered hotkey must run nothing.
         guard settings.customCommandsEnabled else { return }
         guard let command = store.command(id: id), command.isEnabled else { return }
+        guard !command.listsOptions else { return showOptions(of: command) }
         guard let arguments = command.positionalValues(from: values) else {
             paletteCoordinator.showArguments(of: AppEntry(command), values: values)
             return
@@ -288,26 +291,81 @@ final class CustomCommandCoordinator {
         guard settings.customCommandsEnabled else { return }
         if paletteCoordinator.isVisible { paletteCoordinator.hidePalette(restoreFocus: false) }
         Task {
-            if command.requiresConfirmation {
-                guard
-                    // Neutral, not destructive: their own command just wants a second tap.
-                    await core.confirm(
-                        title: command.name,
-                        message: String(
-                            localized: "Are you sure you want to run this command?\n\n\(command.command)"),
-                        symbol: command.symbol, confirmTitle: String(localized: "Run"),
-                        tone: .neutral, confirmRole: .standard)
-                else { return }
-            }
+            guard await confirmIfNeeded(command) else { return }
             guard !command.showsOutput else {
                 await streamOutput(of: command, arguments: arguments)
                 return
             }
-            let result = await ShellCommandRunner.run(
-                command.command, arguments: arguments,
-                loadingShellEnvironment: command.loadsShellEnvironment,
-                workingDirectory: command.workingDirectory)
-            await report(command, result: result)
+            await report(command, result: await execute(command, arguments: arguments))
+        }
+    }
+
+    /// Neutral, not destructive: their own command just wants a second tap.
+    private func confirmIfNeeded(_ command: CustomCommand) async -> Bool {
+        guard command.requiresConfirmation else { return true }
+        return await core.confirm(
+            title: command.name,
+            message: String(
+                localized: "Are you sure you want to run this command?\n\n\(command.command)"),
+            symbol: command.symbol, confirmTitle: String(localized: "Run"),
+            tone: .neutral, confirmRole: .standard)
+    }
+
+    private func execute(_ command: CustomCommand, arguments: [String]) async -> ShellCommandResult {
+        await ShellCommandRunner.run(
+            command.command, arguments: arguments,
+            loadingShellEnvironment: command.loadsShellEnvironment,
+            workingDirectory: command.workingDirectory, environment: Self.phase(of: command))
+    }
+
+    /// Only a command listing options has phases; others keep the environment they always had.
+    private static func phase(of command: CustomCommand) -> [String: String] {
+        command.listsOptions ? [CustomCommand.phaseVariable: "run"] : [:]
+    }
+
+    // MARK: - Options
+
+    /// The palette stays up on its own screen; the list-run starts as that screen opens.
+    private func showOptions(of command: CustomCommand) {
+        options?.cancel()
+        options = CommandOptionsSession(command: command)
+        paletteCoordinator.showPalette(mode: .customCommandOptions, seeding: "")
+    }
+
+    /// Asked for again on every open, a restored screen included, so a list is never stale.
+    func reloadOptions(preferring argument: String? = nil) {
+        guard let session = options, core.palette.mode == .customCommandOptions else { return }
+        session.load { [weak self] in self?.landOptions(of: session, preferring: argument) }
+    }
+
+    private func landOptions(of session: CommandOptionsSession, preferring argument: String?) {
+        let palette = core.palette
+        guard options === session, palette.mode == .customCommandOptions else { return }
+        let rows = session.rows(matching: palette.query)
+        palette.selection = session.landing(in: rows, preferring: argument)
+        palette.followToken = UUID()
+    }
+
+    /// A hidden screen may be restored, which lists again, so only leaving it drops the session.
+    func optionsScreenLeft(hidden: Bool) {
+        options?.cancel()
+        if !hidden { options = nil }
+    }
+
+    func chooseOption(_ option: CommandOption) {
+        guard settings.customCommandsEnabled, let session = options, !option.isDisabled,
+            !session.isBusy, let command = store.command(id: session.command.id), command.isEnabled
+        else { return }
+        // A window of output is where the run reports, so the palette has nothing to refresh.
+        guard option.refreshes, !command.showsOutput else {
+            return perform(command, arguments: [option.argument])
+        }
+        session.isActing = true
+        Task {
+            defer { session.isActing = false }
+            guard await confirmIfNeeded(command) else { return }
+            await report(command, result: await execute(command, arguments: [option.argument]))
+            reloadOptions(preferring: option.argument)
         }
     }
 
@@ -316,7 +374,7 @@ final class CustomCommandCoordinator {
         let session = ShellCommandRunner.stream(
             command.command, arguments: arguments,
             loadingShellEnvironment: command.loadsShellEnvironment,
-            workingDirectory: command.workingDirectory)
+            workingDirectory: command.workingDirectory, environment: Self.phase(of: command))
         let runID = outputPresenter.begin(
             commandID: command.id, name: command.name, commandText: command.command,
             symbol: command.symbol)
@@ -382,6 +440,7 @@ final class CustomCommandCoordinator {
         switch result.termination {
         case .launchFailed: return String(localized: "The shell could not be started.")
         case .stopped: return String(localized: "Stopped")
+        case .timedOut: return String(localized: "Timed out")
         case .exited(let status):
             return status == 0
                 ? String(localized: "Finished successfully.")

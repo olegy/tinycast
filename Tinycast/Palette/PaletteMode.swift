@@ -12,6 +12,7 @@ enum PaletteMode: String, CaseIterable, Identifiable {
     case switchWindows
     case customCommandEditor
     case customCommands
+    case customCommandOptions
     case uninstall
     case snippets
     case snippetEditor
@@ -39,7 +40,7 @@ enum PaletteMode: String, CaseIterable, Identifiable {
         case .fileSearch: return "doc.text.magnifyingglass"
         case .menuSearch: return "menubar.rectangle"
         case .switchWindows: return "macwindow.on.rectangle"
-        case .customCommandEditor, .customCommands: return CustomCommand.sfSymbol
+        case .customCommandEditor, .customCommands, .customCommandOptions: return CustomCommand.sfSymbol
         case .uninstall: return "trash"
         case .snippets, .snippetEditor: return "curlybraces"
         case .quicklinks, .quicklinkEditor: return Quicklink.sfSymbol
@@ -62,6 +63,8 @@ enum PaletteMode: String, CaseIterable, Identifiable {
         case .switchWindows: return String(localized: "Search open windows…")
         case .customCommandEditor: return String(localized: "Command editor")
         case .customCommands: return String(localized: "Search custom commands…")
+        // Replaced by the prompt the command printed whenever it prints one.
+        case .customCommandOptions: return String(localized: "Search options…")
         case .uninstall: return String(localized: "Filter files and folders by name…")
         case .snippets: return String(localized: "Search snippets…")
         case .snippetEditor: return String(localized: "Snippet editor")
