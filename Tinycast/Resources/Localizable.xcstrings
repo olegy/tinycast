@@ -96701,6 +96701,58 @@
         }
       }
     },
+    "Turn on Custom Commands in Settings › Commands to run one on click." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aktiviere eigene Befehle unter Einstellungen › Befehle, um per Klick einen auszuführen."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Activa los comandos personalizados en Ajustes › Comandos para ejecutar uno con un clic."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Activez les commandes personnalisées dans Réglages › Commandes pour en lancer une d’un clic."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "クリックでコマンドを実行するには、設定 › コマンドでカスタムコマンドをオンにしてください。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "클릭으로 명령을 실행하려면 설정 › 명령에서 사용자 지정 명령을 켜십시오."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ative os comandos personalizados em Ajustes › Comandos para executar um com um clique."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Чтобы запускать команду по клику, включите «Свои команды» в Настройки › Команды."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "若要点按时运行命令，请在“设置 › 命令”中打开自定义命令。"
+          }
+        }
+      }
+    },
     "Turned off" : {
       "localizations" : {
         "de" : {
@@ -105909,106 +105961,54 @@
         }
       }
     },
-    "🔒 means every DNS server is local, 🌐 that one is not." : {
+    "🔒 local (encrypted), 🌐 provider, 🤷 unknown status" : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "🔒 bedeutet, dass alle DNS-Server lokal sind, 🌐, dass einer es nicht ist."
+            "value" : "🔒 lokal (verschlüsselt), 🌐 Anbieter, 🤷 Status unbekannt"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "🔒 significa que todos los servidores DNS son locales; 🌐, que alguno no lo es."
+            "value" : "🔒 local (cifrado), 🌐 proveedor, 🤷 estado desconocido"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "🔒 signifie que tous les serveurs DNS sont locaux, 🌐 que l’un d’eux ne l’est pas."
+            "value" : "🔒 local (chiffré), 🌐 fournisseur, 🤷 état inconnu"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "🔒 はすべての DNS サーバがローカル、🌐 はローカルでないサーバがあることを示します。"
+            "value" : "🔒 ローカル（暗号化）、🌐 プロバイダ、🤷 状態不明"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "🔒은 모든 DNS 서버가 로컬임을, 🌐은 로컬이 아닌 서버가 있음을 뜻합니다."
+            "value" : "🔒 로컬(암호화), 🌐 제공업체, 🤷 상태 알 수 없음"
           }
         },
         "pt" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "🔒 significa que todos os servidores DNS são locais; 🌐, que algum não é."
+            "value" : "🔒 local (encriptado), 🌐 operadora, 🤷 estado desconhecido"
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "🔒 — все DNS-серверы локальные, 🌐 — есть нелокальный."
+            "value" : "🔒 локальный (шифрованный), 🌐 провайдер, 🤷 статус неизвестен"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "🔒 表示所有 DNS 服务器都是本地的，🌐 表示有服务器不是本地的。"
-          }
-        }
-      }
-    },
-    "🔒 means every DNS server is local, 🌐 that one is not. Turn on Custom Commands in Settings › Commands to run one on click." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "🔒 bedeutet, dass alle DNS-Server lokal sind, 🌐, dass einer es nicht ist. Aktiviere eigene Befehle unter Einstellungen › Befehle, um per Klick einen auszuführen."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "🔒 significa que todos los servidores DNS son locales; 🌐, que alguno no lo es. Activa los comandos personalizados en Ajustes › Comandos para ejecutar uno con un clic."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "🔒 signifie que tous les serveurs DNS sont locaux, 🌐 que l’un d’eux ne l’est pas. Activez les commandes personnalisées dans Réglages › Commandes pour en lancer une d’un clic."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "🔒 はすべての DNS サーバがローカル、🌐 はローカルでないサーバがあることを示します。クリックでコマンドを実行するには、設定 › コマンドでカスタムコマンドをオンにしてください。"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "🔒은 모든 DNS 서버가 로컬임을, 🌐은 로컬이 아닌 서버가 있음을 뜻합니다. 클릭으로 명령을 실행하려면 설정 › 명령에서 사용자 지정 명령을 켜십시오."
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "🔒 significa que todos os servidores DNS são locais; 🌐, que algum não é. Ative os comandos personalizados em Ajustes › Comandos para executar um com um clique."
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "🔒 — все DNS-серверы локальные, 🌐 — есть нелокальный. Чтобы запускать команду по клику, включите «Свои команды» в Настройки › Команды."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "🔒 表示所有 DNS 服务器都是本地的，🌐 表示有服务器不是本地的。若要点按时运行命令，请在“设置 › 命令”中打开自定义命令。"
+            "value" : "🔒 本地（加密），🌐 运营商，🤷 状态未知"
           }
         }
       }

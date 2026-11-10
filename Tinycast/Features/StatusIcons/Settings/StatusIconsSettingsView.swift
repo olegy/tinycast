@@ -31,6 +31,7 @@ private struct StatusDNSSection: View {
         return Section {
             Toggle(isOn: $settings.statusDNSEnabled) {
                 SettingsRowTitle(.statusIconsDNS, "Show DNS icon")
+                Text("🔒 local (encrypted), 🌐 provider, 🤷 unknown status")
             }
             TextField(
                 text: $settings.statusDNSLocalResolvers,
@@ -50,19 +51,11 @@ private struct StatusDNSSection: View {
         } header: {
             SettingsSectionHeader(.statusIconsDNS)
         } footer: {
-            Group {
-                if settings.customCommandsEnabled {
-                    Text("🔒 means every DNS server is local, 🌐 that one is not.")
-                } else {
-                    Text(
-                        """
-                        🔒 means every DNS server is local, 🌐 that one is not. Turn on Custom \
-                        Commands in Settings › Commands to run one on click.
-                        """)
-                }
+            if !settings.customCommandsEnabled {
+                Text("Turn on Custom Commands in Settings › Commands to run one on click.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
             }
-            .font(.caption)
-            .foregroundStyle(.secondary)
         }
     }
 
