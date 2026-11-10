@@ -996,14 +996,22 @@ struct RootPaletteView: View {
             }
             // A bar button's own inset, so the text sits as far in as the hints on the right.
             .padding(.horizontal, metrics.spacing.md)
-        } else if vm.mode == .clipboard, let clipboard = screen as? ClipboardScreen {
-            Text("\(clipboard.rows.count) items")
+        } else if let count = listedItemCount {
+            Text("\(count) items")
                 .font(metrics.typography.bar)
                 .foregroundStyle(Theme.Colors.textSecondary)
                 .lineLimit(1)
                 .padding(.horizontal, metrics.spacing.md)
         } else {
             Color.clear.frame(width: 0, height: 0)
+        }
+    }
+
+    private var listedItemCount: Int? {
+        switch vm.mode {
+        case .clipboard: (screen as? ClipboardScreen)?.rows.count
+        case .snippets: (screen as? SnippetsScreen)?.rows.count
+        default: nil
         }
     }
 
