@@ -804,7 +804,8 @@ struct RootPaletteView: View {
                 headerGutter(width: metrics.spacing.md)
                 StatusIconStrip()
             }
-            headerGutter(width: metrics.spacing.md * 2)
+            // An icon's button padding counts toward the gutter, so its glyph meets the rows' column.
+            headerGutter(width: metrics.spacing.md * 2 - (showsStatusIcons ? metrics.spacing.sm : 0))
         }
         // One row height in both states; only the padding around it differs.
         .frame(height: metrics.size.headerHeight)

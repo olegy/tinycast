@@ -18,7 +18,8 @@ source. v1 has one source, **DNS**: 🔒 while every DNS resolver is local — a
   bottom bar are exactly what they are with the feature off. An icon is a mouse target and a
   `.help()` tooltip, nothing else; it never takes focus or a key.
 - **Only the root search shows them**, in the expanded palette, after the search field and before
-  the header's trailing gutter. `RootPaletteView.showsStatusIcons` gates them: the field ends where
+  the header's trailing gutter, which gives up the button's `sm` padding so the last glyph ends on
+  the rows' right column. `RootPaletteView.showsStatusIcons` gates them: the field ends where
   they begin, and they step aside while an argument strip (`headerAccessory`) owns the row.
 - **The bottom bar is not theirs.** Its left side is for status messages — an extension's toast
   today, a screen's item count later.
