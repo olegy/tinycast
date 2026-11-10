@@ -1,70 +1,41 @@
 import SwiftUI
 
-/// The status icons at the left of the palette's bottom bar, one small tile each.
+/// The status icons at the right of the launcher's search field, one emoji each.
 struct StatusIconStrip: View {
     @Environment(AppCore.self) private var core
-    @Environment(\.metrics) private var metrics
 
     var body: some View {
         let coordinator = core.statusIconCoordinator
-        // All or nothing: when the bar runs short, the icons give way to the action hints.
-        ViewThatFits(in: .horizontal) {
-            HStack(spacing: metrics.spacing.sm) {
-                ForEach(coordinator.icons) { icon in
-                    StatusIconTile(icon: icon) { coordinator.run(icon) }
-                }
+        HStack(spacing: 0) {
+            ForEach(coordinator.icons) { icon in
+                StatusIcon(icon: icon) { coordinator.run(icon) }
             }
-            // Lines the first tile up with the list rows and the search field above it.
-            .padding(.leading, metrics.spacing.md)
-            Color.clear.frame(width: 0, height: 0)
         }
+        .fixedSize()
     }
 }
 
-private struct StatusIconTile: View {
-    /// About as tall as the bar's key-cap hints, and well under a list row's icon.
-    private static let side: CGFloat = 20
-    private static let cornerFraction: CGFloat = 0.23
-    private static let glyphFraction: CGFloat = 0.5
-    private static let attentionOpacity: Double = 0.3
+private struct StatusIcon: View {
+    private static let emojiSize: CGFloat = 15
 
     let icon: StatusIconCoordinator.Icon
     let action: () -> Void
-    @State private var hovered = false
     @Environment(\.metrics) private var metrics
 
     var body: some View {
-        let side = metrics.scaled(Self.side)
-        let tile = RoundedRectangle(cornerRadius: side * Self.cornerFraction, style: .continuous)
-            .fill(fill)
-            .frame(width: side, height: side)
-            .overlay {
-                Image(systemName: icon.reading.symbol)
-                    .font(.system(size: side * Self.glyphFraction, weight: .medium))
-                    .foregroundStyle(
-                        hovered && isClickable ? Theme.Colors.textPrimary : Theme.Colors.textSecondary)
-            }
-            .accessibilityElement(children: .ignore)
+        let glyph = Text(verbatim: icon.reading.emoji)
+            .font(.system(size: metrics.scaled(Self.emojiSize)))
             .accessibilityLabel(Text(verbatim: icon.reading.summary))
         Group {
-            if isClickable {
-                Button(action: action) { tile.contentShape(Rectangle()) }
-                    .buttonStyle(.plain)
-                    .onHover { hovered = $0 }
-                    .animation(.easeOut(duration: Theme.Duration.hover), value: hovered)
+            // The bar's own hover and press chrome, so it reads like the footer's hints.
+            if icon.command != nil {
+                BarButton(chrome: .rounded, isCompact: true, action: action) { glyph }
             } else {
-                tile
+                glyph
+                    .padding(.horizontal, metrics.spacing.sm)
+                    .frame(height: metrics.size.barButtonHeight)
             }
         }
-        .tooltip(icon.reading.summary, alignment: .leading)
-    }
-
-    private var isClickable: Bool { icon.command != nil }
-
-    private var fill: Color {
-        switch icon.reading.tone {
-        case .normal: Theme.Colors.controlSurface
-        case .attention: Theme.Colors.warning.opacity(Self.attentionOpacity)
-        }
+        .help(icon.reading.summary)
     }
 }

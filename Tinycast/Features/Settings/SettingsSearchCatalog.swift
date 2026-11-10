@@ -350,13 +350,13 @@ enum SettingsSearchCatalog {
     private static let statusIcons: [SettingsSearchEntry] = [
         .init(
             pane: .statusIcons,
-            keywords: ["menu bar", "status", "icons", "dns", "bottom bar"]),
+            keywords: ["menu bar", "status", "icons", "dns", "search bar"]),
         .init(
             .statusIconsStatusIcons, "Enable Status Icons",
-            keywords: ["menu bar", "status", "icons", "bottom bar"]),
+            keywords: ["menu bar", "status", "icons", "search bar"]),
         .init(
             .statusIconsDNS, "Show DNS icon",
-            keywords: ["dns", "lock", "resolver", "status", "dnscrypt"]),
+            keywords: ["dns", "lock", "globe", "resolver", "status", "dnscrypt"]),
         .init(
             .statusIconsDNS, "Local resolvers",
             keywords: ["dns", "resolver", "localhost", "127.0.0.1", "dnscrypt"]),

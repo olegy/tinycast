@@ -1,9 +1,7 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
-    "" : {
-
-    },
+    "" : {},
     "%@ %@ is available" : {
       "localizations" : {
         "de" : {
@@ -10203,110 +10201,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "新对话"
-          }
-        }
-      }
-    },
-    "A closed lock means every DNS server is local." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ein geschlossenes Schloss bedeutet, dass jeder DNS-Server lokal ist."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Un candado cerrado significa que todos los servidores DNS son locales."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Un cadenas fermé signifie que tous les serveurs DNS sont locaux."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "閉じた鍵は、すべての DNS サーバがローカルであることを示します。"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "잠긴 자물쇠는 모든 DNS 서버가 로컬이라는 뜻입니다."
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Um cadeado fechado significa que todos os servidores DNS são locais."
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Закрытый замок означает, что все DNS-серверы локальные."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "锁已闭合表示所有 DNS 服务器都是本地的。"
-          }
-        }
-      }
-    },
-    "A closed lock means every DNS server is local. Turn on Custom Commands in Settings › Commands to run one on click." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ein geschlossenes Schloss bedeutet, dass jeder DNS-Server lokal ist. Aktiviere eigene Befehle unter Einstellungen › Befehle, um per Klick einen auszuführen."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Un candado cerrado significa que todos los servidores DNS son locales. Activa los comandos personalizados en Ajustes › Comandos para ejecutar uno con un clic."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Un cadenas fermé signifie que tous les serveurs DNS sont locaux. Activez les commandes personnalisées dans Réglages › Commandes pour en exécuter une d’un clic."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "閉じた鍵は、すべての DNS サーバがローカルであることを示します。クリックでコマンドを実行するには、設定 › コマンドでカスタムコマンドをオンにしてください。"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "잠긴 자물쇠는 모든 DNS 서버가 로컬이라는 뜻입니다. 클릭으로 명령을 실행하려면 설정 › 명령에서 사용자 지정 명령을 켜십시오."
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Um cadeado fechado significa que todos os servidores DNS são locais. Ative os comandos personalizados em Ajustes › Comandos para executar um com um clique."
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Закрытый замок означает, что все DNS-серверы локальные. Чтобы запускать команду по клику, включите «Свои команды» в Настройки › Команды."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "锁已闭合表示所有 DNS 服务器都是本地的。若要点按时运行命令，请在“设置 › 命令”中打开自定义命令。"
           }
         }
       }
@@ -80290,54 +80184,54 @@
         }
       }
     },
-    "Show status icons at the left of the bottom bar." : {
+    "Show status icons at the right of the search field." : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Zeigt Statussymbole links in der unteren Leiste."
+            "value" : "Statussymbole rechts neben dem Suchfeld anzeigen."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Muestra iconos de estado a la izquierda de la barra inferior."
+            "value" : "Muestra iconos de estado a la derecha del campo de búsqueda."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Affiche des icônes d’état à gauche de la barre inférieure."
+            "value" : "Afficher des icônes d’état à droite du champ de recherche."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "下部バーの左側にステータスアイコンを表示します。"
+            "value" : "検索フィールドの右にステータスアイコンを表示します。"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "하단 막대 왼쪽에 상태 아이콘을 표시합니다."
+            "value" : "검색 필드 오른쪽에 상태 아이콘을 표시합니다."
           }
         },
         "pt" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Mostra ícones de estado à esquerda da barra inferior."
+            "value" : "Mostra ícones de estado à direita do campo de pesquisa."
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Показывать иконки статуса слева на нижней панели."
+            "value" : "Показывать значки статуса справа от поля поиска."
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "在底部栏左侧显示状态图标。"
+            "value" : "在搜索框右侧显示状态图标。"
           }
         }
       }
@@ -106011,6 +105905,110 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "⌘↵ 存储。"
+          }
+        }
+      }
+    },
+    "🔒 means every DNS server is local, 🌐 that one is not." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "🔒 bedeutet, dass alle DNS-Server lokal sind, 🌐, dass einer es nicht ist."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "🔒 significa que todos los servidores DNS son locales; 🌐, que alguno no lo es."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "🔒 signifie que tous les serveurs DNS sont locaux, 🌐 que l’un d’eux ne l’est pas."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "🔒 はすべての DNS サーバがローカル、🌐 はローカルでないサーバがあることを示します。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "🔒은 모든 DNS 서버가 로컬임을, 🌐은 로컬이 아닌 서버가 있음을 뜻합니다."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "🔒 significa que todos os servidores DNS são locais; 🌐, que algum não é."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "🔒 — все DNS-серверы локальные, 🌐 — есть нелокальный."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "🔒 表示所有 DNS 服务器都是本地的，🌐 表示有服务器不是本地的。"
+          }
+        }
+      }
+    },
+    "🔒 means every DNS server is local, 🌐 that one is not. Turn on Custom Commands in Settings › Commands to run one on click." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "🔒 bedeutet, dass alle DNS-Server lokal sind, 🌐, dass einer es nicht ist. Aktiviere eigene Befehle unter Einstellungen › Befehle, um per Klick einen auszuführen."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "🔒 significa que todos los servidores DNS son locales; 🌐, que alguno no lo es. Activa los comandos personalizados en Ajustes › Comandos para ejecutar uno con un clic."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "🔒 signifie que tous les serveurs DNS sont locaux, 🌐 que l’un d’eux ne l’est pas. Activez les commandes personnalisées dans Réglages › Commandes pour en lancer une d’un clic."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "🔒 はすべての DNS サーバがローカル、🌐 はローカルでないサーバがあることを示します。クリックでコマンドを実行するには、設定 › コマンドでカスタムコマンドをオンにしてください。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "🔒은 모든 DNS 서버가 로컬임을, 🌐은 로컬이 아닌 서버가 있음을 뜻합니다. 클릭으로 명령을 실행하려면 설정 › 명령에서 사용자 지정 명령을 켜십시오."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "🔒 significa que todos os servidores DNS são locais; 🌐, que algum não é. Ative os comandos personalizados em Ajustes › Comandos para executar um com um clique."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "🔒 — все DNS-серверы локальные, 🌐 — есть нелокальный. Чтобы запускать команду по клику, включите «Свои команды» в Настройки › Команды."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "🔒 表示所有 DNS 服务器都是本地的，🌐 表示有服务器不是本地的。若要点按时运行命令，请在“设置 › 命令”中打开自定义命令。"
           }
         }
       }

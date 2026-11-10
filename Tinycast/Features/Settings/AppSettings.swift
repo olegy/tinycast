@@ -334,7 +334,7 @@ final class AppSettings {
         didSet { defaults.set(snippetEditorBundleID, forKey: Key.snippetEditorBundleID.rawValue) }
     }
 
-    /// Off means no DNS subscription and nothing at the left of the bottom bar.
+    /// Off means no DNS subscription and no icons in the search bar.
     var statusIconsEnabled: Bool {
         didSet { defaults.set(statusIconsEnabled, forKey: Key.statusIconsEnabled.rawValue) }
     }

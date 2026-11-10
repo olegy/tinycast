@@ -4,7 +4,7 @@ import Foundation
 enum DNSStatus: Equatable, Sendable {
     case local
     case external
-    /// No resolver at all, which is offline rather than a leak, so it asks for no attention.
+    /// No resolver at all: offline, or the monitor could not read the system's state.
     case noServers
 
     static let defaultLocalResolvers = "127.0.0.1, ::1"
@@ -23,17 +23,12 @@ enum DNSStatus: Equatable, Sendable {
         let addresses = resolvers.joined(separator: ", ")
         switch classify(resolvers: resolvers, local: local) {
         case .local:
-            return StatusReading(
-                symbol: "lock.fill", tone: .normal,
-                summary: String(localized: "DNS: \(addresses) — local"))
+            return StatusReading(emoji: "🔒", summary: String(localized: "DNS: \(addresses) — local"))
         case .external:
             return StatusReading(
-                symbol: "lock.open.fill", tone: .attention,
-                summary: String(localized: "DNS: \(addresses) — not local"))
+                emoji: "🌐", summary: String(localized: "DNS: \(addresses) — not local"))
         case .noServers:
-            return StatusReading(
-                symbol: "lock.open.fill", tone: .normal,
-                summary: String(localized: "DNS: no servers"))
+            return StatusReading(emoji: "🤷", summary: String(localized: "DNS: no servers"))
         }
     }
 

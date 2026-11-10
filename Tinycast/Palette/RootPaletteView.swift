@@ -800,6 +800,10 @@ struct RootPaletteView: View {
                     accessory, isOpen: openMenu == .extensionAccessory,
                     action: toggleExtensionSearchAccessory)
             }
+            if showsStatusIcons {
+                headerGutter(width: metrics.spacing.md)
+                StatusIconStrip()
+            }
             headerGutter(width: metrics.spacing.md * 2)
         }
         // One row height in both states; only the padding around it differs.
@@ -815,6 +819,12 @@ struct RootPaletteView: View {
     }
 
     private var headerBottomPadding: CGFloat { metrics.size.headerPadding - headerTopPadding }
+
+    /// An argument strip owns the row's width, so the icons step aside while one shows.
+    private var showsStatusIcons: Bool {
+        !isCollapsed && vm.mode == .launcher && headerAccessory == nil
+            && !core.statusIconCoordinator.icons.isEmpty
+    }
 
     /// Mode-gated ahead of the cast, which would otherwise cost every other mode a list build.
     private var extensionCommandScreen: ExtensionCommandScreen? {
@@ -940,7 +950,7 @@ struct RootPaletteView: View {
     ) -> some View {
         let showsTabHint = tabOpensChat
         return HStack(spacing: 0) {
-            bottomBarLeading
+            Color.clear.frame(width: 0, height: 0)
                 .modifier(ExtensionToastSlot(extensions: extensions, showing: vm.mode == .extensionCommand))
             if showActionGroup || showsTabHint {
                 PaletteActionGroup(
@@ -961,14 +971,6 @@ struct RootPaletteView: View {
         .frame(height: metrics.size.bottomBarHeight)
         .frame(maxWidth: .infinity)
         .overlay(alignment: .top) { BarSeparator() }
-    }
-
-    /// The bar's left side belongs to the screen; only the root search shows anything there yet.
-    @ViewBuilder private var bottomBarLeading: some View {
-        switch vm.mode {
-        case .launcher: StatusIconStrip()
-        default: Color.clear.frame(width: 0, height: 0)
-        }
     }
 
     private func activateSecondary() {

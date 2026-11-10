@@ -62,17 +62,15 @@ struct StatusIconsTest {
 
     private static func testReadings() {
         let local = DNSStatus.reading(resolvers: ["127.0.0.1"], local: defaults)
-        check("local draws a closed lock", local.symbol == "lock.fill" && local.tone == .normal)
+        check("local shows a lock", local.emoji == "🔒")
         check("local says so", local.summary == "DNS: 127.0.0.1 — local")
 
         let external = DNSStatus.reading(resolvers: ["192.168.1.1", "1.1.1.1"], local: defaults)
-        check(
-            "external draws an open lock asking for attention",
-            external.symbol == "lock.open.fill" && external.tone == .attention)
+        check("external shows a globe", external.emoji == "🌐")
         check("external lists every address", external.summary == "DNS: 192.168.1.1, 1.1.1.1 — not local")
 
         let none = DNSStatus.reading(resolvers: [], local: defaults)
-        check("no servers draws a calm open lock", none.symbol == "lock.open.fill" && none.tone == .normal)
+        check("no servers shows a shrug", none.emoji == "🤷")
         check("no servers says so", none.summary == "DNS: no servers")
     }
 }

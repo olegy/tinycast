@@ -1,13 +1,7 @@
 import Foundation
 
-/// What one status icon draws: its glyph, whether it asks for attention, and its tooltip.
+/// What one status icon draws: an emoji, and its tooltip.
 struct StatusReading: Equatable, Sendable {
-    enum Tone: Equatable, Sendable {
-        case normal
-        case attention
-    }
-
-    let symbol: String
-    let tone: Tone
+    let emoji: String
     let summary: String
 }

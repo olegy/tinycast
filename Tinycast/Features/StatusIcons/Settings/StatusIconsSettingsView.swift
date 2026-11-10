@@ -9,7 +9,7 @@ struct StatusIconsSettingsView: View {
             FeatureSwitchSection(
                 anchor: .statusIconsStatusIcons,
                 enableTitle: "Enable Status Icons",
-                enableSubtitle: "Show status icons at the left of the bottom bar.",
+                enableSubtitle: "Show status icons at the right of the search field.",
                 isEnabled: $settings.statusIconsEnabled,
                 showsIcon: true,
                 showsHeader: false)
@@ -52,12 +52,12 @@ private struct StatusDNSSection: View {
         } footer: {
             Group {
                 if settings.customCommandsEnabled {
-                    Text("A closed lock means every DNS server is local.")
+                    Text("🔒 means every DNS server is local, 🌐 that one is not.")
                 } else {
                     Text(
                         """
-                        A closed lock means every DNS server is local. Turn on Custom Commands in \
-                        Settings › Commands to run one on click.
+                        🔒 means every DNS server is local, 🌐 that one is not. Turn on Custom \
+                        Commands in Settings › Commands to run one on click.
                         """)
                 }
             }

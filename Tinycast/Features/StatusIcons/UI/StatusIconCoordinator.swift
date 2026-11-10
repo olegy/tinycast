@@ -1,6 +1,6 @@
 import Foundation
 
-/// The status icons at the left of the bottom bar. See docs/features/status-icons.md.
+/// The status icons beside the launcher's search field. See docs/features/status-icons.md.
 @MainActor
 @Observable
 final class StatusIconCoordinator {

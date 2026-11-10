@@ -168,10 +168,9 @@ its field starts on the section headers' column, as the launcher's does. The che
 `textPrimary` under the pointer over `Theme.Duration.hover`, and
 `HeaderBackButton` keeps that hover state to itself so the header around it never re-renders.
 
-The left of the bottom bar is the screen's slot, `bottomBarLeading`, picked by `vm.mode`. On the
-root search it holds the [status icons](status-icons.md), when that feature is on; elsewhere it is
-empty, and an extension screen's toast covers it. The slot is a mouse target only, so nothing in it
-changes selection, keys or Compact, and it yields its width before the action group does.
+On the root search the header ends in the [status icons](status-icons.md) when that feature is on:
+the search field stops where they begin, and they step aside while an argument strip owns the row.
+They are mouse targets only, so nothing in them changes selection, keys or Compact.
 
 The launcher advertises the first hop in the bottom bar — `Quick AI` beside a ⇥ key cap, after
 the primary and secondary actions and before Actions. It is drawn only when Tab really would open
