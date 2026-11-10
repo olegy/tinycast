@@ -26,7 +26,7 @@ struct ClipboardSearchTests {
                     ? "Common alphabet" + suffix
                     : kind == .file ? "/fixture/common\(index)" + (index % 2 == 0 ? ".pdf" : ".png") : nil,
                 imagePath: kind == .image ? "/fixture/\(index).png" : nil,
-                createdAt: now.addingTimeInterval(Double(-index)), sourceBundleID: nil,
+                createdAt: now.addingTimeInterval(Double(-index)),
                 pinnedAt: index < 220 ? now.addingTimeInterval(Double(-index)) : nil)
             if kind != .text, index % 7 != 0 { metadata[item.id] = "Common invoice" + suffix }
             return item

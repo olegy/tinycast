@@ -186,7 +186,7 @@ struct ClipboardThumbnailTests {
         let blob = image(name, color: color, in: staged)
         ClipboardStore.importStoredItems(
             inDatabaseAt: store.dbURL, adoptingImagesInto: store.imagesDir,
-            [ClipboardItem(imagePath: blob.path, sourceBundleID: nil)])
+            [ClipboardItem(imagePath: blob.path)])
         store.load()
         guard let item = store.items.first(where: { $0.imagePath?.hasSuffix("/" + name) == true }) else {
             fail("\(name) is adopted")

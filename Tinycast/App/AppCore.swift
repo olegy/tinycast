@@ -206,6 +206,7 @@ final class AppCore {
             WindowManagementRemovalMigration.run(
                 settingsFileEnabled: settings.settingsFileEnabled,
                 applicationSupport: AppPaths.applicationSupport())
+            ClipboardSourceRemovalMigration.run(database: clipboardStore.dbURL)
             NSApp.setActivationPolicy(.accessory)
             applyAppearance()
             applyMotion()

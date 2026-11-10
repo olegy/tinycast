@@ -132,7 +132,6 @@ enum BackupComposer {
         }
         return BackupClipboardItem(
             kind: kind, text: item.text, imageName: imageName,
-            createdAt: item.createdAt, sourceBundleID: item.sourceBundleID,
-            pinnedAt: item.pinnedAt)
+            createdAt: item.createdAt, pinnedAt: item.pinnedAt)
     }
 }

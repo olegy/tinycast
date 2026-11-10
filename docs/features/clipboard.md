@@ -19,7 +19,7 @@
   plain-text default pastes it as it is, and ⌃⌘↵ on it falls back to ⌘↵ as on every other screen.
 - **Clipboard writes stamp a private `internalType` marker** so the poller skips Tinycast's own writes.
   If the writer and the poller ever disagree, the app re-captures its own pastes in a loop.
-- **Edit Entry rewrites a text entry in place and never adds one.** The id, pin and source app
+- **Edit Entry rewrites a text entry in place and never adds one.** The id, pin and copy time
   stay; saving then copies it as Copy to Clipboard does, marker included, so the poller does not
   record the edit a second time.
 - **Paste Sequentially never promotes, and its walk is frozen at the first press.** `PasteSequence`
@@ -464,7 +464,7 @@ player view is `KeyboardFocusRefusing`, so clicking its transport leaves the car
 field; see [palette.md](palette.md#the-keyboard-belongs-to-the-search-field).
 
 **`clipboardMediaHeight` is a cap, not a height.** As a fixed `frame(height:)` the player asked for
-260 pt whatever the pane had: with the Information block's 175 pt beneath it the column wanted 435 pt
+260 pt whatever the pane had: with the details block's 175 pt beneath it the column wanted 435 pt
 of a 359 pt content area, and the overflow pushed the bottom bar out and the panel taller. Every other
 preview kind already shrinks — an image scales to fit, text scrolls — so the player does too, and only
 its maximum is a token.

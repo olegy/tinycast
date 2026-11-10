@@ -173,6 +173,7 @@ If a change touches anything in the right column, the harness on the left is man
 | `settings-file-test` | `Settings/Model/` and `Settings/Service/` — key paths, value tokens, the printer and parser, and the repository's import, replace, save, reload and symlink handling on a scratch folder |
 | `launcher-settings-file-test` | Launcher settings application — invalid records, partial edits, deferred bundles, shortcut moves and records outside search scopes; isolated preferences and in-memory scan/Carbon effects |
 | `window-management-removal-migration-test` | `Migrations/WindowManagementRemovalMigration.swift` — retires exactly the Window Management defaults and hotkeys, drops its rows, kinds, links and aliases from the launcher lists, strips the `windowManagement` section, and leaves a file with other problems to the import |
+| `clipboard-source-removal-migration-test` | `Migrations/ClipboardSourceRemovalMigration.swift` — drops `source_app` from a legacy history and keeps its clips, pins and search; leaves a missing history missing; runs idempotently |
 | `backup-archive-test` | all of `Backup/Model/`, plus `Backup/Service/BackupStaging.swift` |
 | `updates-test` | `Updates/Model/` — version precedence, channel filtering, install route, readiness |
 | `update-check-test` | `UpdateCheckStore` — stopping, in-flight cancellation, cached prompt suppression, restart and independent manual checking |

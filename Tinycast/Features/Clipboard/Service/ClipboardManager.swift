@@ -143,13 +143,16 @@ final class ClipboardManager {
         // Never record secrets: skip copies tagged sensitive by any of the marker owners.
         if let types = pb.types, !Set(types).isDisjoint(with: Self.sensitiveTypes) { return }
 
-        // The pasteboard carries no source, so attribute it to the frontmost app.
-        let sourceBundleID = NSWorkspace.shared.frontmostApplication?.bundleIdentifier
-        if let sourceBundleID, settings.clipboardDisabledApps.contains(sourceBundleID) { return }
+        // The pasteboard carries no source, so the frontmost app stands in for it.
+        if let source = NSWorkspace.shared.frontmostApplication?.bundleIdentifier,
+            settings.clipboardDisabledApps.contains(source)
+        {
+            return
+        }
 
         // Ahead of the text branch: Finder puts the file's *name* on `.string` beside its URL.
         if let paths = Self.fileURLs(on: pb) {
-            store.addFiles(paths, sourceBundleID: sourceBundleID)
+            store.addFiles(paths)
             return
         }
 
@@ -157,7 +160,7 @@ final class ClipboardManager {
             !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
         {
             guard text.count <= ClipboardStore.maxTextLength else { return }
-            store.addText(text, sourceBundleID: sourceBundleID)
+            store.addText(text)
             return
         }
 
@@ -172,7 +175,7 @@ final class ClipboardManager {
                     ? data
                     : NSBitmapImageRep(data: data)?.representation(using: .png, properties: [:])
                 guard let png else { return }
-                await store.addImage(png, sourceBundleID: sourceBundleID, capture: capture)
+                await store.addImage(png, capture: capture)
             }
             return
         }
@@ -181,7 +184,7 @@ final class ClipboardManager {
             !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty,
             text.count <= ClipboardStore.maxTextLength
         else { return }
-        store.addText(text, sourceBundleID: sourceBundleID)
+        store.addText(text)
     }
 
     private static let maxImportedHTMLBytes = 256 * 1024

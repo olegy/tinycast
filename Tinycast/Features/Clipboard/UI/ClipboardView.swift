@@ -350,7 +350,7 @@ struct ClipboardPreview: View {
     private var topInset: CGFloat { metrics.spacing.xs * 2 }
 }
 
-/// The "Information" block; disk-touching details are gathered off the main actor.
+/// The details block; disk-touching details are gathered off the main actor.
 private struct ClipboardInfoSection: View {
     @Environment(\.metrics) private var metrics
     let item: ClipboardItem
@@ -360,7 +360,6 @@ private struct ClipboardInfoSection: View {
 
     private struct Details: Equatable, Sendable {
         var characters: Int?
-        var words: Int?
         var pixelSize: CGSize?
         var fileBytes: Int?
         var typeName: String?
@@ -369,7 +368,6 @@ private struct ClipboardInfoSection: View {
     private struct InfoRow: Identifiable {
         let label: String
         let value: String
-        var icon: NSImage?
         var id: String { label }
     }
 
@@ -383,27 +381,17 @@ private struct ClipboardInfoSection: View {
     }()
 
     var body: some View {
-        VStack(alignment: .leading, spacing: metrics.spacing.sm) {
-            Text("Information")
-                .font(metrics.typography.sectionHeader)
-                .foregroundStyle(.secondary)
-            VStack(spacing: 0) {
-                let rows = self.rows
-                ForEach(rows) { row in
-                    if row.id != rows.first?.id { Divider() }
-                    HStack(spacing: metrics.spacing.sm) {
-                        Text(row.label).foregroundStyle(.secondary)
-                        Spacer(minLength: metrics.spacing.lg)
-                        if let icon = row.icon {
-                            Image(nsImage: icon)
-                                .resizable()
-                                .frame(width: 20, height: 20)
-                        }
-                        Text(row.value).lineLimit(1).truncationMode(.middle)
-                    }
-                    .font(.callout)
-                    .padding(.vertical, metrics.spacing.sm)
+        VStack(spacing: 0) {
+            let rows = self.rows
+            ForEach(rows) { row in
+                if row.id != rows.first?.id { Divider() }
+                HStack(spacing: metrics.spacing.sm) {
+                    Text(row.label).foregroundStyle(.secondary)
+                    Spacer(minLength: metrics.spacing.lg)
+                    Text(row.value).lineLimit(1).truncationMode(.middle)
                 }
+                .font(.callout)
+                .padding(.vertical, metrics.spacing.sm)
             }
         }
         .padding(.top, metrics.spacing.xl)
@@ -412,9 +400,6 @@ private struct ClipboardInfoSection: View {
 
     private var rows: [InfoRow] {
         var rows: [InfoRow] = []
-        if let source {
-            rows.append(InfoRow(label: String(localized: "Source"), value: source.name, icon: source.icon))
-        }
         switch item.kind {
         case .text:
             let isColor = item.colorValue != nil
@@ -423,14 +408,9 @@ private struct ClipboardInfoSection: View {
                     label: String(localized: "Type"),
                     value: isColor ? String(localized: "Color") : String(localized: "Text")))
             // A colour's own notations are the pane above; its length is not what you came for.
-            if !isColor {
-                if let characters = details.characters {
-                    rows.append(
-                        InfoRow(label: String(localized: "Characters"), value: characters.formatted()))
-                }
-                if let words = details.words {
-                    rows.append(InfoRow(label: String(localized: "Words"), value: words.formatted()))
-                }
+            if !isColor, let characters = details.characters {
+                rows.append(
+                    InfoRow(label: String(localized: "Characters"), value: characters.formatted()))
             }
         case .image:
             rows.append(InfoRow(label: String(localized: "Type"), value: String(localized: "Image")))
@@ -470,25 +450,14 @@ private struct ClipboardInfoSection: View {
         return rows
     }
 
-    private var source: (name: String, icon: NSImage)? {
-        IconCache.observeStyle()
-        guard let bundleID = item.sourceBundleID,
-            let url = NSWorkspace.shared.urlForApplication(withBundleIdentifier: bundleID)
-        else { return nil }
-        return (url.deletingPathExtension().lastPathComponent, IconCache.icon(forFile: url.path))
-    }
-
     private func loadDetails() async {
-        // Only a text entry: a file's `text` is its path, and counting its words says nothing.
+        // Only a text entry: a file's `text` is its path, and counting it says nothing.
         let text = item.kind == .text ? item.text : nil
         let url = imageURL
         let filePath = item.filePath
         details = await Task.detached(priority: .userInitiated) {
             var details = Details()
-            if let text {
-                details.characters = text.count
-                details.words = Self.wordCount(text)
-            }
+            if let text { details.characters = text.count }
             if let url {
                 details.pixelSize = ImageThumbnail.pixelSize(of: url)
                 details.fileBytes = try? url.resourceValues(forKeys: [.fileSizeKey]).fileSize
@@ -501,17 +470,5 @@ private struct ClipboardInfoSection: View {
             }
             return details
         }.value
-    }
-
-    /// Single pass: `split(whereSeparator:)` allocates per word, which a multi-MB copy feels.
-    private nonisolated static func wordCount(_ text: String) -> Int {
-        var count = 0
-        var inWord = false
-        for scalar in text.unicodeScalars {
-            let separator = CharacterSet.whitespacesAndNewlines.contains(scalar)
-            if !separator && !inWord { count += 1 }
-            inWord = !separator
-        }
-        return count
     }
 }

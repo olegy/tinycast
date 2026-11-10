@@ -77,8 +77,7 @@ struct ClipboardTextTests {
             "a line wider than 2048 pixels stays whole")
 
         let missing = ClipboardItem(
-            filePath: directory.appendingPathComponent("missing.pdf").path,
-            sourceBundleID: nil)
+            filePath: directory.appendingPathComponent("missing.pdf").path)
         do {
             _ = try await ClipboardTextExtractor.extract(
                 at: URL(fileURLWithPath: missing.filePath!), isPDF: true)
@@ -105,7 +104,7 @@ struct ClipboardTextTests {
     static func searchAndLifetime(in directory: URL) async throws {
         let store = ClipboardStore(directory: directory.appendingPathComponent("search"))
         store.maxAge = ClipboardRetention.forever.maxAge
-        store.addFiles(["/tmp/invoice.pdf"], sourceBundleID: nil)
+        store.addFiles(["/tmp/invoice.pdf"])
         let original = store.items[0]
         expect(!store.textSearchEnabled, "text recognition defaults to off")
         expect(store.nextExtractionItem() == nil, "disabled store has no extraction work")
@@ -134,13 +133,13 @@ struct ClipboardTextTests {
         expect(
             store.search("Receipt", filter: .all).first?.id == original.id,
             "unpinning keeps the OCR match synchronously")
-        store.addText("newest", sourceBundleID: nil)
+        store.addText("newest")
         store.promote(original)
         try await waitUntil { store.search("Receipt", filter: .all).first?.id == original.id }
         store.setTextSearchEnabled(false)
         expect(store.search("Receipt", filter: .all).isEmpty, "off excludes cached OCR results immediately")
         expect(store.search("invoice", filter: .all).first?.id == original.id, "off retains ordinary search")
-        store.addText("new while off", sourceBundleID: nil)
+        store.addText("new while off")
         store.promote(store.items.first { $0.id == original.id }!)
         store.close()
         store.open()
@@ -157,8 +156,8 @@ struct ClipboardTextTests {
             "deleted entry cannot be resurrected")
         let old = ClipboardItem(
             imagePath: "/tmp/old.png",
-            createdAt: Date().addingTimeInterval(-86_400 * 7), sourceBundleID: nil)
-        store.importEntries([old] + (0..<1005).map { ClipboardItem(text: "new \($0)", sourceBundleID: nil) })
+            createdAt: Date().addingTimeInterval(-86_400 * 7))
+        store.importEntries([old] + (0..<1005).map { ClipboardItem(text: "new \($0)") })
         expect(!store.items.contains { $0.id == old.id }, "fixture is beyond resident window")
         store.setExtractedText("archive document", for: old, generation: store.extractionGeneration)
         try await waitUntil { store.search("archive", filter: .image).first?.id == old.id }
@@ -199,7 +198,7 @@ struct ClipboardTextTests {
                 return "scheduled result"
             })
         store.onItemsChanged = { [weak indexer] in indexer?.schedule() }
-        store.addFiles(["/tmp/fixture.pdf"], sourceBundleID: nil)
+        store.addFiles(["/tmp/fixture.pdf"])
         indexer.start()
         try await Task.sleep(for: .milliseconds(50))
         expect(calls == 0, "busy input defers extraction")
@@ -214,10 +213,10 @@ struct ClipboardTextTests {
         expect(calls == 2, "reenable resumes cancelled work")
         try await Task.sleep(for: .milliseconds(50))
         expect(calls == 2, "completed item is processed once")
-        store.addFiles(["/tmp/second.pdf"], sourceBundleID: nil)
+        store.addFiles(["/tmp/second.pdf"])
         try await waitUntil { calls == 3 }
         // `applyClipboardTextSearch` never waits between the two, so a cancelled run must requeue.
-        store.addFiles(["/tmp/third.pdf"], sourceBundleID: nil)
+        store.addFiles(["/tmp/third.pdf"])
         let restarted = calls
         indexer.stop()
         indexer.start()
@@ -233,7 +232,7 @@ struct ClipboardTextTests {
         enum Failure: Error { case temporary }
         let store = ClipboardStore(directory: directory.appendingPathComponent("failures"))
         store.setTextSearchEnabled(true)
-        store.addFiles(["/tmp/failure.pdf"], sourceBundleID: nil)
+        store.addFiles(["/tmp/failure.pdf"])
         let failed = store.items[0]
         var calls = 0
         var failing = true
@@ -266,7 +265,7 @@ struct ClipboardTextTests {
         await indexer.waitUntilStopped()
 
         store.clearAll()
-        store.addFiles(["/tmp/later.pdf"], sourceBundleID: nil)
+        store.addFiles(["/tmp/later.pdf"])
         let item = store.items[0]
         let generation = store.extractionGeneration
         let now = Date()
@@ -277,7 +276,7 @@ struct ClipboardTextTests {
         )
         indexer.start()
         try await Task.sleep(for: .milliseconds(30))
-        store.addFiles(["/tmp/fresh.pdf"], sourceBundleID: nil)
+        store.addFiles(["/tmp/fresh.pdf"])
         try await waitUntil { calls == 5 }
         expect(calls == 5, "fresh capture wakes retry sleep without waiting thirty seconds")
         indexer.stop()
@@ -287,7 +286,7 @@ struct ClipboardTextTests {
         store.recordExtractionFailure(for: item, generation: generation, retryAt: now)
         expect(store.nextExtractionRetry == nil, "late failure cannot recreate deleted row")
         store.clearAll()
-        store.addFiles(["/tmp/empty.pdf"], sourceBundleID: nil)
+        store.addFiles(["/tmp/empty.pdf"])
         let empty = store.items[0]
         store.setExtractedText("", for: empty, generation: store.extractionGeneration)
         expect(store.nextExtractionItem() == nil, "empty successful recognition does not loop")

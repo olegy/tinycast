@@ -16,6 +16,7 @@ offers.
 - **Snippets show Paste in the bottom bar.** A one-line snippet now shows Paste ⌘↵ beside Copy, so it is clear that it can be pasted.
 - **Quick AI ⇥ moved to the bottom bar**, next to the other actions, instead of sitting at the right of the search field.
 - **The back chevron shows only when there is a screen to go back to.** A screen opened straight by its hotkey no longer shows it, since Escape there closes the palette.
+- **A leaner Clipboard History.** The details under the preview drop the Information header and the Source and Words rows, and the bottom bar shows how many entries are listed. The history no longer records which app each entry was copied from, and the record already kept is erased on first launch.
 
 ### Removed
 

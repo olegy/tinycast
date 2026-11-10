@@ -306,7 +306,7 @@ struct PasteboardTests {
             let file = dir.appendingPathComponent("report.pdf")
             try? Data("pdf".utf8).write(to: file)
             let store = ClipboardStore(directory: dir.appendingPathComponent("store"))
-            store.addFiles([file.path], sourceBundleID: nil)
+            store.addFiles([file.path])
             let pb = board()
 
             expect(Paster.write(store.items[0], store: store, to: pb), "a present file writes")
@@ -322,7 +322,7 @@ struct PasteboardTests {
     static func aVanishedFileWritesNothing() {
         withScratch { dir in
             let store = ClipboardStore(directory: dir.appendingPathComponent("store"))
-            store.addFiles(["/nowhere/\(UUID().uuidString).txt"], sourceBundleID: nil)
+            store.addFiles(["/nowhere/\(UUID().uuidString).txt"])
             let pb = board()
             pb.declareTypes([.string], owner: nil)
             pb.setString("untouched", forType: .string)
@@ -339,7 +339,7 @@ struct PasteboardTests {
             let bytes = Data("png".utf8)
             try? bytes.write(to: image)
             let store = ClipboardStore(directory: dir.appendingPathComponent("store"))
-            store.importEntries([ClipboardItem(imagePath: image.path, sourceBundleID: nil)])
+            store.importEntries([ClipboardItem(imagePath: image.path)])
             let pb = board()
 
             expect(Paster.write(store.items[0], store: store, to: pb), "a present image writes")

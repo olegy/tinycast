@@ -996,6 +996,12 @@ struct RootPaletteView: View {
             }
             // A bar button's own inset, so the text sits as far in as the hints on the right.
             .padding(.horizontal, metrics.spacing.md)
+        } else if vm.mode == .clipboard, let clipboard = screen as? ClipboardScreen {
+            Text("\(clipboard.rows.count) items")
+                .font(metrics.typography.bar)
+                .foregroundStyle(Theme.Colors.textSecondary)
+                .lineLimit(1)
+                .padding(.horizontal, metrics.spacing.md)
         } else {
             Color.clear.frame(width: 0, height: 0)
         }

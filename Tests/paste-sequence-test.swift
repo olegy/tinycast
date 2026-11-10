@@ -8,11 +8,11 @@ struct PasteSequenceTests {
     static var passes = 0
 
     static let start = Date(timeIntervalSinceReferenceDate: 0)
-    static let newest = ClipboardItem(text: "newest", sourceBundleID: nil)
-    static let middle = ClipboardItem(text: "middle", sourceBundleID: nil)
-    static let oldest = ClipboardItem(text: "oldest", sourceBundleID: nil)
-    static let image = ClipboardItem(imagePath: "/scratch/shot.png", sourceBundleID: nil)
-    static let file = ClipboardItem(filePath: "/scratch/report.pdf", sourceBundleID: nil)
+    static let newest = ClipboardItem(text: "newest")
+    static let middle = ClipboardItem(text: "middle")
+    static let oldest = ClipboardItem(text: "oldest")
+    static let image = ClipboardItem(imagePath: "/scratch/shot.png")
+    static let file = ClipboardItem(filePath: "/scratch/report.pdf")
     static let history = [newest, image, middle, file, oldest]
 
     static func main() {
@@ -64,7 +64,7 @@ struct PasteSequenceTests {
 
     static func captureMidWalkWaitsForTheNextWalk() {
         var sequence = freshSequence()
-        let captured = [ClipboardItem(text: "captured", sourceBundleID: nil)] + history
+        let captured = [ClipboardItem(text: "captured")] + history
         expect(
             pasted(&sequence, from: captured) == ids(history),
             "an entry captured mid-walk is not pasted by it")

@@ -13,6 +13,5 @@ struct BackupClipboardItem: Codable, Sendable, Equatable {
     /// A filename inside the bundle's `clipboard/images/`, never a path.
     var imageName: String?
     var createdAt: Date
-    var sourceBundleID: String?
     var pinnedAt: Date?
 }

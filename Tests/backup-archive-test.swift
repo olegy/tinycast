@@ -109,15 +109,15 @@ struct BackupArchiveTest {
         let items = [
             BackupClipboardItem(
                 kind: .text, text: "one\ntwo\nthree", imageName: nil,
-                createdAt: Date(timeIntervalSince1970: 10), sourceBundleID: "com.apple.Safari",
+                createdAt: Date(timeIntervalSince1970: 10),
                 pinnedAt: nil),
             BackupClipboardItem(
                 kind: .text, text: "carriage\r\nreturn", imageName: nil,
-                createdAt: Date(timeIntervalSince1970: 20), sourceBundleID: nil,
+                createdAt: Date(timeIntervalSince1970: 20),
                 pinnedAt: Date(timeIntervalSince1970: 25)),
             BackupClipboardItem(
                 kind: .image, text: nil, imageName: "b.png",
-                createdAt: Date(timeIntervalSince1970: 30), sourceBundleID: nil, pinnedAt: nil)
+                createdAt: Date(timeIntervalSince1970: 30), pinnedAt: nil)
         ]
         if let writer = try? bundle.clipboardWriter() {
             for item in items { try? writer.write(item) }
@@ -137,7 +137,7 @@ struct BackupArchiveTest {
         let bundle = BackupBundle(root: root.appendingPathComponent("paths"))
         try? bundle.prepare([.clipboard])
         let item = BackupClipboardItem(
-            kind: .image, text: nil, imageName: "c.png", createdAt: Date(), sourceBundleID: nil,
+            kind: .image, text: nil, imageName: "c.png", createdAt: Date(),
             pinnedAt: nil)
         if let writer = try? bundle.clipboardWriter() { try? writer.write(item) }
         let raw = (try? Data(contentsOf: bundle.clipboardItemsURL)) ?? Data()

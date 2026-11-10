@@ -193,12 +193,12 @@ struct ClipboardCoordinatorTests {
             Paster.copies = []
             Paster.plainCopies = []
             store = ClipboardStore(directory: directory)
-            store.addText("other pin", sourceBundleID: nil)
+            store.addText("other pin")
             store.togglePinned(store.items[0])
-            store.addText(text, sourceBundleID: "test.source")
+            store.addText(text)
             if pinned { store.togglePinned(store.items[0]) }
             item = store.items[0]
-            store.addText("draft another row", sourceBundleID: nil)
+            store.addText("draft another row")
             palette.prepare(mode: .clipboard)
             coordinator = ClipboardCoordinator(
                 clipboardStore: store, clipboardManager: ClipboardManager(), settings: AppSettings(),

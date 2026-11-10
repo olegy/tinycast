@@ -14,8 +14,6 @@ struct ClipboardItem: Identifiable, Hashable, Sendable {
     /// Absolute path on disk; only files under `imagesDir` are ours to delete.
     let imagePath: String?
     let createdAt: Date
-    /// Bundle ID of the app frontmost when the copy was captured (see `ClipboardManager.poll`).
-    let sourceBundleID: String?
     /// When the entry was pinned; pins lead the list and are exempt from pruning.
     let pinnedAt: Date?
 
@@ -39,35 +37,28 @@ struct ClipboardItem: Identifiable, Hashable, Sendable {
         }
     }
 
-    init(text: String, sourceBundleID: String?) {
-        self.init(
-            id: UUID(), kind: .text, text: text, imagePath: nil, createdAt: Date(),
-            sourceBundleID: sourceBundleID)
+    init(text: String) {
+        self.init(id: UUID(), kind: .text, text: text, imagePath: nil, createdAt: Date())
     }
 
-    init(imagePath: String, createdAt: Date = Date(), sourceBundleID: String?) {
-        self.init(
-            id: UUID(), kind: .image, text: nil, imagePath: imagePath, createdAt: createdAt,
-            sourceBundleID: sourceBundleID)
+    init(imagePath: String, createdAt: Date = Date()) {
+        self.init(id: UUID(), kind: .image, text: nil, imagePath: imagePath, createdAt: createdAt)
     }
 
     /// Referenced where it lies: `imagePath` stays nil, keeping an unowned file from `deleteBlob`.
-    init(filePath: String, createdAt: Date = Date(), sourceBundleID: String?) {
-        self.init(
-            id: UUID(), kind: .file, text: filePath, imagePath: nil, createdAt: createdAt,
-            sourceBundleID: sourceBundleID)
+    init(filePath: String, createdAt: Date = Date()) {
+        self.init(id: UUID(), kind: .file, text: filePath, imagePath: nil, createdAt: createdAt)
     }
 
     init(
         id: UUID, kind: Kind, text: String?, imagePath: String?, createdAt: Date,
-        sourceBundleID: String?, pinnedAt: Date? = nil
+        pinnedAt: Date? = nil
     ) {
         self.id = id
         self.kind = kind
         self.text = text
         self.imagePath = imagePath
         self.createdAt = createdAt
-        self.sourceBundleID = sourceBundleID
         self.pinnedAt = pinnedAt
     }
 
@@ -75,8 +66,7 @@ struct ClipboardItem: Identifiable, Hashable, Sendable {
     func with(createdAt: Date? = nil, pinnedAt: Date?) -> ClipboardItem {
         ClipboardItem(
             id: id, kind: kind, text: text, imagePath: imagePath,
-            createdAt: createdAt ?? self.createdAt, sourceBundleID: sourceBundleID,
-            pinnedAt: pinnedAt)
+            createdAt: createdAt ?? self.createdAt, pinnedAt: pinnedAt)
     }
 
     /// Case-insensitive substring match: how the store filters without FTS.
@@ -217,8 +207,8 @@ final class ClipboardStore {
     nonisolated private static let searchLimit = 200
 
     nonisolated private static let insertSQL = """
-        INSERT INTO items(id, kind, text, image_path, created_at, source_app, pinned_at)
-        VALUES(?,?,?,?,?,?,?)
+        INSERT INTO items(id, kind, text, image_path, created_at, pinned_at)
+        VALUES(?,?,?,?,?,?)
         """
 
     private static let schema = """
@@ -228,7 +218,6 @@ final class ClipboardStore {
           text TEXT,
           image_path TEXT,
           created_at REAL NOT NULL,
-          source_app TEXT,
           pinned_at REAL
         );
         CREATE INDEX IF NOT EXISTS items_created_at ON items(created_at);
@@ -364,17 +353,17 @@ final class ClipboardStore {
         return sqlite3_step(stmt) == SQLITE_ROW ? sqlite3_column_int64(stmt, 0) : 0
     }
 
-    func addText(_ text: String, sourceBundleID: String?) {
+    func addText(_ text: String) {
         if items.first?.kind == .text, items.first?.text == text { return }
-        insert(ClipboardItem(text: text, sourceBundleID: sourceBundleID))
+        insert(ClipboardItem(text: text))
     }
 
     /// One row per file. Batched, so a multi-file copy prunes once rather than once per file.
-    func addFiles(_ paths: [String], sourceBundleID: String?) {
+    func addFiles(_ paths: [String]) {
         // Only a single file can be a ⌘C repeat, which is the case `addText` also guards.
         if paths.count == 1, items.first?.kind == .file, items.first?.text == paths[0] { return }
         for path in paths {
-            let item = ClipboardItem(filePath: path, sourceBundleID: sourceBundleID)
+            let item = ClipboardItem(filePath: path)
             if let stmt = insertStmt { Self.bindAndInsert(stmt, item) }
             items.insert(item, at: 0)
             trimWindow()
@@ -382,10 +371,10 @@ final class ClipboardStore {
         prune()
     }
 
-    func addImage(_ data: Data, sourceBundleID: String?, capture: UUID) {
+    func addImage(_ data: Data, capture: UUID) {
         guard capture == captureGeneration else { return }
         let url = imagesDir.appendingPathComponent(UUID().uuidString + ".png")
-        let item = ClipboardItem(imagePath: url.path, sourceBundleID: sourceBundleID)
+        let item = ClipboardItem(imagePath: url.path)
         // The blob write is multi-MB I/O; only the row insert returns to the main actor.
         Task.detached(priority: .utility) { [weak self] in
             guard (try? data.write(to: url, options: .atomic)) != nil else { return }
@@ -436,7 +425,7 @@ final class ClipboardStore {
         let current = index.map { items[$0] } ?? item
         let edited = ClipboardItem(
             id: current.id, kind: .text, text: text, imagePath: nil, createdAt: current.createdAt,
-            sourceBundleID: current.sourceBundleID, pinnedAt: current.pinnedAt)
+            pinnedAt: current.pinnedAt)
         if let index {
             items[index] = edited
         } else {
@@ -505,7 +494,7 @@ final class ClipboardStore {
         guard
             let stmt = prepare(
                 """
-                SELECT id, kind, text, image_path, created_at, source_app, pinned_at
+                SELECT id, kind, text, image_path, created_at, pinned_at
                 FROM items WHERE kind IN ('image', 'file')
                   AND id NOT IN (SELECT item_id FROM item_text)
                   AND id NOT IN (SELECT item_id FROM item_text_failures
@@ -738,7 +727,7 @@ final class ClipboardStore {
         let kind =
             filter == .image ? "(i.kind = 'image' OR (i.kind = 'file' AND is_image_file(i.text)))"
             : filter == .file ? "(i.kind = 'file' AND NOT is_image_file(i.text))" : "1"
-        let columns = "i.id, i.kind, i.text, i.image_path, i.created_at, i.source_app, i.pinned_at"
+        let columns = "i.id, i.kind, i.text, i.image_path, i.created_at, i.pinned_at"
         let sql =
             isShort
             ? """
@@ -776,7 +765,7 @@ final class ClipboardStore {
             guard let item = row(stmt) else { continue }
             if let residentIDs, !residentIDs.contains(item.id) { continue }
             if isShort || item.isPinned,
-                columnString(stmt, 7)?.localizedCaseInsensitiveContains(query) != true
+                columnString(stmt, 6)?.localizedCaseInsensitiveContains(query) != true
             {
                 continue
             }
@@ -886,15 +875,10 @@ final class ClipboardStore {
             sqlite3_bind_null(stmt, 4)
         }
         sqlite3_bind_double(stmt, 5, item.createdAt.timeIntervalSince1970)
-        if let source = item.sourceBundleID {
-            sqlite3_bind_text(stmt, 6, source, -1, SQLITE_TRANSIENT)
+        if let pinnedAt = item.pinnedAt {
+            sqlite3_bind_double(stmt, 6, pinnedAt.timeIntervalSince1970)
         } else {
             sqlite3_bind_null(stmt, 6)
-        }
-        if let pinnedAt = item.pinnedAt {
-            sqlite3_bind_double(stmt, 7, pinnedAt.timeIntervalSince1970)
-        } else {
-            sqlite3_bind_null(stmt, 7)
         }
         sqlite3_step(stmt)
         sqlite3_reset(stmt)
@@ -964,7 +948,7 @@ final class ClipboardStore {
         // Two indexed branches, deliberately not one OR. See docs/features/clipboard.md#store.
         loadStmt = prepare(
             """
-            SELECT id, kind, text, image_path, created_at, source_app, pinned_at FROM (
+            SELECT id, kind, text, image_path, created_at, pinned_at FROM (
               SELECT rowid AS rid, * FROM items WHERE rowid >= ?1
               UNION ALL
               SELECT rowid AS rid, * FROM items WHERE pinned_at IS NOT NULL AND rowid < ?1
@@ -974,7 +958,7 @@ final class ClipboardStore {
             "SELECT rowid FROM items WHERE pinned_at IS NULL ORDER BY rowid DESC LIMIT 1 OFFSET ?")
         searchStmt = prepare(
             """
-            SELECT i.id, i.kind, i.text, i.image_path, i.created_at, i.source_app, i.pinned_at
+            SELECT i.id, i.kind, i.text, i.image_path, i.created_at, i.pinned_at
             FROM (
               SELECT rowid FROM items_fts WHERE items_fts MATCH ?
               ORDER BY rowid DESC LIMIT \(Self.searchLimit)
@@ -1074,7 +1058,7 @@ final class ClipboardStore {
         return ClipboardItem(
             id: item.id, kind: .image, text: nil,
             imagePath: directory.appendingPathComponent(name).path, createdAt: item.createdAt,
-            sourceBundleID: item.sourceBundleID, pinnedAt: item.pinnedAt)
+            pinnedAt: item.pinnedAt)
     }
 
     /// false leaves the row out, so none ever points into a staging tree about to be discarded.
@@ -1098,7 +1082,7 @@ final class ClipboardStore {
         defer { sqlite3_close_v2(db) }
         var stmt: OpaquePointer?
         let sql = """
-            SELECT id, kind, text, image_path, created_at, source_app, pinned_at
+            SELECT id, kind, text, image_path, created_at, pinned_at
             FROM items ORDER BY rowid
             """
         guard sqlite3_prepare_v2(db, sql, -1, &stmt, nil) == SQLITE_OK else { return }
@@ -1116,7 +1100,7 @@ final class ClipboardStore {
         return ClipboardItem(
             id: id, kind: kind, text: columnString(stmt, 2), imagePath: columnString(stmt, 3),
             createdAt: Date(timeIntervalSince1970: sqlite3_column_double(stmt, 4)),
-            sourceBundleID: columnString(stmt, 5), pinnedAt: columnDate(stmt, 6))
+            pinnedAt: columnDate(stmt, 5))
     }
 
     nonisolated private static func columnDate(_ stmt: OpaquePointer?, _ index: Int32) -> Date? {

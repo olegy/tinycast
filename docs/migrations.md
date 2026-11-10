@@ -31,3 +31,4 @@ When the check fails, delete everything the row lists, then the row.
 | Migration | Repairs | Delete with it |
 | --- | --- | --- |
 | `WindowManagementRemovalMigration` | the Window Management defaults, layouts, rooms and custom sizes, their hotkeys, their rows, kinds, links and aliases in the launcher lists, the room-parking ledger, and the `windowManagement` section in `settings.json`, which the import would report as unknown | its call in `AppCore.start()`, `Tests/window-management-removal-migration-test.swift`, its `run-tests.sh` entry and its testing.md row |
+| `ClipboardSourceRemovalMigration` | the `source_app` column of the clipboard history's `items` table, which recorded each clip's frontmost app | its call in `AppCore.start()`, `Tests/clipboard-source-removal-migration-test.swift`, its `run-tests.sh` entry and its testing.md row |

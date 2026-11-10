@@ -56,11 +56,11 @@ struct ClipboardTests {
         let data = Data("captured image".utf8)
         let beforeClear = store.captureGeneration
         store.clearAll()
-        store.addImage(data, sourceBundleID: nil, capture: beforeClear)
+        store.addImage(data, capture: beforeClear)
         let beforeClose = store.captureGeneration
         store.close()
         store.open()
-        store.addImage(data, sourceBundleID: nil, capture: beforeClose)
+        store.addImage(data, capture: beforeClose)
         expect(store.items.isEmpty, "a capture retired during conversion never reaches history")
         let images = directory.appendingPathComponent("images")
         let blobs = try FileManager.default.contentsOfDirectory(atPath: images.path)
@@ -68,9 +68,9 @@ struct ClipboardTests {
             blobs.isEmpty,
             "a capture retired before its write leaves no blob")
 
-        store.addImage(data, sourceBundleID: nil, capture: store.captureGeneration)
+        store.addImage(data, capture: store.captureGeneration)
         store.clearAll()
-        store.addImage(data, sourceBundleID: nil, capture: store.captureGeneration)
+        store.addImage(data, capture: store.captureGeneration)
         let deadline = ContinuousClock.now.advanced(by: .seconds(3))
         while store.items.isEmpty, ContinuousClock.now < deadline {
             try await Task.sleep(for: .milliseconds(10))
@@ -84,9 +84,9 @@ struct ClipboardTests {
     /// Pins stack in pin order, oldest pin first, regardless of how old the entries are.
     static func pinOrder() {
         withStore { store, _ in
-            store.addText("oldest", sourceBundleID: nil)
-            store.addText("middle", sourceBundleID: nil)
-            store.addText("newest", sourceBundleID: nil)
+            store.addText("oldest")
+            store.addText("middle")
+            store.addText("newest")
 
             store.togglePinned(item(store, "oldest"))
             expect(texts(store) == ["oldest", "newest", "middle"], "first pin leads the list")
@@ -106,9 +106,9 @@ struct ClipboardTests {
     /// Unpinning drops the row in as today's newest entry rather than back where it came from.
     static func unpinRejoinsAsNewest() {
         withStore { store, _ in
-            store.addText("a", sourceBundleID: nil)
-            store.addText("b", sourceBundleID: nil)
-            store.addText("c", sourceBundleID: nil)
+            store.addText("a")
+            store.addText("b")
+            store.addText("c")
             let before = item(store, "a").createdAt
 
             store.togglePinned(item(store, "a"))
@@ -123,8 +123,8 @@ struct ClipboardTests {
     /// Pasting a pinned entry must not reshuffle the Pinned section.
     static func pasteLeavesPinsAlone() {
         withStore { store, _ in
-            store.addText("one", sourceBundleID: nil)
-            store.addText("two", sourceBundleID: nil)
+            store.addText("one")
+            store.addText("two")
             store.togglePinned(item(store, "one"))
             store.togglePinned(item(store, "two"))
             let stamp = item(store, "one").createdAt
@@ -134,8 +134,8 @@ struct ClipboardTests {
             expect(texts(store) == ["one", "two"], "promote leaves a pinned row in place")
             expect(item(store, "one").createdAt == stamp, "promote does not rewrite a pinned row")
 
-            store.addText("three", sourceBundleID: nil)
-            store.addText("four", sourceBundleID: nil)
+            store.addText("three")
+            store.addText("four")
             store.promote(item(store, "three"))
             expect(
                 texts(store) == ["one", "two", "three", "four"],
@@ -146,9 +146,9 @@ struct ClipboardTests {
     /// An edit keeps the entry's id, pin and place; search and the database see only the new text.
     static func editRewritesInPlace() throws {
         try withStore { store, dir in
-            store.addText("first draft", sourceBundleID: nil)
-            store.addText("pinned draft", sourceBundleID: nil)
-            store.addText("newest", sourceBundleID: nil)
+            store.addText("first draft")
+            store.addText("pinned draft")
+            store.addText("newest")
             store.togglePinned(item(store, "pinned draft"))
             let original = item(store, "first draft")
 
@@ -178,7 +178,7 @@ struct ClipboardTests {
             expect(try store.updateText("ghost", of: deleted) == nil, "a deleted entry cannot be edited")
             expect(!texts(store).contains("ghost"), "and does not come back")
 
-            let image = ClipboardItem(imagePath: "/tmp/shot.png", sourceBundleID: nil)
+            let image = ClipboardItem(imagePath: "/tmp/shot.png")
             expect(try store.updateText("caption", of: image) == nil, "only a text entry is editable")
         }
     }
@@ -186,7 +186,7 @@ struct ClipboardTests {
     /// An edit may hold no more text than capture would have recorded.
     static func editHonoursTheCaptureLimit() {
         withStore { store, _ in
-            store.addText("short", sourceBundleID: nil)
+            store.addText("short")
             let longest = String(repeating: "a", count: ClipboardStore.maxTextLength)
             expect(
                 (try? store.updateText(longest, of: item(store, "short"))) != nil,
@@ -209,8 +209,7 @@ struct ClipboardTests {
                 (0..<total).map {
                     ClipboardItem(
                         id: UUID(), kind: .text, text: "entry \($0)", imagePath: nil,
-                        createdAt: Date().addingTimeInterval(TimeInterval($0 - total)),
-                        sourceBundleID: nil)
+                        createdAt: Date().addingTimeInterval(TimeInterval($0 - total)))
                 })
             guard let oldest = store.search("entry 0", filter: .all).first else {
                 return fail("the oldest entry is found past the window")
@@ -285,10 +284,10 @@ struct ClipboardTests {
     /// Slot picks are taken from the visible pinned block after query/filter, not from all pins.
     static func pinnedSlotResolutionUsesVisiblePins() {
         withStore { store, _ in
-            store.addText("alpha one", sourceBundleID: nil)
-            store.addText("beta two", sourceBundleID: nil)
-            store.addText("beta three", sourceBundleID: nil)
-            store.addText("plain text", sourceBundleID: nil)
+            store.addText("alpha one")
+            store.addText("beta two")
+            store.addText("beta three")
+            store.addText("plain text")
 
             store.togglePinned(item(store, "alpha one"))
             store.togglePinned(item(store, "beta two"))
@@ -323,10 +322,10 @@ struct ClipboardTests {
     /// A reset passes the pins for the newest clip; a typed query lands on its first match.
     static func landingSkipsThePins() {
         withStore { store, _ in
-            store.addText("alpha one", sourceBundleID: nil)
-            store.addText("beta two", sourceBundleID: nil)
-            store.addText("https://example.com", sourceBundleID: nil)
-            store.addText("beta three", sourceBundleID: nil)
+            store.addText("alpha one")
+            store.addText("beta two")
+            store.addText("https://example.com")
+            store.addText("beta three")
             expect(
                 store.landingIndex(in: "", filter: .all) == 0, "no pins: the newest clip is row 0")
 
@@ -392,7 +391,7 @@ struct ClipboardTests {
             "an over-long token is plain by definition")
 
         expect(
-            ClipboardItem(imagePath: "/tmp/x.png", sourceBundleID: nil).textForm == nil,
+            ClipboardItem(imagePath: "/tmp/x.png").textForm == nil,
             "an image has no text form")
     }
 
@@ -594,12 +593,12 @@ struct ClipboardTests {
     /// Each filter returns only its own kind, and a pin still leads the block.
     static func typeFilterSplitsTheHistory() {
         withStore { store, _ in
-            store.addText("just some prose", sourceBundleID: nil)
-            store.addText("https://apple.com", sourceBundleID: nil)
-            store.addText("hi@apple.com", sourceBundleID: nil)
-            store.addText("second.link.dev", sourceBundleID: nil)
-            store.addText("#FF5733", sourceBundleID: nil)
-            store.addText("rgb(0 255 0 / 0.5)", sourceBundleID: nil)
+            store.addText("just some prose")
+            store.addText("https://apple.com")
+            store.addText("hi@apple.com")
+            store.addText("second.link.dev")
+            store.addText("#FF5733")
+            store.addText("rgb(0 255 0 / 0.5)")
 
             expect(texts(store).count == 6, "every entry under All Types")
             expect(texts(store, filter: .text) == ["just some prose"], "text excludes links")
@@ -618,7 +617,7 @@ struct ClipboardTests {
                 "a pinned link leads its filtered block")
 
             store.addFiles(
-                ["/Users/me/Desktop/Shot.png", "/Users/me/Desktop/Report.pdf"], sourceBundleID: nil)
+                ["/Users/me/Desktop/Shot.png", "/Users/me/Desktop/Report.pdf"])
             expect(
                 texts(store, filter: .image) == ["/Users/me/Desktop/Shot.png"],
                 "an image copied in Finder is an image")
@@ -631,8 +630,8 @@ struct ClipboardTests {
     /// The memo keys on the filter too: same query, new filter, different rows.
     static func typeFilterJoinsTheSearchMemo() {
         withStore { store, _ in
-            store.addText("shared token prose", sourceBundleID: nil)
-            store.addText("shared-token.com", sourceBundleID: nil)
+            store.addText("shared token prose")
+            store.addText("shared-token.com")
 
             expect(store.search("shared", filter: .all).count == 2, "both match the query")
             expect(
@@ -648,9 +647,9 @@ struct ClipboardTests {
     /// Pin stamps and their order survive a reopen.
     static func persistence() {
         withStore { store, dir in
-            store.addText("first", sourceBundleID: nil)
-            store.addText("second", sourceBundleID: nil)
-            store.addText("third", sourceBundleID: nil)
+            store.addText("first")
+            store.addText("second")
+            store.addText("third")
             store.togglePinned(item(store, "third"))
             store.togglePinned(item(store, "first"))
 
@@ -680,8 +679,7 @@ struct ClipboardTests {
                 (0..<total).map {
                     ClipboardItem(
                         id: UUID(), kind: .text, text: "entry \($0)", imagePath: nil,
-                        createdAt: Date().addingTimeInterval(TimeInterval($0 - total)),
-                        sourceBundleID: nil)
+                        createdAt: Date().addingTimeInterval(TimeInterval($0 - total)))
                 })
             expect(store.items.count < total, "the resident window holds back some of the history")
 
@@ -702,8 +700,7 @@ struct ClipboardTests {
                 let blob = dir.appendingPathComponent("blob.png")
                 try? Data("png".utf8).write(to: blob)
                 let staged = ClipboardItem(
-                    imagePath: blob.path, createdAt: Date().addingTimeInterval(-2 * 86_400),
-                    sourceBundleID: nil)
+                    imagePath: blob.path, createdAt: Date().addingTimeInterval(-2 * 86_400))
                 ClipboardStore.importStoredItems(
                     inDatabaseAt: store.dbURL, adoptingImagesInto: store.imagesDir, [staged])
                 store.load()
@@ -743,7 +740,7 @@ struct ClipboardTests {
             try? Data("png".utf8).write(to: blob)
             ClipboardStore.importStoredItems(
                 inDatabaseAt: store.dbURL, adoptingImagesInto: store.imagesDir,
-                [ClipboardItem(imagePath: blob.path, sourceBundleID: nil)])
+                [ClipboardItem(imagePath: blob.path)])
             let kept = ImageDerivative.all(of: store.imagesDir.appendingPathComponent("kept.png")).map(\.url)
             let gone = store.imagesDir.appendingPathComponent("gone.png")
             let orphans = ImageDerivative.all(of: gone).map(\.url)
@@ -768,7 +765,7 @@ struct ClipboardTests {
             let staging = dir.appendingPathComponent("staged", isDirectory: true)
             try? FileManager.default.createDirectory(at: staging, withIntermediateDirectories: true)
             let blob = staging.appendingPathComponent("blob.png")
-            let staged = ClipboardItem(imagePath: blob.path, sourceBundleID: nil)
+            let staged = ClipboardItem(imagePath: blob.path)
 
             for pass in 1...2 {
                 try? Data("png".utf8).write(to: blob)
@@ -787,25 +784,25 @@ struct ClipboardTests {
     /// One row per file, and the first file copied leads the history.
     static func multiFileCopyMakesOneRowEach() {
         withStore { store, _ in
-            store.addFiles(["/tmp/a.png", "/tmp/b.mov", "/tmp/c.pdf"], sourceBundleID: nil)
+            store.addFiles(["/tmp/a.png", "/tmp/b.mov", "/tmp/c.pdf"])
             expect(store.items.count == 3, "three files make three rows")
             expect(
                 store.items.map(\.filePath) == ["/tmp/c.pdf", "/tmp/b.mov", "/tmp/a.png"],
                 "and the reader inserts them newest-last")
-            store.addFiles(["/tmp/c.pdf"], sourceBundleID: nil)
+            store.addFiles(["/tmp/c.pdf"])
             expect(store.items.count == 3, "re-copying the leading file adds no row")
         }
     }
 
     static func fileBatchesRespectTheMemoryWindow() {
         withStore { store, _ in
-            for index in 0..<1000 { store.addText("entry \(index)", sourceBundleID: nil) }
+            for index in 0..<1000 { store.addText("entry \(index)") }
             let pinned = item(store, "entry 0")
             store.togglePinned(pinned)
 
             for batch in 0..<3 {
                 let paths = (0..<32).map { "/Users/me/batch-\(batch)-\($0).txt" }
-                store.addFiles(paths, sourceBundleID: nil)
+                store.addFiles(paths)
                 expect(store.items.count == 1000, "each file batch keeps the window bounded")
                 expect(
                     store.items.prefix(paths.count).compactMap(\.filePath) == paths.reversed(),
@@ -829,14 +826,14 @@ struct ClipboardTests {
         withStore { store, dir in
             let outside = dir.appendingPathComponent("original.txt")
             try? Data("keep me".utf8).write(to: outside)
-            store.addFiles([outside.path], sourceBundleID: nil)
+            store.addFiles([outside.path])
 
             store.remove(store.items[0])
             expect(
                 FileManager.default.fileExists(atPath: outside.path),
                 "removing a row leaves the referenced file on disk")
 
-            store.addFiles([outside.path], sourceBundleID: nil)
+            store.addFiles([outside.path])
             store.maxAge = -1
             store.enforceLimits()
             expect(store.items.isEmpty, "a retention cut takes the row")
@@ -845,7 +842,7 @@ struct ClipboardTests {
                 "but never the referenced file")
 
             store.maxAge = 86_400
-            store.addFiles([outside.path], sourceBundleID: nil)
+            store.addFiles([outside.path])
             store.clearAll()
             expect(
                 FileManager.default.fileExists(atPath: outside.path),
@@ -855,7 +852,7 @@ struct ClipboardTests {
 
     /// A path is not prose: it must never be filed as a link, a colour or an address.
     static func filePathsAreNeverATextForm() {
-        let item = ClipboardItem(filePath: "/Users/me/apple.com/#FF5733.txt", sourceBundleID: nil)
+        let item = ClipboardItem(filePath: "/Users/me/apple.com/#FF5733.txt")
         expect(item.textForm == nil, "a file entry has no text form")
         expect(item.colorValue == nil, "and parses as no colour")
         expect(!ClipboardFilter.link.matches(item), "so Links Only never shows it")
@@ -866,7 +863,7 @@ struct ClipboardTests {
     /// The path lives in `text`, so the trigram index finds a file by name or by folder.
     static func fileEntriesAreFoundByNameAndFolder() {
         withStore { store, _ in
-            store.addFiles(["/Users/me/Downloads/Quarterly Report.pdf"], sourceBundleID: nil)
+            store.addFiles(["/Users/me/Downloads/Quarterly Report.pdf"])
             expect(store.search("report", filter: .all).count == 1, "FTS finds it by name")
             expect(store.search("downloads", filter: .all).count == 1, "and by folder")
             expect(store.search("re", filter: .all).count == 1, "the sub-trigram fallback too")
@@ -885,8 +882,8 @@ struct ClipboardTests {
     /// `importKey` must key a file row off its path, or every file collides into one row.
     static func importedFilesArriveOncePerPath() {
         withStore { store, _ in
-            let a = ClipboardItem(filePath: "/tmp/one.pdf", sourceBundleID: nil)
-            let b = ClipboardItem(filePath: "/tmp/two.pdf", sourceBundleID: nil)
+            let a = ClipboardItem(filePath: "/tmp/one.pdf")
+            let b = ClipboardItem(filePath: "/tmp/two.pdf")
             expect(store.importEntries([a, b]) == 2, "two distinct paths import as two rows")
             expect(store.importEntries([a]) == 0, "and re-importing one adds nothing")
             expect(
@@ -897,9 +894,9 @@ struct ClipboardTests {
 
     /// The default takes ↵ and Paste its chord; the Paste and Copy defaults keep their old pair.
     static func defaultActionChords() {
-        let text = ClipboardItem(text: "hello", sourceBundleID: nil)
-        let file = ClipboardItem(filePath: "/Users/me/report.pdf", sourceBundleID: nil)
-        let image = ClipboardItem(imagePath: "/tmp/shot.png", sourceBundleID: nil)
+        let text = ClipboardItem(text: "hello")
+        let file = ClipboardItem(filePath: "/Users/me/report.pdf")
+        let image = ClipboardItem(imagePath: "/tmp/shot.png")
         let expected: [ClipboardDefaultAction: [ClipboardDefaultAction]] = [
             .paste: [.paste, .copy, .pastePlainText],
             .copy: [.copy, .paste, .pastePlainText],
@@ -919,39 +916,38 @@ struct ClipboardTests {
     }
 
     static func plainTextSkipsTheFile() {
-        expect(ClipboardItem(text: "hi", sourceBundleID: nil).plainText == "hi", "text is itself")
+        expect(ClipboardItem(text: "hi").plainText == "hi", "text is itself")
         expect(
-            ClipboardItem(filePath: "/a/b.pdf", sourceBundleID: nil).plainText == "/a/b.pdf",
+            ClipboardItem(filePath: "/a/b.pdf").plainText == "/a/b.pdf",
             "a file is its path")
         expect(
-            ClipboardItem(imagePath: "/a/b.png", sourceBundleID: nil).plainText == nil,
+            ClipboardItem(imagePath: "/a/b.png").plainText == nil,
             "an image has no plain text")
     }
 
     /// Copy Text is an image answer: a captured blob, or an image file — never text or a PDF.
     static func offersTextExtraction() {
         expect(
-            ClipboardItem(imagePath: "/tmp/shot.png", sourceBundleID: nil).offersTextExtraction,
+            ClipboardItem(imagePath: "/tmp/shot.png").offersTextExtraction,
             "a captured image offers Copy Text")
         expect(
             !ClipboardItem(
-                id: UUID(), kind: .image, text: nil, imagePath: nil, createdAt: Date(),
-                sourceBundleID: nil
+                id: UUID(), kind: .image, text: nil, imagePath: nil, createdAt: Date()
             ).offersTextExtraction,
             "an image entry without its blob does not")
         expect(
-            !ClipboardItem(text: "hello", sourceBundleID: nil).offersTextExtraction,
+            !ClipboardItem(text: "hello").offersTextExtraction,
             "a text entry does not")
         expect(
-            ClipboardItem(filePath: "/Users/me/shot.png", sourceBundleID: nil)
+            ClipboardItem(filePath: "/Users/me/shot.png")
                 .offersTextExtraction,
             "an image file copied in Finder offers Copy Text")
         expect(
-            !ClipboardItem(filePath: "/Users/me/notes.txt", sourceBundleID: nil)
+            !ClipboardItem(filePath: "/Users/me/notes.txt")
                 .offersTextExtraction,
             "a text file does not")
         expect(
-            !ClipboardItem(filePath: "/Users/me/report.pdf", sourceBundleID: nil)
+            !ClipboardItem(filePath: "/Users/me/report.pdf")
                 .offersTextExtraction,
             "a PDF stays a background-indexing capability")
     }
@@ -974,13 +970,12 @@ struct ClipboardTests {
     }
 
     static func form(_ text: String) -> ClipboardItem.TextForm? {
-        ClipboardItem(text: text, sourceBundleID: nil).textForm
+        ClipboardItem(text: text).textForm
     }
 
     static func entry(_ text: String, at date: Date) -> ClipboardItem {
         ClipboardItem(
-            id: UUID(), kind: .text, text: text, imagePath: nil, createdAt: date,
-            sourceBundleID: nil)
+            id: UUID(), kind: .text, text: text, imagePath: nil, createdAt: date)
     }
 
     static func texts(_ store: ClipboardStore, filter: ClipboardFilter = .all) -> [String] {
