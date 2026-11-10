@@ -43,7 +43,8 @@ struct CustomCommandEditorView: View {
                             String(localized: "Lists options"),
                             detail: String(
                                 localized: """
-                                    Run without $1 it prints choices to pick from; the chosen one runs it as $1.
+                                    Run without $1 it prints choices to pick from; the chosen one runs it as $1, \
+                                    so a script needs "$@".
                                     """),
                             value: $editor.listsOptions, focus: .listsOptions)
                     }

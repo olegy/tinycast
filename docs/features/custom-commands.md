@@ -198,6 +198,10 @@ everything is as for any command: confirmation, silence, pill or output window. 
 `list` or `run` for such a command, so a script can tell the two apart by more than an empty `$1`.
 In a terminal the same script stays usable: `eject` lists, `eject all` acts.
 
+The argument reaches **zsh's** `$1`, as every [argument](#arguments) does, so a command that calls a
+script has to pass it on: `~/.bin/eject "$@"`. Without the forwarding the script sees no argument and
+the run that should act prints the list again — the editor's hint for the switch says so.
+
 The output is xbar's line format, parsed by `Model/CommandOptionList.swift`:
 
 ```

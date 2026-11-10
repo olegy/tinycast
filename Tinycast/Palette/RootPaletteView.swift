@@ -994,7 +994,8 @@ struct RootPaletteView: View {
                         .truncationMode(.tail)
                 }
             }
-            .padding(.trailing, metrics.spacing.md)
+            // A bar button's own inset, so the text sits as far in as the hints on the right.
+            .padding(.horizontal, metrics.spacing.md)
         } else {
             Color.clear.frame(width: 0, height: 0)
         }

@@ -74616,54 +74616,54 @@
         }
       }
     },
-    "Run without $1 it prints choices to pick from; the chosen one runs it as $1." : {
+    "Run without $1 it prints choices to pick from; the chosen one runs it as $1, so a script needs \"$@\"." : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ohne $1 gibt er Optionen zur Auswahl aus; die gewählte führt ihn mit $1 aus."
+            "value" : "Ohne $1 gibt er Optionen zur Auswahl aus; die gewählte führt ihn mit $1 aus, ein Skript braucht also \"$@\"."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Sin $1 muestra opciones para elegir; la elegida lo ejecuta como $1."
+            "value" : "Sin $1 muestra opciones para elegir; la elegida lo ejecuta como $1, así que un script necesita \"$@\"."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Sans $1, elle affiche des choix ; celui choisi la relance avec $1."
+            "value" : "Sans $1, elle affiche des choix ; celui choisi la relance avec $1, un script a donc besoin de \"$@\"."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "$1 なしで実行すると選択肢を出力し、選んだものを $1 として実行します。"
+            "value" : "$1 なしで実行すると選択肢を出力し、選んだものを $1 として実行します。スクリプトには \"$@\" が必要です。"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "$1 없이 실행하면 선택지를 출력하고, 선택한 항목을 $1로 실행합니다."
+            "value" : "$1 없이 실행하면 선택지를 출력하고, 선택한 항목을 $1로 실행합니다. 스크립트에는 \"$@\"가 필요합니다."
           }
         },
         "pt" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Sem $1 ele lista opções para escolher; a escolhida o executa como $1."
+            "value" : "Sem $1 ele lista opções para escolher; a escolhida o executa como $1, então um script precisa de \"$@\"."
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Без $1 команда выводит варианты; выбранный вариант запускает её с $1."
+            "value" : "Без $1 команда выводит варианты; выбранный запускает её с $1, поэтому скрипту нужен \"$@\"."
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "不带 $1 运行时输出可选项；所选项将作为 $1 运行它。"
+            "value" : "不带 $1 运行时输出可选项；所选项将作为 $1 运行它，因此脚本需要 \"$@\"。"
           }
         }
       }
